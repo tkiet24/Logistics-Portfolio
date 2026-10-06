@@ -4,57 +4,127 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tuan Kiet – Coffee export logistics</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap">
 <style>
-:root{--bg:#e8eef0;--fg:#1d1612;--muted:#54606a;--panel:rgba(244,248,249,.84);--line:rgba(29,22,18,.16);--accent:#c93a1a;--onacc:#fff;--dot:#18455a;--ball:#cfdde3;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a20;--fg:#f1ebe4;--muted:#a3b4bc;--panel:rgba(11,26,32,.8);--line:rgba(241,235,228,.18);--accent:#ff6a3d;--onacc:#1a0d08;--dot:#6fc3d8;--ball:#10303c}}
-:root[data-theme="dark"]{--bg:#0b1a20;--fg:#f1ebe4;--muted:#a3b4bc;--panel:rgba(11,26,32,.8);--line:rgba(241,235,228,.18);--accent:#ff6a3d;--onacc:#1a0d08;--dot:#6fc3d8;--ball:#10303c}
+:root {
+  --bg: #f3f3f3;
+  --fg: #030000;
+  --muted: #676261;
+  --panel: rgba(255, 255, 255, 0.88);
+  --line: #e3e3e3;
+  --accent: #c00719;
+  --onacc: #ffffff;
+  --dot: #a4a4a4;
+  --ball: #e3e3e3;
+  --accent-2: #fa4e42;
+  --accent-tint: #ffb79d;
+  --font-sans: 'Inter Tight', 'Hanken Grotesk', system-ui, sans-serif;
+  --r-card: 6px;
+  --r-pill: 999px;
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 28px;
+  --s-7: 40px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --gutter: 27px;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0e0c0c;
+    --fg: #f3f3f3;
+    --muted: #b3afae;
+    --panel: rgba(20, 17, 17, 0.84);
+    --line: rgba(243, 243, 243, 0.16);
+    --accent: #fa4e42;
+    --onacc: #1a0504;
+    --dot: #6f6a69;
+    --ball: #1e1a1a;
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #0e0c0c;
+  --fg: #f3f3f3;
+  --muted: #b3afae;
+  --panel: rgba(20, 17, 17, 0.84);
+  --line: rgba(243, 243, 243, 0.16);
+  --accent: #fa4e42;
+  --onacc: #1a0504;
+  --dot: #6f6a69;
+  --ball: #1e1a1a;
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 Archivo,system-ui,sans-serif}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--font-sans)}
 #c{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block;touch-action:pan-y}
 .nogl #c{display:none}
 #bar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);z-index:6}
-header{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top,0px)) 22px 12px;pointer-events:none}
-header b{font-weight:800;letter-spacing:-.01em}
-nav a{pointer-events:auto;color:var(--fg);text-decoration:none;font-size:.88rem;margin-left:20px;opacity:.65;padding:4px 0;border-bottom:2px solid transparent}
-nav a.on{opacity:1;border-color:var(--accent)}
-a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-section{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:90px 6vw;pointer-events:none}
-.panel{pointer-events:auto;max-width:500px;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:28px;opacity:.0;transition:opacity .7s}
+header{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:calc(13px + env(safe-area-inset-top,0px)) var(--gutter) 12px;pointer-events:none}
+header b{background:var(--accent);color:var(--onacc);padding:10px 16px;border-radius:var(--r-card);font-weight:500;letter-spacing:-0.01em;font-size:1rem;line-height:1}
+nav{display:flex;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-soft);pointer-events:auto}
+nav a{pointer-events:auto;color:var(--fg);text-decoration:none;font-size:0.95rem;margin:0;padding:12px 16px;opacity:0.7;border-left:1px solid var(--line);border-bottom:2px solid transparent}
+nav a:first-child{border-left:0}
+nav a.on{opacity:1;border-bottom-color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+section{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:96px 6vw;pointer-events:none}
+.panel{pointer-events:auto;max-width:520px;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:var(--r-card);padding:var(--s-6);box-shadow:var(--shadow-soft);opacity:0;transition:opacity .7s}
 .panel.in{opacity:1}
 .nogl .panel{opacity:1}
-h1{font-size:clamp(2.4rem,5.6vw,4rem);line-height:1;font-weight:800;letter-spacing:-.03em;margin:0 0 .3em}
-h2{font-size:clamp(1.8rem,3.6vw,2.5rem);line-height:1.08;font-weight:800;letter-spacing:-.02em;margin:0 0 .4em}
+h1{font-size:clamp(2.5rem,5.4vw,4.5rem);line-height:1;font-weight:400;letter-spacing:-0.03em;margin:0 0 .3em}
+h2{font-size:clamp(1.9rem,3.4vw,2.75rem);line-height:1.05;font-weight:400;letter-spacing:-0.03em;margin:0 0 .4em}
 p{margin:.5em 0;color:var(--muted)}
-.btn{display:inline-block;margin:12px 10px 0 0;padding:11px 22px;border-radius:99px;background:var(--accent);color:var(--onacc);text-decoration:none;font-weight:600;border:1px solid var(--accent)}
+/* pill button with attached arrow circle */
+.btn{display:inline-flex;align-items:center;gap:var(--s-3);min-height:44px;margin:var(--s-3) var(--s-3) 0 0;padding:6px 6px 6px 20px;border-radius:var(--r-pill);background:var(--accent);color:var(--onacc);text-decoration:none;font-weight:500;font-size:1rem;border:1px solid var(--accent)}
+.btn::after{content:'→';display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--onacc);color:var(--accent);transition:transform 0.2s}
+.btn:hover::after{transform:translateX(3px)}
 .btn.o{background:none;color:var(--fg);border-color:var(--line)}
+.btn.o::after{background:var(--accent);color:var(--onacc)}
 .hint{font-size:.85rem}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
-.stats b{display:block;font-size:1.9rem;font-weight:800;color:var(--accent);line-height:1.1}
+/* stats: big light numbers with thin vertical dividers */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.stats > div{padding:0 var(--s-3)}
+.stats > div:first-child{padding-left:0}
+.stats > div + div{border-left:1px solid var(--fg)}
+.stats b{display:block;font-size:clamp(2rem,3.2vw,2.75rem);font-weight:400;color:var(--fg);line-height:1;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
 .stats span{font-size:.8rem;color:var(--muted)}
 .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
-.chip{font:inherit;font-weight:600;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--fg);cursor:pointer}
+.chip{font:inherit;font-size:1rem;font-weight:500;text-align:left;padding:10px 12px;border-radius:var(--r-card);border:1px solid var(--line);background:none;color:var(--fg);cursor:pointer;min-height:44px;transition:border-color 0.2s}
+.chip:hover{border-color:var(--accent-2)}
 .chip.on{background:var(--accent);border-color:var(--accent);color:var(--onacc)}
 #cap{min-height:3.2em}
 ol{list-style:none;margin:14px 0 0;padding:0}
-li{border-left:3px solid var(--accent);padding:2px 0 2px 14px;margin-bottom:14px}
-li b{display:block}
+li{border-left:2px solid var(--accent);padding:2px 0 2px 14px;margin-bottom:14px}
+li b{display:block;font-weight:500;font-size:1.15rem;line-height:1.3}
 li small{color:var(--muted);font-size:.85rem}
 @media(max-width:860px){
 section{align-items:flex-end;padding:80px 12px 20px}
 .panel{max-width:none;width:100%;padding:18px}
-nav a{margin-left:12px;font-size:.8rem}
+nav a{padding:12px;font-size:.8rem}
 header b{display:none}header{justify-content:center}
 p{font-size:.94rem;margin:.35em 0}
 }
+/* theme toggle button */
+#theme-toggle{pointer-events:auto;display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-card);color:var(--fg);font-size:1rem;cursor:pointer;box-shadow:var(--shadow-soft);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:border-color .2s,background .2s}
+#theme-toggle:hover{border-color:var(--accent-2)}
+#theme-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 </style>
+<script>/* prevent FOUC: apply saved theme before first paint */
+(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+</script>
 </head>
 <body>
 <div id="bar"></div>
-<header><b>Tuan Kiet</b><nav><a href="#home">Home</a><a href="#about">About</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="#contact">Contact</a></nav></header>
+<header><b>Tuan Kiet</b><button id="theme-toggle" aria-label="Toggle colour theme" title="Toggle light / dark">🌙</button><nav><a href="#home">Home</a><a href="#about">About</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="#contact">Contact</a></nav></header>
 <canvas id="c" aria-hidden="true"></canvas>
 
 <section id="home"><div class="panel">
@@ -126,14 +196,18 @@ function ui(){const r=Math.round(cs);panels.forEach((p,i)=>p.classList.toggle('i
 let R;try{R=new THREE.WebGLRenderer({canvas:$('#c'),antialias:innerWidth>720})}catch(e){R=null}
 meas();calc();addEventListener('scroll',calc,{passive:true});
 if(!R){document.body.classList.add('nogl');return}
-const T=THREE,mob=innerWidth<720,ACC=0xe0502a,PAL=[0xe0502a,0x1f6feb,0xf2b705,0x2a9d8f,0xc9d1de,0x7a4cc2];
+const T=THREE,mob=innerWidth<720,ACC=0xEB2316,PAL=[0xEB2316,0x00716E,0x4A4443,0xFFB79D,0x676261,0xD9D6D4];
 R.setPixelRatio(Math.min(devicePixelRatio,2));
 const S=new T.Scene(),cam=new T.PerspectiveCamera(50,1,.1,300);
-S.add(new T.HemisphereLight(0xffffff,0x405070,1.1));
+S.add(new T.HemisphereLight(0xffffff,0x6B6564,1.1));
 const dl=new T.DirectionalLight(0xffffff,1.1);dl.position.set(5,8,6);S.add(dl);
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const stripe=(()=>{const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,256,64);x.fillStyle='rgba(0,0,0,.17)';for(let i=4;i<256;i+=10)x.fillRect(i,0,4,64);return new T.CanvasTexture(c)})();
-function tag(txt,col){const c=document.createElement('canvas');c.width=512;c.height=214;const x=c.getContext('2d');x.fillStyle=col;x.fillRect(0,0,512,214);x.fillStyle='rgba(0,0,0,.2)';for(let i=0;i<512;i+=32)x.fillRect(i,0,6,214);x.fillStyle='#fff';x.font='800 42px Archivo,system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,256,107);return new T.CanvasTexture(c)}
+function tag(txt,col){const c=document.createElement('canvas');c.width=512;c.height=214;const x=c.getContext('2d');x.fillStyle=col;x.fillRect(0,0,512,214);x.fillStyle='rgba(0,0,0,.2)';for(let i=0;i<512;i+=32)x.fillRect(i,0,6,214);
+// Use dark text on light fills, white on dark fills
+const lightFills=[0xFFB79D,0xD9D6D4];const colHex=parseInt(col.replace('#',''),16);const isLight=lightFills.includes(colHex);
+x.fillStyle=isLight?'#030000':'#fff';
+x.font='500 42px "Inter Tight",system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,256,107);return new T.CanvasTexture(c)}
 function cont(col,txt){const m=new T.MeshStandardMaterial({color:col,map:stripe,roughness:.55,metalness:.25});
 const f=txt?new T.MeshStandardMaterial({map:tag(txt,'#'+new T.Color(col).getHexString())}):m;
 return new T.Mesh(new T.BoxGeometry(2.4,1,1),[m,m,m,m,f,m])}
@@ -158,7 +232,7 @@ const mid=A.clone().add(B).normalize(),base=Math.atan2(-mid.x,mid.z);G.rotation.
 
 /* port with crane */
 const P=new T.Group();P.position.x=40;S.add(P);
-const gr=new T.GridHelper(40,40,0x7f8aa0,0x7f8aa0);gr.material.transparent=true;gr.material.opacity=.25;gr.position.y=-.5;P.add(gr);
+const gr=new T.GridHelper(40,40,0xA4A4A4,0xA4A4A4);gr.material.transparent=true;gr.material.opacity=.25;gr.position.y=-.5;P.add(gr);
 for(let c=-2;c<=2;c++)for(let r=-1;r<=1;r++){const h=1+Math.floor(Math.random()*3);for(let k=0;k<h;k++){const b=cont(PAL[(Math.random()*6)|0]);b.position.set(c*2.6-2,k*1.02,r*1.25-1.5);P.add(b)}}
 const cm=new T.MeshStandardMaterial({color:ACC,roughness:.5});
 [-7.4,3.4].forEach(x=>{const l=new T.Mesh(new T.BoxGeometry(.25,5.9,.25),cm);l.position.set(x,2.45,1.4);P.add(l)});
@@ -178,7 +252,7 @@ const rc=new T.CatmullRomCurve3([[-9,-1,1],[-4.5,-1,-2],[0,-1,1],[4.5,-1,-2],[9,
 E.add(new T.Mesh(new T.TubeGeometry(rc,80,.07,6),new T.MeshBasicMaterial({color:ACC})));
 const nodes=[.2,.5,.8].map(t=>{const p=rc.getPoint(t),g=new T.Group();g.position.copy(p);
 g.add(new T.Mesh(new T.SphereGeometry(.2,16,16),new T.MeshBasicMaterial({color:ACC})));
-const w=new T.Mesh(new T.BoxGeometry(1.3,.8,.9),new T.MeshStandardMaterial({color:0xaab6c4,roughness:.8}));w.position.set(0,-.1,-1.3);g.add(w);E.add(g);return g});
+const w=new T.Mesh(new T.BoxGeometry(1.3,.8,.9),new T.MeshStandardMaterial({color:0xD9D6D4,roughness:.8}));w.position.set(0,-.1,-1.3);g.add(w);E.add(g);return g});
 const truck=new T.Group();
 const tl=new T.Mesh(new T.BoxGeometry(1.3,.45,.45),new T.MeshStandardMaterial({color:0xffffff}));
 const tc=new T.Mesh(new T.BoxGeometry(.4,.38,.45),new T.MeshStandardMaterial({color:ACC}));tc.position.set(.85,-.03,0);
@@ -189,8 +263,8 @@ const C=new T.Group();C.position.set(160,-.3,0);C.rotation.y=-.45;C.scale.setSca
 const wm=new T.MeshStandardMaterial({color:ACC,roughness:.5,metalness:.2});
 const wall=(w,h,d,x,y,z)=>{const m=new T.Mesh(new T.BoxGeometry(w,h,d),wm);m.position.set(x,y,z);C.add(m)};
 wall(.05,1,2.4,-.5,.5,0);wall(.05,1,2.4,.5,.5,0);wall(1,.05,2.4,0,0,0);wall(1,.05,2.4,0,1,0);wall(1,1,.05,0,.5,-1.2);
-const glow=new T.Mesh(new T.PlaneGeometry(.9,.9),new T.MeshBasicMaterial({color:0xffc27a}));glow.position.set(0,.5,-1.15);C.add(glow);
-const pl=new T.PointLight(0xffa860,0,9);pl.position.set(0,.5,0);C.add(pl);
+const glow=new T.Mesh(new T.PlaneGeometry(.9,.9),new T.MeshBasicMaterial({color:0xFFB79D}));glow.position.set(0,.5,-1.15);C.add(glow);
+const pl=new T.PointLight(0xFFB79D,0,9);pl.position.set(0,.5,0);C.add(pl);
 const doors=[-1,1].map(sg=>{const p=new T.Group();p.position.set(sg*.5,.5,1.2);const d=new T.Mesh(new T.BoxGeometry(.5,1,.04),wm);d.position.x=-sg*.25;p.add(d);C.add(p);return p});
 const BN=70,bp=new Float32Array(BN*3),bs=Array.from({length:BN},Math.random),bg=new T.BufferGeometry();
 bg.setAttribute('position',new T.BufferAttribute(bp,3));
@@ -240,6 +314,34 @@ if(near(4)){doors.forEach((d,j)=>d.rotation.y=(j?1:-1)*o*1.75);pl.intensity=o*1.
 for(let n=0;n<BN;n++){const u=(bs[n]+t*.12)%1;bp.set([Math.sin(n*12.9)*.35,.3+u*3,1+u*1.8+Math.cos(n*7.3)*.2],n*3)}bg.attributes.position.needsUpdate=true}
 ui();R.render(S,cam)}
 requestAnimationFrame(frame);
+})();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('theme-toggle');
+  var root=document.documentElement;
+
+  /* determine current effective theme */
+  function getEffective(){
+    var saved=localStorage.getItem('theme');
+    if(saved)return saved;
+    return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  }
+
+  function applyTheme(theme){
+    root.setAttribute('data-theme',theme);
+    localStorage.setItem('theme',theme);
+    btn.textContent=theme==='dark'?'☀':'🌙';
+    btn.setAttribute('aria-label',theme==='dark'?'Switch to light mode':'Switch to dark mode');
+  }
+
+  /* initialise icon from current state */
+  applyTheme(getEffective());
+
+  btn.addEventListener('click',function(){
+    var next=getEffective()==='dark'?'light':'dark';
+    applyTheme(next);
+  });
 })();
 </script>
 </body>
