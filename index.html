@@ -4,11 +4,13 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>Tuan Kiet – Coffee export logistics</title>
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" />
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap"
+    />
     <style>
       :root {
         --bg: #f3f3f3;
@@ -22,7 +24,7 @@
         --ball: #e3e3e3;
         --accent-2: #fa4e42;
         --accent-tint: #ffb79d;
-        --font-sans: 'Inter Tight', 'Hanken Grotesk', system-ui, sans-serif;
+        --font-sans: "Inter Tight", "Hanken Grotesk", system-ui, sans-serif;
         --r-card: 6px;
         --r-pill: 999px;
         --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -41,7 +43,7 @@
         padding-bottom: env(safe-area-inset-bottom, 0px);
       }
       @media (prefers-color-scheme: dark) {
-        :root:not([data-theme='light']) {
+        :root:not([data-theme="light"]) {
           --bg: #0e0c0c;
           --fg: #f3f3f3;
           --muted: #b3afae;
@@ -54,7 +56,7 @@
           --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
       }
-      :root[data-theme='dark'] {
+      :root[data-theme="dark"] {
         --bg: #0e0c0c;
         --fg: #f3f3f3;
         --muted: #b3afae;
@@ -138,31 +140,74 @@
       }
       nav {
         display: flex;
-        background: var(--panel);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid var(--line);
-        border-radius: var(--r-card);
-        box-shadow: var(--shadow-soft);
+        flex-direction: column;
+        gap: 16px;
+        position: fixed;
+        right: var(--gutter);
+        top: 50%;
+        transform: translateY(-50%);
         pointer-events: auto;
+        z-index: 10;
+      }
+      nav::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        background: var(--line);
+        z-index: -1;
       }
       nav a {
-        pointer-events: auto;
-        color: var(--fg);
+        position: relative;
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--dot);
+        margin: 0 auto;
+        padding: 0;
+        opacity: 0.6;
+        transition:
+          background 0.3s,
+          transform 0.3s,
+          opacity 0.3s;
         text-decoration: none;
-        font-size: 0.95rem;
-        margin: 0;
-        padding: 12px 16px;
-        opacity: 0.7;
-        border-left: 1px solid var(--line);
-        border-bottom: 2px solid transparent;
       }
-      nav a:first-child {
-        border-left: 0;
-      }
-      nav a.on {
+      nav a.on,
+      nav a:hover {
         opacity: 1;
-        border-bottom-color: var(--accent);
+        background: var(--accent);
+        transform: scale(1.4);
+      }
+      nav a::after {
+        content: attr(data-text);
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--panel);
+        color: var(--fg);
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.3s,
+          visibility 0.3s,
+          right 0.3s;
+        pointer-events: none;
+        box-shadow: var(--shadow-soft);
+      }
+      nav a:hover::after {
+        opacity: 1;
+        visibility: visible;
+        right: 22px;
       }
       a:focus-visible,
       button:focus-visible {
@@ -233,7 +278,7 @@
         border: 1px solid var(--accent);
       }
       .btn::after {
-        content: '→';
+        content: "→";
         display: grid;
         place-items: center;
         width: 32px;
@@ -350,10 +395,7 @@
           width: 100%;
           padding: 18px;
         }
-        nav a {
-          padding: 12px;
-          font-size: 0.8rem;
-        }
+
         header b {
           display: none;
         }
@@ -491,10 +533,10 @@
         text-align: left;
       }
       .ah::after {
-        content: '+';
+        content: "+";
       }
-      .ah[aria-expanded='true']::after {
-        content: '\2013';
+      .ah[aria-expanded="true"]::after {
+        content: "\2013";
       }
       .ab {
         display: grid;
@@ -528,8 +570,8 @@
     <script>
       /* prevent FOUC: apply saved theme before first paint */
       (function () {
-        var t = localStorage.getItem('theme');
-        if (t) document.documentElement.setAttribute('data-theme', t);
+        var t = localStorage.getItem("theme");
+        if (t) document.documentElement.setAttribute("data-theme", t);
       })();
     </script>
   </head>
@@ -540,13 +582,16 @@
       ><button
         id="theme-toggle"
         aria-label="Toggle colour theme"
-        title="Toggle light / dark">
+        title="Toggle light / dark"
+      >
         🌙
       </button>
       <nav>
-        <a href="#home">Home</a><a href="#about">About</a
-        ><a href="#skills">Skills</a><a href="#work">Work</a
-        ><a href="#contact">Contact</a>
+        <a href="#home" data-text="Home" aria-label="Home"></a>
+        <a href="#about" data-text="About" aria-label="About"></a>
+        <a href="#skills" data-text="Skills" aria-label="Skills"></a>
+        <a href="#work" data-text="Work" aria-label="Work"></a>
+        <a href="#contact" data-text="Contact" aria-label="Contact"></a>
       </nav>
     </header>
     <canvas id="c" aria-hidden="true"></canvas>
@@ -554,7 +599,8 @@
       id="bgl"
       aria-hidden="true"
       viewBox="0 0 1000 600"
-      preserveAspectRatio="none">
+      preserveAspectRatio="none"
+    >
       <path d="M-20 430C250 120 600 540 1020 150" />
       <path d="M-20 520C300 300 650 600 1020 330" />
     </svg>
@@ -672,93 +718,93 @@
       (function () {
         const $ = (s) => document.querySelector(s),
           $$ = (s) => [...document.querySelectorAll(s)];
-        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
         const SK = [
           [
-            'Certifications',
-            'Mock data: replace with your real credentials.',
-            'CERTIFICATIONS',
+            "Certifications",
+            "Mock data: replace with your real credentials.",
+            "CERTIFICATIONS",
             [
               [
-                'IELTS',
-                'Overall 7.0 · 2023',
-                'Academic module, used for international contracts and carrier calls.',
+                "IELTS",
+                "Overall 7.0 · 2023",
+                "Academic module, used for international contracts and carrier calls.",
               ],
               [
-                'MOS Excel',
-                'Expert · 2022',
-                'Microsoft Office Specialist: pivot tables and cost models for freight reports.',
+                "MOS Excel",
+                "Expert · 2022",
+                "Microsoft Office Specialist: pivot tables and cost models for freight reports.",
               ],
               [
-                'Incoterms 2020',
-                'Course · 2022',
-                'FOB, CIF and DAP responsibilities across the shipment.',
+                "Incoterms 2020",
+                "Course · 2022",
+                "FOB, CIF and DAP responsibilities across the shipment.",
               ],
             ],
           ],
           [
-            'GPA',
-            'Mock data: replace with your real grades.',
-            'GPA',
+            "GPA",
+            "Mock data: replace with your real grades.",
+            "GPA",
             [
               [
-                'Overall GPA',
-                '3.6 / 4.0',
-                'International trade degree, top 15% of the cohort.',
+                "Overall GPA",
+                "3.6 / 4.0",
+                "International trade degree, top 15% of the cohort.",
               ],
               [
-                'Major GPA',
-                '3.8 / 4.0',
-                'Logistics, customs and international payment courses.',
+                "Major GPA",
+                "3.8 / 4.0",
+                "Logistics, customs and international payment courses.",
               ],
               [
-                'Thesis',
-                'Grade A',
-                'Coffee export route comparison, Ho Chi Minh City to Genoa.',
+                "Thesis",
+                "Grade A",
+                "Coffee export route comparison, Ho Chi Minh City to Genoa.",
               ],
             ],
           ],
           [
-            'Achievements',
-            'Mock data: replace with your real results.',
-            'ACHIEVEMENTS',
+            "Achievements",
+            "Mock data: replace with your real results.",
+            "ACHIEVEMENTS",
             [
               [
-                'Zero-delay quarter',
-                'Q3 2024',
-                'All 40 containers cleared customs on the first attempt.',
+                "Zero-delay quarter",
+                "Q3 2024",
+                "All 40 containers cleared customs on the first attempt.",
               ],
               [
-                'Freight cost saving',
-                '-12% per container',
-                'Renegotiated carrier rates and consolidated bookings.',
+                "Freight cost saving",
+                "-12% per container",
+                "Renegotiated carrier rates and consolidated bookings.",
               ],
               [
-                'New talent award',
-                '2021',
-                'Fastest coordinator onboarded in the team.',
+                "New talent award",
+                "2021",
+                "Fastest coordinator onboarded in the team.",
               ],
             ],
           ],
           [
-            'Soft skills',
-            'Mock data: replace with your own examples.',
-            'SOFT SKILLS',
+            "Soft skills",
+            "Mock data: replace with your own examples.",
+            "SOFT SKILLS",
             [
               [
-                'Communication',
-                'Daily',
-                'Clear updates between buyers, carriers and customs agents.',
+                "Communication",
+                "Daily",
+                "Clear updates between buyers, carriers and customs agents.",
               ],
               [
-                'Negotiation',
-                'Rates and terms',
-                'Win-win deals with forwarders and shipping lines.',
+                "Negotiation",
+                "Rates and terms",
+                "Win-win deals with forwarders and shipping lines.",
               ],
               [
-                'Time management',
-                'Deadlines',
-                'Cut-off dates, vessel schedules and document deadlines.',
+                "Time management",
+                "Deadlines",
+                "Cut-off dates, vessel schedules and document deadlines.",
               ],
             ],
           ],
@@ -766,67 +812,67 @@
         const NT = [0.1, 0.3, 0.5, 0.7, 0.9];
         let act = -1,
           onPick = () => {};
-        const chips = $('#chips');
+        const chips = $("#chips");
         SK.forEach((k, i) => {
-          const b = document.createElement('button');
-          b.className = 'chip';
+          const b = document.createElement("button");
+          b.className = "chip";
           b.textContent = k[0];
           b.onclick = () => pick(i);
           chips.appendChild(b);
         });
-        const acc = $('#acc');
+        const acc = $("#acc");
         function pick(i) {
           act = i;
-          $$('.chip').forEach((c, j) => c.classList.toggle('on', j === i));
-          $('#cap').textContent = SK[i][1];
-          acc.innerHTML = '';
+          $$(".chip").forEach((c, j) => c.classList.toggle("on", j === i));
+          $("#cap").textContent = SK[i][1];
+          acc.innerHTML = "";
           SK[i][3].forEach((it) => {
-            const h = document.createElement('button');
-            h.className = 'ah';
-            h.setAttribute('aria-expanded', 'false');
-            h.innerHTML = '<span>' + it[0] + '</span>';
-            const b = document.createElement('div');
-            b.className = 'ab';
+            const h = document.createElement("button");
+            h.className = "ah";
+            h.setAttribute("aria-expanded", "false");
+            h.innerHTML = "<span>" + it[0] + "</span>";
+            const b = document.createElement("div");
+            b.className = "ab";
             b.innerHTML =
-              '<div><p><b>' + it[1] + '</b><br>' + it[2] + '</p></div>';
+              "<div><p><b>" + it[1] + "</b><br>" + it[2] + "</p></div>";
             h.onclick = () => {
-              const o = h.getAttribute('aria-expanded') === 'true';
-              $$('.ah').forEach((x) =>
-                x.setAttribute('aria-expanded', 'false'),
+              const o = h.getAttribute("aria-expanded") === "true";
+              $$(".ah").forEach((x) =>
+                x.setAttribute("aria-expanded", "false"),
               );
-              $$('.ab').forEach((x) => x.classList.remove('o'));
+              $$(".ab").forEach((x) => x.classList.remove("o"));
               if (!o) {
-                h.setAttribute('aria-expanded', 'true');
-                b.classList.add('o');
+                h.setAttribute("aria-expanded", "true");
+                b.classList.add("o");
               }
             };
             acc.append(h, b);
           });
-          const f = acc.querySelector('.ah');
+          const f = acc.querySelector(".ah");
           if (f) f.click();
           onPick();
         }
         pick(0);
-        const wl = $$('.wl li'),
-          wd = $$('.wstep i');
+        const wl = $$(".wl li"),
+          wd = $$(".wstep i");
         let wi = -1,
           wp = 0;
         function setWork(i) {
           if (i === wi) return;
           wi = i;
-          wl.forEach((l, j) => l.classList.toggle('on', j === i));
-          wd.forEach((d, j) => d.classList.toggle('on', j <= i));
-          $('#wnum').textContent = i + 1 + ' / ' + wl.length;
+          wl.forEach((l, j) => l.classList.toggle("on", j === i));
+          wd.forEach((d, j) => d.classList.toggle("on", j <= i));
+          $("#wnum").textContent = i + 1 + " / " + wl.length;
         }
         setWork(0);
-        const panels = $$('.panel'),
-          secs = $$('section'),
-          links = $$('nav a');
+        const panels = $$(".panel"),
+          secs = $$("section"),
+          links = $$("nav a");
         let counted = 0;
         function count() {
           if (counted) return;
           counted = 1;
-          $$('.stats b').forEach((e) => {
+          $$(".stats b").forEach((e) => {
             const n = +e.dataset.n,
               s = e.dataset.s;
             let t0 = null;
@@ -834,7 +880,7 @@
               t0 = t0 || t;
               const u = reduce ? 1 : Math.min(1, (t - t0) / 1400);
               e.textContent =
-                Math.round(n * (1 - Math.pow(1 - u, 3))) + (u >= 1 ? s : '');
+                Math.round(n * (1 - Math.pow(1 - u, 3))) + (u >= 1 ? s : "");
               if (u < 1) requestAnimationFrame(f);
             })(performance.now());
           });
@@ -853,31 +899,31 @@
               ? i + Math.max(0, (y - tops[i]) / (tops[i + 1] - tops[i]))
               : 4;
           const r0 = s;
-          if (i === 3 && !document.body.classList.contains('nogl')) {
+          if (i === 3 && !document.body.classList.contains("nogl")) {
             const q = (y - tops[3]) / (tops[4] - tops[3]);
             wp = Math.max(0, Math.min(1, q / 0.88));
             s = 3 + Math.max(0, (q - 0.88) / 0.12);
           } else wp = i > 3 ? 1 : 0;
-          $('#bgl').style.transform = 'translateY(' + -r0 * 30 + 'px)';
-          $('#bar').style.transform = 'scaleX(' + r0 / 4 + ')';
+          $("#bgl").style.transform = "translateY(" + -r0 * 30 + "px)";
+          $("#bar").style.transform = "scaleX(" + r0 / 4 + ")";
         }
         let cs = 0;
         function ui() {
           const r = Math.round(cs);
           panels.forEach((p, i) =>
             p.classList.toggle(
-              'in',
+              "in",
               i === 3 ? cs > 2.55 && cs < 3.6 : Math.abs(cs - i) < 0.45,
             ),
           );
-          links.forEach((a, i) => a.classList.toggle('on', i === r));
+          links.forEach((a, i) => a.classList.toggle("on", i === r));
           if (r === 1) count();
         }
 
         let R;
         try {
           R = new THREE.WebGLRenderer({
-            canvas: $('#c'),
+            canvas: $("#c"),
             antialias: innerWidth > 720,
           });
         } catch (e) {
@@ -885,9 +931,9 @@
         }
         meas();
         calc();
-        addEventListener('scroll', calc, { passive: true });
+        addEventListener("scroll", calc, { passive: true });
         if (!R) {
-          document.body.classList.add('nogl');
+          document.body.classList.add("nogl");
           return;
         }
         const T = THREE,
@@ -904,33 +950,33 @@
         const css = (n) =>
           getComputedStyle(document.documentElement).getPropertyValue(n).trim();
         const stripe = (() => {
-          const c = document.createElement('canvas');
+          const c = document.createElement("canvas");
           c.width = 256;
           c.height = 64;
-          const x = c.getContext('2d');
-          x.fillStyle = '#fff';
+          const x = c.getContext("2d");
+          x.fillStyle = "#fff";
           x.fillRect(0, 0, 256, 64);
-          x.fillStyle = 'rgba(0,0,0,.17)';
+          x.fillStyle = "rgba(0,0,0,.17)";
           for (let i = 4; i < 256; i += 10) x.fillRect(i, 0, 4, 64);
           return new T.CanvasTexture(c);
         })();
         function tag(txt, col) {
-          const c = document.createElement('canvas');
+          const c = document.createElement("canvas");
           c.width = 512;
           c.height = 214;
-          const x = c.getContext('2d');
+          const x = c.getContext("2d");
           x.fillStyle = col;
           x.fillRect(0, 0, 512, 214);
-          x.fillStyle = 'rgba(0,0,0,.2)';
+          x.fillStyle = "rgba(0,0,0,.2)";
           for (let i = 0; i < 512; i += 32) x.fillRect(i, 0, 6, 214);
           // Use dark text on light fills, white on dark fills
           const lightFills = [0xffb79d, 0xd9d6d4];
-          const colHex = parseInt(col.replace('#', ''), 16);
+          const colHex = parseInt(col.replace("#", ""), 16);
           const isLight = lightFills.includes(colHex);
-          x.fillStyle = isLight ? '#030000' : '#fff';
+          x.fillStyle = isLight ? "#030000" : "#fff";
           x.font = '500 42px "Inter Tight",system-ui,sans-serif';
-          x.textAlign = 'center';
-          x.textBaseline = 'middle';
+          x.textAlign = "center";
+          x.textBaseline = "middle";
           x.fillText(txt, 256, 107);
           return new T.CanvasTexture(c);
         }
@@ -943,7 +989,7 @@
           });
           const f = txt
             ? new T.MeshStandardMaterial({
-                map: tag(txt, '#' + new T.Color(col).getHexString()),
+                map: tag(txt, "#" + new T.Color(col).getHexString()),
               })
             : m;
           const b = new T.Mesh(new T.BoxGeometry(2.4, 1, 1), [
@@ -1001,7 +1047,7 @@
           );
         }
         const pg = new T.BufferGeometry();
-        pg.setAttribute('position', new T.BufferAttribute(pp, 3));
+        pg.setAttribute("position", new T.BufferAttribute(pp, 3));
         const dotM = new T.PointsMaterial({ size: 0.035 });
         G.add(new T.Points(pg, dotM));
         const A = ll(10.8, 106.7),
@@ -1055,7 +1101,7 @@
             path,
             (gltf) => onLoad(gltf.scene),
             null,
-            (err) => console.warn('GLB load error:', path, err),
+            (err) => console.warn("GLB load error:", path, err),
           );
         }
 
@@ -1063,7 +1109,7 @@
         const pivot = new T.Group();
         G.add(pivot);
         let deliveryModelLoaded = false;
-        loadGLB('kits/car-kit/Models/GLB format/delivery.glb', (model) => {
+        loadGLB("kits/car-kit/Models/GLB format/delivery.glb", (model) => {
           model.traverse((ch) => {
             if (ch.isMesh) {
               ch.castShadow = false;
@@ -1229,9 +1275,9 @@
         const loadP = (url) => new Promise((resolve) => loadGLB(url, resolve));
 
         Promise.all([
-          loadP('kits/train-kit/Models/GLB format/railroad-straight.glb'),
-          loadP('kits/train-kit/Models/GLB format/train-locomotive-a.glb'),
-          loadP('kits/train-kit/Models/GLB format/train-carriage-flatbed.glb'),
+          loadP("kits/train-kit/Models/GLB format/railroad-straight.glb"),
+          loadP("kits/train-kit/Models/GLB format/train-locomotive-a.glb"),
+          loadP("kits/train-kit/Models/GLB format/train-carriage-flatbed.glb"),
         ]).then(([trackModel, locoModel, wagonModel]) => {
           // Track
           const trackHolder = normalizeModel(trackModel, 1.1);
@@ -1319,7 +1365,7 @@
             const rawWheels = [];
             modelsToExtract.forEach((mod) => {
               mod.traverse((ch) => {
-                if (ch.isMesh && ch.name.toLowerCase().includes('wheel')) {
+                if (ch.isMesh && ch.name.toLowerCase().includes("wheel")) {
                   rawWheels.push(ch);
                 }
               });
@@ -1431,11 +1477,11 @@
               const mat = mesh.material;
               for (let wc of wheelComps) {
                 const newGeom = new T.BufferGeometry();
-                newGeom.setAttribute('position', geom.attributes.position);
+                newGeom.setAttribute("position", geom.attributes.position);
                 if (geom.attributes.normal)
-                  newGeom.setAttribute('normal', geom.attributes.normal);
+                  newGeom.setAttribute("normal", geom.attributes.normal);
                 if (geom.attributes.uv)
-                  newGeom.setAttribute('uv', geom.attributes.uv);
+                  newGeom.setAttribute("uv", geom.attributes.uv);
 
                 const newIndex = new (index ? index.constructor : Uint32Array)(
                   wc.triIndices.length * 3,
@@ -1460,7 +1506,7 @@
                 );
 
                 const newMesh = new T.Mesh(newGeom, mat);
-                newMesh.name = mesh.name + '_disc';
+                newMesh.name = mesh.name + "_disc";
 
                 newMesh.position.copy(mesh.position);
                 newMesh.rotation.copy(mesh.rotation);
@@ -1572,7 +1618,7 @@
               trainWheels.push({ pivot, radius });
             });
           } catch (e) {
-            console.error('Wheel extraction failed:', e);
+            console.error("Wheel extraction failed:", e);
           }
 
           P.updateMatrixWorld(true);
@@ -1656,7 +1702,7 @@
         truck.position.y = 0.22;
         E.add(truck);
         /* Work section: load sedan-sports GLB, parent into the existing truck group */
-        loadGLB('kits/car-kit/Models/GLB format/sedan-sports.glb', (model) => {
+        loadGLB("kits/car-kit/Models/GLB format/sedan-sports.glb", (model) => {
           model.scale.setScalar(0.52);
           /* sedan-sports faces +Z by default; route tangent math expects +X forward */
           model.rotation.y = Math.PI / 2;
@@ -1735,7 +1781,7 @@
           bp = new Float32Array(BN * 3),
           bs = Array.from({ length: BN }, Math.random),
           bg = new T.BufferGeometry();
-        bg.setAttribute('position', new T.BufferAttribute(bp, 3));
+        bg.setAttribute("position", new T.BufferAttribute(bp, 3));
         const beans = new T.Points(
           bg,
           new T.PointsMaterial({
@@ -1760,7 +1806,7 @@
             i * 3,
           );
         const sg = new T.BufferGeometry();
-        sg.setAttribute('position', new T.BufferAttribute(SP, 3));
+        sg.setAttribute("position", new T.BufferAttribute(SP, 3));
         const starM = new T.PointsMaterial({
           size: 0.05,
           transparent: true,
@@ -1769,13 +1815,13 @@
         S.add(new T.Points(sg, starM));
 
         function theme() {
-          const bg = new T.Color(css('--bg'));
+          const bg = new T.Color(css("--bg"));
           S.background = bg;
           S.fog = new T.Fog(bg, 14, 55);
-          dotM.color.set(css('--dot'));
-          starM.color.set(css('--dot'));
+          dotM.color.set(css("--dot"));
+          starM.color.set(css("--dot"));
 
-          const ballCol = new T.Color(css('--ball'));
+          const ballCol = new T.Color(css("--ball"));
           ball.material.color.copy(ballCol);
           gm.color.copy(ballCol);
 
@@ -1783,8 +1829,8 @@
           gravelMat.color.copy(ballCol).lerp(new T.Color(0x000000), 0.2);
         }
         theme();
-        matchMedia('(prefers-color-scheme: dark)').addEventListener(
-          'change',
+        matchMedia("(prefers-color-scheme: dark)").addEventListener(
+          "change",
           theme,
         );
         new MutationObserver(theme).observe(document.documentElement, {
@@ -1823,7 +1869,7 @@
           lx = 0,
           t = 0,
           last = performance.now();
-        const cv = $('#c'),
+        const cv = $("#c"),
           ray = new T.Raycaster(),
           v2 = new T.Vector2();
         function size() {
@@ -1846,16 +1892,16 @@
           calc();
         }
         size();
-        addEventListener('resize', size);
-        addEventListener('load', meas);
-        addEventListener('pointerdown', (e) => {
+        addEventListener("resize", size);
+        addEventListener("load", meas);
+        addEventListener("pointerdown", (e) => {
           if (e.target === cv && cs < 0.6) {
             drag = 1;
             lx = e.clientX;
           }
         });
-        addEventListener('pointerup', () => (drag = 0));
-        addEventListener('pointermove', (e) => {
+        addEventListener("pointerup", () => (drag = 0));
+        addEventListener("pointermove", (e) => {
           mx = (e.clientX / innerWidth) * 2 - 1;
           my = (e.clientY / innerHeight) * 2 - 1;
           if (drag) {
@@ -1870,11 +1916,11 @@
             if (n !== hov) {
               hov = n;
               lit();
-              cv.style.cursor = n >= 0 ? 'pointer' : '';
+              cv.style.cursor = n >= 0 ? "pointer" : "";
             }
           }
         });
-        addEventListener('click', (e) => {
+        addEventListener("click", (e) => {
           if (e.target === cv && hov >= 0) pick(hov);
         });
         const near = (n) => Math.abs(cs - n) < 1.4,
@@ -2045,33 +2091,33 @@
     </script>
     <script>
       (function () {
-        var btn = document.getElementById('theme-toggle');
+        var btn = document.getElementById("theme-toggle");
         var root = document.documentElement;
 
         /* determine current effective theme */
         function getEffective() {
-          var saved = localStorage.getItem('theme');
+          var saved = localStorage.getItem("theme");
           if (saved) return saved;
-          return matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light';
+          return matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
         }
 
         function applyTheme(theme) {
-          root.setAttribute('data-theme', theme);
-          localStorage.setItem('theme', theme);
-          btn.textContent = theme === 'dark' ? '☀' : '🌙';
+          root.setAttribute("data-theme", theme);
+          localStorage.setItem("theme", theme);
+          btn.textContent = theme === "dark" ? "☀" : "🌙";
           btn.setAttribute(
-            'aria-label',
-            theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+            "aria-label",
+            theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
           );
         }
 
         /* initialise icon from current state */
         applyTheme(getEffective());
 
-        btn.addEventListener('click', function () {
-          var next = getEffective() === 'dark' ? 'light' : 'dark';
+        btn.addEventListener("click", function () {
+          var next = getEffective() === "dark" ? "light" : "dark";
           applyTheme(next);
         });
       })();
