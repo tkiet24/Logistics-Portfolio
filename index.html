@@ -1051,22 +1051,47 @@
         /* GLB loader helper */
         const loader = new THREE.GLTFLoader();
         function loadGLB(path, onLoad) {
-          loader.load(path, (gltf) => onLoad(gltf.scene), null, (err) => console.warn('GLB load error:', path, err));
+          loader.load(
+            path,
+            (gltf) => onLoad(gltf.scene),
+            null,
+            (err) => console.warn('GLB load error:', path, err),
+          );
         }
 
-        /* Home scene: delivery van circling near globe base */
-        const deliveryGroup = new T.Group();
-        deliveryGroup.position.set(0, -2.5, 0);
-        S.add(deliveryGroup);
-        let deliveryModel = null;
+        /* Home scene: delivery truck replacing the box ship */
+        const pivot = new T.Group();
+        G.add(pivot);
+        let deliveryModelLoaded = false;
         loadGLB('kits/car-kit/Models/GLB format/delivery.glb', (model) => {
-          model.scale.setScalar(0.38);
-          model.traverse(ch => { if (ch.isMesh) { ch.castShadow = false; } });
-          deliveryGroup.add(model);
-          deliveryModel = model;
+          model.traverse((ch) => {
+            if (ch.isMesh) {
+              ch.castShadow = false;
+            }
+          });
+
+          const bb = new T.Box3().setFromObject(model);
+          const size = new T.Vector3();
+          bb.getSize(size);
+          const center = new T.Vector3();
+          bb.getCenter(center);
+
+          model.position.set(-center.x, -bb.min.y, -center.z);
+
+          const maxDim = Math.max(size.x, Math.max(size.y, size.z));
+          const scale = 0.35 / maxDim;
+
+          const wrapper = new T.Group();
+          wrapper.add(model);
+          wrapper.scale.setScalar(scale);
+          // Offset so the cab faces forward (-Z direction in the matrix).
+          // Kenney cars often face +Z or +X natively.
+          wrapper.rotation.y = Math.PI;
+
+          pivot.add(wrapper);
+          ship.visible = false; // Hide fallback box ship
+          deliveryModelLoaded = true;
         });
-
-
         const P = new T.Group();
         P.position.x = 40;
         S.add(P);
@@ -1119,8 +1144,15 @@
         P.add(trainGroup);
 
         // Procedural rails (sleepers + two metal rails) as fallback base
-        const sleeperMat = new T.MeshStandardMaterial({ color: 0x5a4030, roughness: 1 });
-        const railMat = new T.MeshStandardMaterial({ color: 0x8a8a8a, roughness: 0.4, metalness: 0.7 });
+        const sleeperMat = new T.MeshStandardMaterial({
+          color: 0x5a4030,
+          roughness: 1,
+        });
+        const railMat = new T.MeshStandardMaterial({
+          color: 0x8a8a8a,
+          roughness: 0.4,
+          metalness: 0.7,
+        });
         for (let n = -8; n <= 8; n++) {
           // sleeper
           const sl = new T.Mesh(new T.BoxGeometry(2.4, 0.1, 0.3), sleeperMat);
@@ -1147,10 +1179,13 @@
             trainGroup.add(piece);
           }
         }
-        loadGLB('kits/train-kit/Models/GLB format/railroad-straight.glb', (model) => {
-          model.scale.setScalar(1.1);
-          tileTrack(model, 14);
-        });
+        loadGLB(
+          'kits/train-kit/Models/GLB format/railroad-straight.glb',
+          (model) => {
+            model.scale.setScalar(1.1);
+            tileTrack(model, 14);
+          },
+        );
 
         // Train: locomotive + carriages
         const trainRig = new T.Group();
@@ -1158,13 +1193,16 @@
         let trainLocoLoaded = false;
         let trainCarPos = 0; // animation offset
 
-        loadGLB('kits/train-kit/Models/GLB format/train-locomotive-a.glb', (model) => {
-          model.scale.setScalar(0.95);
-          model.rotation.y = Math.PI / 2;
-          model.position.set(0, 0.1, -3);
-          trainRig.add(model);
-          trainLocoLoaded = true;
-        });
+        loadGLB(
+          'kits/train-kit/Models/GLB format/train-locomotive-a.glb',
+          (model) => {
+            model.scale.setScalar(0.95);
+            model.rotation.y = Math.PI / 2;
+            model.position.set(0, 0.1, -3);
+            trainRig.add(model);
+            trainLocoLoaded = true;
+          },
+        );
         const carriageFiles = [
           'kits/train-kit/Models/GLB format/train-carriage-container-red.glb',
           'kits/train-kit/Models/GLB format/train-carriage-box.glb',
@@ -1178,7 +1216,6 @@
             trainRig.add(model);
           });
         });
-
 
         const W = new T.Group();
         W.position.x = 80;
@@ -1487,16 +1524,30 @@
             G.rotation.y = base + off + Math.sin(t * 0.3) * 0.3;
             G.updateMatrixWorld();
             const u = (t * 0.06) % 1;
-            ship.position.copy(arc.getPoint(u));
-            ship.lookAt(G.localToWorld(arc.getPoint(Math.min(1, u + 0.01))));
-            marks.forEach((m) => m.scale.setScalar(1 + 0.4 * Math.sin(t * 3)));
-            /* delivery van: orbit below globe */
-            if (deliveryModel) {
-              const va = t * 0.4;
-              const vr = 4.5;
-              deliveryGroup.position.set(Math.cos(va) * vr, -2.5, Math.sin(va) * vr);
-              deliveryGroup.rotation.y = -(va + Math.PI / 2);
+            const pos = arc.getPoint(u);
+            const next = arc.getPoint(Math.min(1, u + 0.01));
+
+            // Fallback old box ship logic
+            if (!deliveryModelLoaded) {
+              ship.position.copy(pos);
+              ship.lookAt(G.localToWorld(next.clone()));
             }
+
+            // Pivot orientation for GLB truck
+            const fwd = next.clone().sub(pos).normalize();
+            const up = pos.clone().normalize();
+            const right = new T.Vector3().crossVectors(fwd, up).normalize();
+            const up2 = new T.Vector3().crossVectors(right, fwd).normalize();
+            const mRot = new T.Matrix4().makeBasis(
+              right,
+              up2,
+              fwd.clone().negate(),
+            );
+
+            pivot.position.copy(pos);
+            pivot.quaternion.setFromRotationMatrix(mRot);
+
+            marks.forEach((m) => m.scale.setScalar(1 + 0.4 * Math.sin(t * 3)));
           }
           if (near(1)) {
             const hx = -2 + Math.sin(t * 0.6) * 4.5,
