@@ -667,6 +667,7 @@
     </section>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
       (function () {
         const $ = (s) => document.querySelector(s),
@@ -1047,7 +1048,25 @@
           base = Math.atan2(-mid.x, mid.z);
         G.rotation.x = 0.28;
 
-        /* port with crane */
+        /* GLB loader helper */
+        const loader = new THREE.GLTFLoader();
+        function loadGLB(path, onLoad) {
+          loader.load(path, (gltf) => onLoad(gltf.scene), null, (err) => console.warn('GLB load error:', path, err));
+        }
+
+        /* Home scene: delivery van circling near globe base */
+        const deliveryGroup = new T.Group();
+        deliveryGroup.position.set(0, -2.5, 0);
+        S.add(deliveryGroup);
+        let deliveryModel = null;
+        loadGLB('kits/car-kit/Models/GLB format/delivery.glb', (model) => {
+          model.scale.setScalar(0.38);
+          model.traverse(ch => { if (ch.isMesh) { ch.castShadow = false; } });
+          deliveryGroup.add(model);
+          deliveryModel = model;
+        });
+
+
         const P = new T.Group();
         P.position.x = 40;
         S.add(P);
@@ -1094,7 +1113,73 @@
           P.add(w);
         }
 
-        /* skills wall */
+        /* About/Port scene: railroad tracks + train */
+        const trainGroup = new T.Group();
+        trainGroup.position.set(-4, -0.5, -14); // behind the warehouses
+        P.add(trainGroup);
+
+        // Procedural rails (sleepers + two metal rails) as fallback base
+        const sleeperMat = new T.MeshStandardMaterial({ color: 0x5a4030, roughness: 1 });
+        const railMat = new T.MeshStandardMaterial({ color: 0x8a8a8a, roughness: 0.4, metalness: 0.7 });
+        for (let n = -8; n <= 8; n++) {
+          // sleeper
+          const sl = new T.Mesh(new T.BoxGeometry(2.4, 0.1, 0.3), sleeperMat);
+          sl.position.set(0, 0, n * 1.2);
+          trainGroup.add(sl);
+          // left rail
+          const rl = new T.Mesh(new T.BoxGeometry(0.12, 0.12, 1.2), railMat);
+          rl.position.set(-0.9, 0.11, n * 1.2);
+          trainGroup.add(rl);
+          // right rail
+          const rr = rl.clone();
+          rr.position.x = 0.9;
+          trainGroup.add(rr);
+        }
+
+        // GLB railroad track pieces tiled along Z
+        let trackOffset = 0;
+        function tileTrack(model, count) {
+          const bb = new T.Box3().setFromObject(model);
+          const len = bb.max.z - bb.min.z || 2.4;
+          for (let n = 0; n < count; n++) {
+            const piece = model.clone();
+            piece.position.set(0, 0, n * len - (count * len) / 2);
+            trainGroup.add(piece);
+          }
+        }
+        loadGLB('kits/train-kit/Models/GLB format/railroad-straight.glb', (model) => {
+          model.scale.setScalar(1.1);
+          tileTrack(model, 14);
+        });
+
+        // Train: locomotive + carriages
+        const trainRig = new T.Group();
+        trainGroup.add(trainRig);
+        let trainLocoLoaded = false;
+        let trainCarPos = 0; // animation offset
+
+        loadGLB('kits/train-kit/Models/GLB format/train-locomotive-a.glb', (model) => {
+          model.scale.setScalar(0.95);
+          model.rotation.y = Math.PI / 2;
+          model.position.set(0, 0.1, -3);
+          trainRig.add(model);
+          trainLocoLoaded = true;
+        });
+        const carriageFiles = [
+          'kits/train-kit/Models/GLB format/train-carriage-container-red.glb',
+          'kits/train-kit/Models/GLB format/train-carriage-box.glb',
+          'kits/train-kit/Models/GLB format/train-carriage-container-green.glb',
+        ];
+        carriageFiles.forEach((path, idx) => {
+          loadGLB(path, (model) => {
+            model.scale.setScalar(0.95);
+            model.rotation.y = Math.PI / 2;
+            model.position.set(0, 0.1, 0 + idx * 2.8);
+            trainRig.add(model);
+          });
+        });
+
+
         const W = new T.Group();
         W.position.x = 80;
         S.add(W);
@@ -1155,48 +1240,17 @@
           return g;
         });
         const truck = new T.Group();
-        const tl = new T.Mesh(
-          new T.BoxGeometry(1.3, 0.5, 0.46),
-          new T.MeshStandardMaterial({
-            color: 0xffffff,
-            map: stripe,
-            roughness: 0.55,
-            metalness: 0.2,
-          }),
-        );
-        tl.position.y = 0.05;
-        const tc = new T.Mesh(
-          new T.BoxGeometry(0.4, 0.4, 0.46),
-          new T.MeshStandardMaterial({ color: ACC, roughness: 0.5 }),
-        );
-        tc.position.set(0.85, -0.03, 0);
-        const wsh = new T.Mesh(
-          new T.BoxGeometry(0.04, 0.16, 0.4),
-          new T.MeshStandardMaterial({
-            color: 0x1a1a1a,
-            roughness: 0.2,
-            metalness: 0.6,
-          }),
-        );
-        wsh.position.set(1.06, 0.05, 0);
-        truck.add(tl, tc, wsh);
-        const wmat = new T.MeshStandardMaterial({
-          color: 0x1a1a1a,
-          roughness: 0.9,
-        });
-        [-0.45, 0.1, 0.85].forEach((x) =>
-          [-1, 1].forEach((z) => {
-            const w = new T.Mesh(
-              new T.CylinderGeometry(0.13, 0.13, 0.1, 12),
-              wmat,
-            );
-            w.rotation.x = Math.PI / 2;
-            w.position.set(x, -0.22, z * 0.24);
-            truck.add(w);
-          }),
-        );
-        truck.position.y = 0.3;
+        truck.position.y = 0.22;
         E.add(truck);
+        /* Work section: load sedan-sports GLB, parent into the existing truck group */
+        loadGLB('kits/car-kit/Models/GLB format/sedan-sports.glb', (model) => {
+          model.scale.setScalar(0.52);
+          /* sedan-sports faces +Z by default; route tangent math expects +X forward */
+          model.rotation.y = -Math.PI / 2;
+          model.position.y = -0.22; // sit on road
+          truck.add(model);
+        });
+
         const gm = new T.MeshStandardMaterial({
             color: 0xe3e3e3,
             roughness: 1,
@@ -1436,6 +1490,13 @@
             ship.position.copy(arc.getPoint(u));
             ship.lookAt(G.localToWorld(arc.getPoint(Math.min(1, u + 0.01))));
             marks.forEach((m) => m.scale.setScalar(1 + 0.4 * Math.sin(t * 3)));
+            /* delivery van: orbit below globe */
+            if (deliveryModel) {
+              const va = t * 0.4;
+              const vr = 4.5;
+              deliveryGroup.position.set(Math.cos(va) * vr, -2.5, Math.sin(va) * vr);
+              deliveryGroup.rotation.y = -(va + Math.PI / 2);
+            }
           }
           if (near(1)) {
             const hx = -2 + Math.sin(t * 0.6) * 4.5,
@@ -1446,7 +1507,10 @@
             tro.position.x = hx;
             rope.scale.y = bt - top;
             rope.position.set(hx, (bt + top) / 2, 1.4);
+            /* train: slow back-and-forth crawl through station */
+            trainRig.position.z = Math.sin(t * 0.18) * 7;
           }
+
           if (near(2))
             sk.forEach((m, j) => {
               const tz = j === act ? 1.1 : j === hov ? 0.5 : 0;
