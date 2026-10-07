@@ -4,13 +4,11 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+      content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Tuan Kiet – Coffee export logistics</title>
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap"
-    />
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" />
     <style>
       :root {
         --bg: #f3f3f3;
@@ -24,7 +22,7 @@
         --ball: #e3e3e3;
         --accent-2: #fa4e42;
         --accent-tint: #ffb79d;
-        --font-sans: "Inter Tight", "Hanken Grotesk", system-ui, sans-serif;
+        --font-sans: 'Inter Tight', 'Hanken Grotesk', system-ui, sans-serif;
         --r-card: 6px;
         --r-pill: 999px;
         --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -43,7 +41,7 @@
         padding-bottom: env(safe-area-inset-bottom, 0px);
       }
       @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) {
+        :root:not([data-theme='light']) {
           --bg: #0e0c0c;
           --fg: #f3f3f3;
           --muted: #b3afae;
@@ -56,7 +54,7 @@
           --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
       }
-      :root[data-theme="dark"] {
+      :root[data-theme='dark'] {
         --bg: #0e0c0c;
         --fg: #f3f3f3;
         --muted: #b3afae;
@@ -235,7 +233,7 @@
         border: 1px solid var(--accent);
       }
       .btn::after {
-        content: "→";
+        content: '→';
         display: grid;
         place-items: center;
         width: 32px;
@@ -493,10 +491,10 @@
         text-align: left;
       }
       .ah::after {
-        content: "+";
+        content: '+';
       }
-      .ah[aria-expanded="true"]::after {
-        content: "\2013";
+      .ah[aria-expanded='true']::after {
+        content: '\2013';
       }
       .ab {
         display: grid;
@@ -530,8 +528,8 @@
     <script>
       /* prevent FOUC: apply saved theme before first paint */
       (function () {
-        var t = localStorage.getItem("theme");
-        if (t) document.documentElement.setAttribute("data-theme", t);
+        var t = localStorage.getItem('theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
       })();
     </script>
   </head>
@@ -542,8 +540,7 @@
       ><button
         id="theme-toggle"
         aria-label="Toggle colour theme"
-        title="Toggle light / dark"
-      >
+        title="Toggle light / dark">
         🌙
       </button>
       <nav>
@@ -557,8 +554,7 @@
       id="bgl"
       aria-hidden="true"
       viewBox="0 0 1000 600"
-      preserveAspectRatio="none"
-    >
+      preserveAspectRatio="none">
       <path d="M-20 430C250 120 600 540 1020 150" />
       <path d="M-20 520C300 300 650 600 1020 330" />
     </svg>
@@ -676,93 +672,93 @@
       (function () {
         const $ = (s) => document.querySelector(s),
           $$ = (s) => [...document.querySelectorAll(s)];
-        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
         const SK = [
           [
-            "Certifications",
-            "Mock data: replace with your real credentials.",
-            "CERTIFICATIONS",
+            'Certifications',
+            'Mock data: replace with your real credentials.',
+            'CERTIFICATIONS',
             [
               [
-                "IELTS",
-                "Overall 7.0 · 2023",
-                "Academic module, used for international contracts and carrier calls.",
+                'IELTS',
+                'Overall 7.0 · 2023',
+                'Academic module, used for international contracts and carrier calls.',
               ],
               [
-                "MOS Excel",
-                "Expert · 2022",
-                "Microsoft Office Specialist: pivot tables and cost models for freight reports.",
+                'MOS Excel',
+                'Expert · 2022',
+                'Microsoft Office Specialist: pivot tables and cost models for freight reports.',
               ],
               [
-                "Incoterms 2020",
-                "Course · 2022",
-                "FOB, CIF and DAP responsibilities across the shipment.",
+                'Incoterms 2020',
+                'Course · 2022',
+                'FOB, CIF and DAP responsibilities across the shipment.',
               ],
             ],
           ],
           [
-            "GPA",
-            "Mock data: replace with your real grades.",
-            "GPA",
+            'GPA',
+            'Mock data: replace with your real grades.',
+            'GPA',
             [
               [
-                "Overall GPA",
-                "3.6 / 4.0",
-                "International trade degree, top 15% of the cohort.",
+                'Overall GPA',
+                '3.6 / 4.0',
+                'International trade degree, top 15% of the cohort.',
               ],
               [
-                "Major GPA",
-                "3.8 / 4.0",
-                "Logistics, customs and international payment courses.",
+                'Major GPA',
+                '3.8 / 4.0',
+                'Logistics, customs and international payment courses.',
               ],
               [
-                "Thesis",
-                "Grade A",
-                "Coffee export route comparison, Ho Chi Minh City to Genoa.",
+                'Thesis',
+                'Grade A',
+                'Coffee export route comparison, Ho Chi Minh City to Genoa.',
               ],
             ],
           ],
           [
-            "Achievements",
-            "Mock data: replace with your real results.",
-            "ACHIEVEMENTS",
+            'Achievements',
+            'Mock data: replace with your real results.',
+            'ACHIEVEMENTS',
             [
               [
-                "Zero-delay quarter",
-                "Q3 2024",
-                "All 40 containers cleared customs on the first attempt.",
+                'Zero-delay quarter',
+                'Q3 2024',
+                'All 40 containers cleared customs on the first attempt.',
               ],
               [
-                "Freight cost saving",
-                "-12% per container",
-                "Renegotiated carrier rates and consolidated bookings.",
+                'Freight cost saving',
+                '-12% per container',
+                'Renegotiated carrier rates and consolidated bookings.',
               ],
               [
-                "New talent award",
-                "2021",
-                "Fastest coordinator onboarded in the team.",
+                'New talent award',
+                '2021',
+                'Fastest coordinator onboarded in the team.',
               ],
             ],
           ],
           [
-            "Soft skills",
-            "Mock data: replace with your own examples.",
-            "SOFT SKILLS",
+            'Soft skills',
+            'Mock data: replace with your own examples.',
+            'SOFT SKILLS',
             [
               [
-                "Communication",
-                "Daily",
-                "Clear updates between buyers, carriers and customs agents.",
+                'Communication',
+                'Daily',
+                'Clear updates between buyers, carriers and customs agents.',
               ],
               [
-                "Negotiation",
-                "Rates and terms",
-                "Win-win deals with forwarders and shipping lines.",
+                'Negotiation',
+                'Rates and terms',
+                'Win-win deals with forwarders and shipping lines.',
               ],
               [
-                "Time management",
-                "Deadlines",
-                "Cut-off dates, vessel schedules and document deadlines.",
+                'Time management',
+                'Deadlines',
+                'Cut-off dates, vessel schedules and document deadlines.',
               ],
             ],
           ],
@@ -770,67 +766,67 @@
         const NT = [0.1, 0.3, 0.5, 0.7, 0.9];
         let act = -1,
           onPick = () => {};
-        const chips = $("#chips");
+        const chips = $('#chips');
         SK.forEach((k, i) => {
-          const b = document.createElement("button");
-          b.className = "chip";
+          const b = document.createElement('button');
+          b.className = 'chip';
           b.textContent = k[0];
           b.onclick = () => pick(i);
           chips.appendChild(b);
         });
-        const acc = $("#acc");
+        const acc = $('#acc');
         function pick(i) {
           act = i;
-          $$(".chip").forEach((c, j) => c.classList.toggle("on", j === i));
-          $("#cap").textContent = SK[i][1];
-          acc.innerHTML = "";
+          $$('.chip').forEach((c, j) => c.classList.toggle('on', j === i));
+          $('#cap').textContent = SK[i][1];
+          acc.innerHTML = '';
           SK[i][3].forEach((it) => {
-            const h = document.createElement("button");
-            h.className = "ah";
-            h.setAttribute("aria-expanded", "false");
-            h.innerHTML = "<span>" + it[0] + "</span>";
-            const b = document.createElement("div");
-            b.className = "ab";
+            const h = document.createElement('button');
+            h.className = 'ah';
+            h.setAttribute('aria-expanded', 'false');
+            h.innerHTML = '<span>' + it[0] + '</span>';
+            const b = document.createElement('div');
+            b.className = 'ab';
             b.innerHTML =
-              "<div><p><b>" + it[1] + "</b><br>" + it[2] + "</p></div>";
+              '<div><p><b>' + it[1] + '</b><br>' + it[2] + '</p></div>';
             h.onclick = () => {
-              const o = h.getAttribute("aria-expanded") === "true";
-              $$(".ah").forEach((x) =>
-                x.setAttribute("aria-expanded", "false"),
+              const o = h.getAttribute('aria-expanded') === 'true';
+              $$('.ah').forEach((x) =>
+                x.setAttribute('aria-expanded', 'false'),
               );
-              $$(".ab").forEach((x) => x.classList.remove("o"));
+              $$('.ab').forEach((x) => x.classList.remove('o'));
               if (!o) {
-                h.setAttribute("aria-expanded", "true");
-                b.classList.add("o");
+                h.setAttribute('aria-expanded', 'true');
+                b.classList.add('o');
               }
             };
             acc.append(h, b);
           });
-          const f = acc.querySelector(".ah");
+          const f = acc.querySelector('.ah');
           if (f) f.click();
           onPick();
         }
         pick(0);
-        const wl = $$(".wl li"),
-          wd = $$(".wstep i");
+        const wl = $$('.wl li'),
+          wd = $$('.wstep i');
         let wi = -1,
           wp = 0;
         function setWork(i) {
           if (i === wi) return;
           wi = i;
-          wl.forEach((l, j) => l.classList.toggle("on", j === i));
-          wd.forEach((d, j) => d.classList.toggle("on", j <= i));
-          $("#wnum").textContent = i + 1 + " / " + wl.length;
+          wl.forEach((l, j) => l.classList.toggle('on', j === i));
+          wd.forEach((d, j) => d.classList.toggle('on', j <= i));
+          $('#wnum').textContent = i + 1 + ' / ' + wl.length;
         }
         setWork(0);
-        const panels = $$(".panel"),
-          secs = $$("section"),
-          links = $$("nav a");
+        const panels = $$('.panel'),
+          secs = $$('section'),
+          links = $$('nav a');
         let counted = 0;
         function count() {
           if (counted) return;
           counted = 1;
-          $$(".stats b").forEach((e) => {
+          $$('.stats b').forEach((e) => {
             const n = +e.dataset.n,
               s = e.dataset.s;
             let t0 = null;
@@ -838,7 +834,7 @@
               t0 = t0 || t;
               const u = reduce ? 1 : Math.min(1, (t - t0) / 1400);
               e.textContent =
-                Math.round(n * (1 - Math.pow(1 - u, 3))) + (u >= 1 ? s : "");
+                Math.round(n * (1 - Math.pow(1 - u, 3))) + (u >= 1 ? s : '');
               if (u < 1) requestAnimationFrame(f);
             })(performance.now());
           });
@@ -857,31 +853,31 @@
               ? i + Math.max(0, (y - tops[i]) / (tops[i + 1] - tops[i]))
               : 4;
           const r0 = s;
-          if (i === 3 && !document.body.classList.contains("nogl")) {
+          if (i === 3 && !document.body.classList.contains('nogl')) {
             const q = (y - tops[3]) / (tops[4] - tops[3]);
             wp = Math.max(0, Math.min(1, q / 0.88));
             s = 3 + Math.max(0, (q - 0.88) / 0.12);
           } else wp = i > 3 ? 1 : 0;
-          $("#bgl").style.transform = "translateY(" + -r0 * 30 + "px)";
-          $("#bar").style.transform = "scaleX(" + r0 / 4 + ")";
+          $('#bgl').style.transform = 'translateY(' + -r0 * 30 + 'px)';
+          $('#bar').style.transform = 'scaleX(' + r0 / 4 + ')';
         }
         let cs = 0;
         function ui() {
           const r = Math.round(cs);
           panels.forEach((p, i) =>
             p.classList.toggle(
-              "in",
+              'in',
               i === 3 ? cs > 2.55 && cs < 3.6 : Math.abs(cs - i) < 0.45,
             ),
           );
-          links.forEach((a, i) => a.classList.toggle("on", i === r));
+          links.forEach((a, i) => a.classList.toggle('on', i === r));
           if (r === 1) count();
         }
 
         let R;
         try {
           R = new THREE.WebGLRenderer({
-            canvas: $("#c"),
+            canvas: $('#c'),
             antialias: innerWidth > 720,
           });
         } catch (e) {
@@ -889,9 +885,9 @@
         }
         meas();
         calc();
-        addEventListener("scroll", calc, { passive: true });
+        addEventListener('scroll', calc, { passive: true });
         if (!R) {
-          document.body.classList.add("nogl");
+          document.body.classList.add('nogl');
           return;
         }
         const T = THREE,
@@ -908,33 +904,33 @@
         const css = (n) =>
           getComputedStyle(document.documentElement).getPropertyValue(n).trim();
         const stripe = (() => {
-          const c = document.createElement("canvas");
+          const c = document.createElement('canvas');
           c.width = 256;
           c.height = 64;
-          const x = c.getContext("2d");
-          x.fillStyle = "#fff";
+          const x = c.getContext('2d');
+          x.fillStyle = '#fff';
           x.fillRect(0, 0, 256, 64);
-          x.fillStyle = "rgba(0,0,0,.17)";
+          x.fillStyle = 'rgba(0,0,0,.17)';
           for (let i = 4; i < 256; i += 10) x.fillRect(i, 0, 4, 64);
           return new T.CanvasTexture(c);
         })();
         function tag(txt, col) {
-          const c = document.createElement("canvas");
+          const c = document.createElement('canvas');
           c.width = 512;
           c.height = 214;
-          const x = c.getContext("2d");
+          const x = c.getContext('2d');
           x.fillStyle = col;
           x.fillRect(0, 0, 512, 214);
-          x.fillStyle = "rgba(0,0,0,.2)";
+          x.fillStyle = 'rgba(0,0,0,.2)';
           for (let i = 0; i < 512; i += 32) x.fillRect(i, 0, 6, 214);
           // Use dark text on light fills, white on dark fills
           const lightFills = [0xffb79d, 0xd9d6d4];
-          const colHex = parseInt(col.replace("#", ""), 16);
+          const colHex = parseInt(col.replace('#', ''), 16);
           const isLight = lightFills.includes(colHex);
-          x.fillStyle = isLight ? "#030000" : "#fff";
+          x.fillStyle = isLight ? '#030000' : '#fff';
           x.font = '500 42px "Inter Tight",system-ui,sans-serif';
-          x.textAlign = "center";
-          x.textBaseline = "middle";
+          x.textAlign = 'center';
+          x.textBaseline = 'middle';
           x.fillText(txt, 256, 107);
           return new T.CanvasTexture(c);
         }
@@ -947,7 +943,7 @@
           });
           const f = txt
             ? new T.MeshStandardMaterial({
-                map: tag(txt, "#" + new T.Color(col).getHexString()),
+                map: tag(txt, '#' + new T.Color(col).getHexString()),
               })
             : m;
           const b = new T.Mesh(new T.BoxGeometry(2.4, 1, 1), [
@@ -1005,7 +1001,7 @@
           );
         }
         const pg = new T.BufferGeometry();
-        pg.setAttribute("position", new T.BufferAttribute(pp, 3));
+        pg.setAttribute('position', new T.BufferAttribute(pp, 3));
         const dotM = new T.PointsMaterial({ size: 0.035 });
         G.add(new T.Points(pg, dotM));
         const A = ll(10.8, 106.7),
@@ -1059,7 +1055,7 @@
             path,
             (gltf) => onLoad(gltf.scene),
             null,
-            (err) => console.warn("GLB load error:", path, err),
+            (err) => console.warn('GLB load error:', path, err),
           );
         }
 
@@ -1067,7 +1063,7 @@
         const pivot = new T.Group();
         G.add(pivot);
         let deliveryModelLoaded = false;
-        loadGLB("kits/car-kit/Models/GLB format/delivery.glb", (model) => {
+        loadGLB('kits/car-kit/Models/GLB format/delivery.glb', (model) => {
           model.traverse((ch) => {
             if (ch.isMesh) {
               ch.castShadow = false;
@@ -1083,7 +1079,7 @@
           model.position.set(-center.x, -bb.min.y, -center.z);
 
           const maxDim = Math.max(size.x, Math.max(size.y, size.z));
-          const scale = 0.35 / maxDim;
+          const scale = 0.5 / maxDim;
 
           const wrapper = new T.Group();
           wrapper.add(model);
@@ -1115,9 +1111,14 @@
           }
         const cm = new T.MeshStandardMaterial({ color: ACC, roughness: 0.5 });
         [-7.4, 3.4].forEach((x) => {
-          const l = new T.Mesh(new T.BoxGeometry(0.25, 5.9, 0.25), cm);
-          l.position.set(x, 2.45, 1.4);
-          P.add(l);
+          [-1.4, 1.4].forEach((dz) => {
+            const l = new T.Mesh(new T.BoxGeometry(0.25, 5.9, 0.25), cm);
+            l.position.set(x, 2.45, 1.4 + dz);
+            P.add(l);
+          });
+          const crossBeam = new T.Mesh(new T.BoxGeometry(0.25, 0.3, 3.05), cm);
+          crossBeam.position.set(x, 5.5, 1.4);
+          P.add(crossBeam);
         });
         const beam = new T.Mesh(new T.BoxGeometry(11, 0.3, 0.4), cm);
         beam.position.set(-2, 5.5, 1.4);
@@ -1145,6 +1146,9 @@
         /* About/Port scene: railway and train */
         const RAIL_Z = 1.4;
         const RAIL_Y = -0.49;
+        const PLANE_HALF = 20;
+        const PARK_X = 0;
+        let START_X = -PLANE_HALF - 10;
 
         const trainGroup = new T.Group();
         trainGroup.position.set(0, RAIL_Y, 0);
@@ -1160,7 +1164,7 @@
         trainGroup.add(gravel);
 
         const trainRig = new T.Group();
-        trainRig.position.set(-22, 0, 0);
+        trainRig.position.set(START_X, 0, 0);
         trainGroup.add(trainRig);
 
         const trainWheels = [];
@@ -1222,91 +1226,372 @@
           return holder;
         }
 
-        loadGLB(
-          "kits/train-kit/Models/GLB format/railroad-straight.glb",
-          (model) => {
-            const holder = normalizeModel(model, 1.1);
-            const bb = new T.Box3().setFromObject(holder);
-            railTopY = bb.max.y;
-            trainRig.position.y = railTopY;
+        const loadP = (url) => new Promise((resolve) => loadGLB(url, resolve));
 
-            const hSize = new T.Vector3();
-            bb.getSize(hSize);
-            const len = hSize.x || 2.4;
-            const count = 18;
-            for (let n = 0; n < count; n++) {
-              const piece = holder.clone();
-              piece.position.set(n * len - (count * len) / 2, 0, RAIL_Z);
-              trainGroup.add(piece);
+        Promise.all([
+          loadP('kits/train-kit/Models/GLB format/railroad-straight.glb'),
+          loadP('kits/train-kit/Models/GLB format/train-locomotive-a.glb'),
+          loadP('kits/train-kit/Models/GLB format/train-carriage-flatbed.glb'),
+        ]).then(([trackModel, locoModel, wagonModel]) => {
+          // Track
+          const trackHolder = normalizeModel(trackModel, 1.1);
+          const tbb = new T.Box3().setFromObject(trackHolder);
+          railTopY = tbb.max.y;
+          trainRig.position.y = railTopY;
+
+          const tSize = new T.Vector3();
+          tbb.getSize(tSize);
+          const tLen = tSize.x || 2.4;
+
+          const span = PLANE_HALF * 2;
+          const count = Math.max(1, Math.round(span / tLen));
+          const sx = span / (count * tLen);
+
+          for (let n = 0; n < count; n++) {
+            const piece = trackHolder.clone();
+            piece.scale.x *= sx;
+            piece.position.set(-PLANE_HALF + (n + 0.5) * tLen * sx, 0, RAIL_Z);
+            trainGroup.add(piece);
+          }
+
+          const modelsToExtract = [];
+
+          // Loco
+          const locoHolder = normalizeModel(locoModel, 0.95);
+          const lbb = new T.Box3().setFromObject(locoHolder);
+          const lSize = new T.Vector3();
+          lbb.getSize(lSize);
+          const locoLen = lSize.x;
+
+          const targetFrontX = 2.4;
+          const locoX = targetFrontX - locoLen / 2 + 0.2;
+          locoHolder.position.set(locoX, 0, RAIL_Z);
+          trainRig.add(locoHolder);
+          modelsToExtract.push(locoModel);
+
+          locoFrontX = targetFrontX;
+          locoTopY = lbb.max.y;
+
+          // Wagons
+          const gap = 0.06;
+          let trainBackX = locoX - locoLen / 2;
+
+          const numWagons = 3;
+          for (let idx = 0; idx < numWagons; idx++) {
+            const wModel = wagonModel.clone();
+            const wHolder = normalizeModel(wModel, 0.95);
+            const wbb = new T.Box3().setFromObject(wHolder);
+            const wSize = new T.Vector3();
+            wbb.getSize(wSize);
+            const wLen = wSize.x;
+            const wInnerW = Math.min(wSize.z * 0.85, 1.0);
+
+            const wagonX = trainBackX - gap - wLen / 2;
+            wHolder.position.set(wagonX, 0, RAIL_Z);
+            trainRig.add(wHolder);
+            modelsToExtract.push(wModel);
+
+            trainBackX = wagonX - wLen / 2;
+
+            P.updateMatrixWorld(true);
+
+            const rcaster = new T.Raycaster();
+            const wCenter = trainRig.localToWorld(
+              new T.Vector3(wagonX, 2.0, RAIL_Z),
+            );
+            rcaster.set(wCenter, new T.Vector3(0, -1, 0));
+            const hits = rcaster.intersectObject(wHolder, true);
+            let deckY = 0.5;
+            if (hits.length > 0) {
+              deckY = trainRig.worldToLocal(hits[0].point).y;
             }
-          },
-        );
 
-        loadGLB(
-          "kits/train-kit/Models/GLB format/train-locomotive-a.glb",
-          (model) => {
-            model.traverse((ch) => {
-              if (ch.isMesh && ch.name.toLowerCase().includes("wheel")) {
-                trainWheels.push(ch);
-              }
-            });
-            const holder = normalizeModel(model, 0.95);
-            const bb = new T.Box3().setFromObject(holder);
-            const hSize = new T.Vector3();
-            bb.getSize(hSize);
+            const cCol = PAL[(idx + 2) % 6];
+            const cBox = cont(cCol);
+            cBox.scale.set((wLen * 0.9) / 2.4, 1.0, wInnerW / 1.0);
+            cBox.position.set(wagonX, deckY + 0.5 * cBox.scale.y, RAIL_Z);
+            trainRig.add(cBox);
+          }
 
-            holder.position.set(2.6, 0, RAIL_Z);
-            trainRig.add(holder);
+          P.updateMatrixWorld(true);
 
-            locoFrontX = 2.6 + hSize.x / 2 - 0.2;
-            locoTopY = bb.max.y;
-          },
-        );
-
-        const numWagons = 3;
-        for (let idx = 0; idx < numWagons; idx++) {
-          loadGLB(
-            "kits/train-kit/Models/GLB format/train-carriage-flatbed.glb",
-            (model) => {
-              model.traverse((ch) => {
-                if (ch.isMesh && ch.name.toLowerCase().includes("wheel")) {
-                  trainWheels.push(ch);
+          try {
+            const rawWheels = [];
+            modelsToExtract.forEach((mod) => {
+              mod.traverse((ch) => {
+                if (ch.isMesh && ch.name.toLowerCase().includes('wheel')) {
+                  rawWheels.push(ch);
                 }
               });
-              const holder = normalizeModel(model, 0.95);
-              const bb = new T.Box3().setFromObject(holder);
-              const hSize = new T.Vector3();
-              bb.getSize(hSize);
-              const wLen = hSize.x;
-              const wInnerW = Math.min(hSize.z * 0.85, 1.0);
-              const gap = 0.06;
+            });
 
-              const wagonX = -idx * (wLen + gap);
-              holder.position.set(wagonX, 0, RAIL_Z);
-              trainRig.add(holder);
+            // CASE 2 Split logic
+            function splitMesh(mesh) {
+              const geom = mesh.geometry;
+              const pos = geom.attributes.position;
+              if (!pos) return [];
 
-              P.updateMatrixWorld(true);
-              const rcaster = new T.Raycaster();
-              const wCenter = trainRig.localToWorld(
-                new T.Vector3(wagonX, 2.0, RAIL_Z),
+              const posArr = pos.array;
+              const index = geom.index ? geom.index.array : null;
+              const numVerts = pos.count;
+
+              const parent = new Int32Array(numVerts);
+              for (let i = 0; i < numVerts; i++) parent[i] = i;
+
+              function find(i) {
+                let root = i;
+                while (root !== parent[root]) root = parent[root];
+                let curr = i;
+                while (curr !== root) {
+                  let nxt = parent[curr];
+                  parent[curr] = root;
+                  curr = nxt;
+                }
+                return root;
+              }
+
+              function union(i, j) {
+                const rootI = find(i);
+                const rootJ = find(j);
+                if (rootI !== rootJ) parent[rootI] = rootJ;
+              }
+
+              const map = new Map();
+              for (let i = 0; i < numVerts; i++) {
+                const px = Math.round(posArr[i * 3] * 1e4);
+                const py = Math.round(posArr[i * 3 + 1] * 1e4);
+                const pz = Math.round(posArr[i * 3 + 2] * 1e4);
+                const key = `${px},${py},${pz}`;
+                if (map.has(key)) union(i, map.get(key));
+                else map.set(key, i);
+              }
+
+              const numTris = index ? index.length / 3 : numVerts / 3;
+              for (let i = 0; i < numTris; i++) {
+                const a = index ? index[i * 3] : i * 3;
+                const b = index ? index[i * 3 + 1] : i * 3 + 1;
+                const c = index ? index[i * 3 + 2] : i * 3 + 2;
+                union(a, b);
+                union(b, c);
+              }
+
+              const comps = new Map();
+              for (let i = 0; i < numTris; i++) {
+                const a = index ? index[i * 3] : i * 3;
+                const root = find(a);
+                if (!comps.has(root)) comps.set(root, []);
+                comps.get(root).push(i);
+              }
+
+              const wheelComps = [];
+              const nonWheelTris = [];
+
+              for (let [root, triIndices] of comps.entries()) {
+                let minX = Infinity,
+                  minY = Infinity,
+                  minZ = Infinity;
+                let maxX = -Infinity,
+                  maxY = -Infinity,
+                  maxZ = -Infinity;
+                for (let ti of triIndices) {
+                  for (let j = 0; j < 3; j++) {
+                    const vi = index ? index[ti * 3 + j] : ti * 3 + j;
+                    const px = posArr[vi * 3],
+                      py = posArr[vi * 3 + 1],
+                      pz = posArr[vi * 3 + 2];
+                    minX = Math.min(minX, px);
+                    minY = Math.min(minY, py);
+                    minZ = Math.min(minZ, pz);
+                    maxX = Math.max(maxX, px);
+                    maxY = Math.max(maxY, py);
+                    maxZ = Math.max(maxZ, pz);
+                  }
+                }
+                const dx = maxX - minX,
+                  dy = maxY - minY,
+                  dz = maxZ - minZ;
+                const maxD = Math.max(dx, dy, dz);
+                const minD = Math.min(dx, dy, dz);
+                const midD = dx + dy + dz - maxD - minD;
+
+                if (midD >= maxD * 0.85 && minD < maxD * 0.6) {
+                  wheelComps.push({
+                    triIndices,
+                    min: [minX, minY, minZ],
+                    max: [maxX, maxY, maxZ],
+                  });
+                } else {
+                  for (let ti of triIndices) nonWheelTris.push(ti);
+                }
+              }
+
+              if (wheelComps.length === 0) return []; // CASE 3: No discs separated
+
+              const newMeshes = [];
+              const mat = mesh.material;
+              for (let wc of wheelComps) {
+                const newGeom = new T.BufferGeometry();
+                newGeom.setAttribute('position', geom.attributes.position);
+                if (geom.attributes.normal)
+                  newGeom.setAttribute('normal', geom.attributes.normal);
+                if (geom.attributes.uv)
+                  newGeom.setAttribute('uv', geom.attributes.uv);
+
+                const newIndex = new (index ? index.constructor : Uint32Array)(
+                  wc.triIndices.length * 3,
+                );
+                for (let i = 0; i < wc.triIndices.length; i++) {
+                  const ti = wc.triIndices[i];
+                  newIndex[i * 3] = index ? index[ti * 3] : ti * 3;
+                  newIndex[i * 3 + 1] = index ? index[ti * 3 + 1] : ti * 3 + 1;
+                  newIndex[i * 3 + 2] = index ? index[ti * 3 + 2] : ti * 3 + 2;
+                }
+                newGeom.setIndex(new T.BufferAttribute(newIndex, 1));
+
+                newGeom.boundingBox = new T.Box3(
+                  new T.Vector3(wc.min[0], wc.min[1], wc.min[2]),
+                  new T.Vector3(wc.max[0], wc.max[1], wc.max[2]),
+                );
+                const center = new T.Vector3();
+                newGeom.boundingBox.getCenter(center);
+                newGeom.boundingSphere = new T.Sphere(
+                  center,
+                  center.distanceTo(newGeom.boundingBox.max),
+                );
+
+                const newMesh = new T.Mesh(newGeom, mat);
+                newMesh.name = mesh.name + '_disc';
+
+                newMesh.position.copy(mesh.position);
+                newMesh.rotation.copy(mesh.rotation);
+                newMesh.scale.copy(mesh.scale);
+                if (mesh.parent) mesh.parent.add(newMesh);
+
+                newMeshes.push(newMesh);
+              }
+
+              let kMinX = Infinity,
+                kMinY = Infinity,
+                kMinZ = Infinity;
+              let kMaxX = -Infinity,
+                kMaxY = -Infinity,
+                kMaxZ = -Infinity;
+
+              const keepIndex = new (index ? index.constructor : Uint32Array)(
+                nonWheelTris.length * 3,
               );
-              rcaster.set(wCenter, new T.Vector3(0, -1, 0));
-              const hits = rcaster.intersectObject(holder, true);
-              let deckY = 0.5;
-              if (hits.length > 0) {
-                deckY = trainRig.worldToLocal(hits[0].point).y;
+              for (let i = 0; i < nonWheelTris.length; i++) {
+                const ti = nonWheelTris[i];
+                keepIndex[i * 3] = index ? index[ti * 3] : ti * 3;
+                keepIndex[i * 3 + 1] = index ? index[ti * 3 + 1] : ti * 3 + 1;
+                keepIndex[i * 3 + 2] = index ? index[ti * 3 + 2] : ti * 3 + 2;
+
+                for (let j = 0; j < 3; j++) {
+                  const vi = index ? index[ti * 3 + j] : ti * 3 + j;
+                  const px = posArr[vi * 3],
+                    py = posArr[vi * 3 + 1],
+                    pz = posArr[vi * 3 + 2];
+                  kMinX = Math.min(kMinX, px);
+                  kMinY = Math.min(kMinY, py);
+                  kMinZ = Math.min(kMinZ, pz);
+                  kMaxX = Math.max(kMaxX, px);
+                  kMaxY = Math.max(kMaxY, py);
+                  kMaxZ = Math.max(kMaxZ, pz);
+                }
               }
 
-              if (idx !== 0) {
-                const cCol = PAL[(idx + 2) % 6];
-                const cBox = cont(cCol);
-                cBox.scale.set((wLen * 0.9) / 2.4, 1.0, wInnerW / 1.0);
-                cBox.position.set(wagonX, deckY + 0.5 * cBox.scale.y, RAIL_Z);
-                trainRig.add(cBox);
+              mesh.geometry = mesh.geometry.clone();
+              mesh.geometry.setIndex(new T.BufferAttribute(keepIndex, 1));
+
+              if (nonWheelTris.length > 0) {
+                mesh.geometry.boundingBox = new T.Box3(
+                  new T.Vector3(kMinX, kMinY, kMinZ),
+                  new T.Vector3(kMaxX, kMaxY, kMaxZ),
+                );
+                const kCenter = new T.Vector3();
+                mesh.geometry.boundingBox.getCenter(kCenter);
+                mesh.geometry.boundingSphere = new T.Sphere(
+                  kCenter,
+                  kCenter.distanceTo(mesh.geometry.boundingBox.max),
+                );
               }
-            },
+
+              return newMeshes;
+            }
+
+            const discsToPivot = [];
+
+            rawWheels.forEach((ch) => {
+              const wbb = new T.Box3().setFromObject(ch);
+              const wSize = new T.Vector3();
+              wbb.getSize(wSize);
+
+              const minDim = Math.min(wSize.x, wSize.y, wSize.z);
+              const maxDim = Math.max(wSize.x, wSize.y, wSize.z);
+              const midDim = wSize.x + wSize.y + wSize.z - maxDim - minDim;
+
+              // CASE 1 Check: is the entire mesh a round disc?
+              if (midDim >= maxDim * 0.85 && minDim < maxDim * 0.6) {
+                discsToPivot.push(ch);
+              } else {
+                // CASE 2 Split
+                const extractedDiscs = splitMesh(ch);
+                // The extracted meshes are now separate, so add them to discsToPivot
+                extractedDiscs.forEach((d) => discsToPivot.push(d));
+              }
+            });
+
+            // STEP 1 - Apply pivots
+            P.updateMatrixWorld(true);
+
+            discsToPivot.forEach((disc) => {
+              const wbb = new T.Box3().setFromObject(disc);
+              const wSize = new T.Vector3();
+              wbb.getSize(wSize);
+
+              const maxDim = Math.max(wSize.x, wSize.y, wSize.z);
+              const radius = maxDim / 2;
+
+              const center = new T.Vector3();
+              wbb.getCenter(center);
+
+              const pivot = new T.Group();
+              trainRig.worldToLocal(center);
+              pivot.position.copy(center);
+              trainRig.add(pivot);
+
+              pivot.attach(disc);
+
+              // Smallest dimension in trainRig space is the rotation axis.
+              // For Box3, we compute in trainRig space by localizing the bounds.
+              // But wait, wbb is in world space. Since trainRig only translates along X,
+              // world space dimensions perfectly align with trainRig space dimensions!
+              // Z is the width (axle direction). We will rotate around Z.
+              // The user specified: pivot.rotation.z -= dX / radius.
+              // So we don't need to dynamically detect the axis here, just use Z in the animation.
+              trainWheels.push({ pivot, radius });
+            });
+          } catch (e) {
+            console.error('Wheel extraction failed:', e);
+          }
+
+          P.updateMatrixWorld(true);
+          const fullTrainBB = new T.Box3().setFromObject(trainRig);
+          const minVec = new T.Vector3(
+            fullTrainBB.min.x === Infinity ? 0 : fullTrainBB.min.x,
+            0,
+            0,
           );
-        }
+          trainRig.worldToLocal(minVec);
+          const finalTrainBackX = minVec.x;
+
+          const oldStartX = START_X;
+          START_X = -PLANE_HALF - finalTrainBackX;
+
+          if (trainRig.position.x === oldStartX) {
+            trainRig.position.x = START_X;
+          }
+        });
 
         const W = new T.Group();
         W.position.x = 80;
@@ -1371,10 +1656,10 @@
         truck.position.y = 0.22;
         E.add(truck);
         /* Work section: load sedan-sports GLB, parent into the existing truck group */
-        loadGLB("kits/car-kit/Models/GLB format/sedan-sports.glb", (model) => {
+        loadGLB('kits/car-kit/Models/GLB format/sedan-sports.glb', (model) => {
           model.scale.setScalar(0.52);
           /* sedan-sports faces +Z by default; route tangent math expects +X forward */
-          model.rotation.y = -Math.PI / 2;
+          model.rotation.y = Math.PI / 2;
           model.position.y = -0.22; // sit on road
           truck.add(model);
         });
@@ -1450,7 +1735,7 @@
           bp = new Float32Array(BN * 3),
           bs = Array.from({ length: BN }, Math.random),
           bg = new T.BufferGeometry();
-        bg.setAttribute("position", new T.BufferAttribute(bp, 3));
+        bg.setAttribute('position', new T.BufferAttribute(bp, 3));
         const beans = new T.Points(
           bg,
           new T.PointsMaterial({
@@ -1475,7 +1760,7 @@
             i * 3,
           );
         const sg = new T.BufferGeometry();
-        sg.setAttribute("position", new T.BufferAttribute(SP, 3));
+        sg.setAttribute('position', new T.BufferAttribute(SP, 3));
         const starM = new T.PointsMaterial({
           size: 0.05,
           transparent: true,
@@ -1484,13 +1769,13 @@
         S.add(new T.Points(sg, starM));
 
         function theme() {
-          const bg = new T.Color(css("--bg"));
+          const bg = new T.Color(css('--bg'));
           S.background = bg;
           S.fog = new T.Fog(bg, 14, 55);
-          dotM.color.set(css("--dot"));
-          starM.color.set(css("--dot"));
+          dotM.color.set(css('--dot'));
+          starM.color.set(css('--dot'));
 
-          const ballCol = new T.Color(css("--ball"));
+          const ballCol = new T.Color(css('--ball'));
           ball.material.color.copy(ballCol);
           gm.color.copy(ballCol);
 
@@ -1498,8 +1783,8 @@
           gravelMat.color.copy(ballCol).lerp(new T.Color(0x000000), 0.2);
         }
         theme();
-        matchMedia("(prefers-color-scheme: dark)").addEventListener(
-          "change",
+        matchMedia('(prefers-color-scheme: dark)').addEventListener(
+          'change',
           theme,
         );
         new MutationObserver(theme).observe(document.documentElement, {
@@ -1538,7 +1823,7 @@
           lx = 0,
           t = 0,
           last = performance.now();
-        const cv = $("#c"),
+        const cv = $('#c'),
           ray = new T.Raycaster(),
           v2 = new T.Vector2();
         function size() {
@@ -1561,16 +1846,16 @@
           calc();
         }
         size();
-        addEventListener("resize", size);
-        addEventListener("load", meas);
-        addEventListener("pointerdown", (e) => {
+        addEventListener('resize', size);
+        addEventListener('load', meas);
+        addEventListener('pointerdown', (e) => {
           if (e.target === cv && cs < 0.6) {
             drag = 1;
             lx = e.clientX;
           }
         });
-        addEventListener("pointerup", () => (drag = 0));
-        addEventListener("pointermove", (e) => {
+        addEventListener('pointerup', () => (drag = 0));
+        addEventListener('pointermove', (e) => {
           mx = (e.clientX / innerWidth) * 2 - 1;
           my = (e.clientY / innerHeight) * 2 - 1;
           if (drag) {
@@ -1585,11 +1870,11 @@
             if (n !== hov) {
               hov = n;
               lit();
-              cv.style.cursor = n >= 0 ? "pointer" : "";
+              cv.style.cursor = n >= 0 ? 'pointer' : '';
             }
           }
         });
-        addEventListener("click", (e) => {
+        addEventListener('click', (e) => {
           if (e.target === cv && hov >= 0) pick(hov);
         });
         const near = (n) => Math.abs(cs - n) < 1.4,
@@ -1616,6 +1901,9 @@
           pos.y -= py * 0.4;
           cam.position.copy(pos);
           cam.lookAt(look);
+
+          trainGroup.visible = Math.abs(cs - 1) < 1.2;
+
           if (near(0)) {
             G.rotation.y = base + off + Math.sin(t * 0.3) * 0.3;
             G.updateMatrixWorld();
@@ -1658,12 +1946,12 @@
             // Train animation
             const ad = Math.abs(cs - 1);
             if (reduce) {
-              trainRig.position.x = 0;
+              trainRig.position.x = PARK_X;
               sigLightMat.color.setHex(0x00ff00);
             } else {
               if (ad > 1.2) {
                 trainState = 0;
-                trainRig.position.x = -22;
+                trainRig.position.x = START_X;
                 trainTime = 0;
               } else if (ad < 0.45 && trainState === 0) {
                 trainState = 1;
@@ -1676,13 +1964,13 @@
                 // Ease out cubic
                 let ease = 1 - Math.pow(1 - progress, 3);
                 let oldX = trainRig.position.x;
-                trainRig.position.x = -22 + 22 * ease;
+                trainRig.position.x = START_X + (PARK_X - START_X) * ease;
 
                 if (progress < 1.0) {
                   moving = true;
                   let dX = trainRig.position.x - oldX;
                   trainWheels.forEach((w) => {
-                    w.rotation.x -= dX * 2.5;
+                    w.pivot.rotation.z -= dX / w.radius;
                   });
                 }
               }
@@ -1757,33 +2045,33 @@
     </script>
     <script>
       (function () {
-        var btn = document.getElementById("theme-toggle");
+        var btn = document.getElementById('theme-toggle');
         var root = document.documentElement;
 
         /* determine current effective theme */
         function getEffective() {
-          var saved = localStorage.getItem("theme");
+          var saved = localStorage.getItem('theme');
           if (saved) return saved;
-          return matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
+          return matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
         }
 
         function applyTheme(theme) {
-          root.setAttribute("data-theme", theme);
-          localStorage.setItem("theme", theme);
-          btn.textContent = theme === "dark" ? "☀" : "🌙";
+          root.setAttribute('data-theme', theme);
+          localStorage.setItem('theme', theme);
+          btn.textContent = theme === 'dark' ? '☀' : '🌙';
           btn.setAttribute(
-            "aria-label",
-            theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+            'aria-label',
+            theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
           );
         }
 
         /* initialise icon from current state */
         applyTheme(getEffective());
 
-        btn.addEventListener("click", function () {
-          var next = getEffective() === "dark" ? "light" : "dark";
+        btn.addEventListener('click', function () {
+          var next = getEffective() === 'dark' ? 'light' : 'dark';
           applyTheme(next);
         });
       })();
