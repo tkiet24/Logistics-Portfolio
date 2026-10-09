@@ -138,31 +138,74 @@
       }
       nav {
         display: flex;
-        background: var(--panel);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid var(--line);
-        border-radius: var(--r-card);
-        box-shadow: var(--shadow-soft);
+        flex-direction: column;
+        gap: 16px;
+        position: fixed;
+        right: var(--gutter);
+        top: 50%;
+        transform: translateY(-50%);
         pointer-events: auto;
+        z-index: 10;
+      }
+      nav::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        background: var(--line);
+        z-index: -1;
       }
       nav a {
-        pointer-events: auto;
-        color: var(--fg);
+        position: relative;
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--dot);
+        margin: 0 auto;
+        padding: 0;
+        opacity: 0.6;
+        transition:
+          background 0.3s,
+          transform 0.3s,
+          opacity 0.3s;
         text-decoration: none;
-        font-size: 0.95rem;
-        margin: 0;
-        padding: 12px 16px;
-        opacity: 0.7;
-        border-left: 1px solid var(--line);
-        border-bottom: 2px solid transparent;
       }
-      nav a:first-child {
-        border-left: 0;
-      }
-      nav a.on {
+      nav a.on,
+      nav a:hover {
         opacity: 1;
-        border-bottom-color: var(--accent);
+        background: var(--accent);
+        transform: scale(1.4);
+      }
+      nav a::after {
+        content: attr(data-text);
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--panel);
+        color: var(--fg);
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.3s,
+          visibility 0.3s,
+          right 0.3s;
+        pointer-events: none;
+        box-shadow: var(--shadow-soft);
+      }
+      nav a:hover::after {
+        opacity: 1;
+        visibility: visible;
+        right: 22px;
       }
       a:focus-visible,
       button:focus-visible {
@@ -350,10 +393,7 @@
           width: 100%;
           padding: 18px;
         }
-        nav a {
-          padding: 12px;
-          font-size: 0.8rem;
-        }
+
         header b {
           display: none;
         }
@@ -544,9 +584,11 @@
         🌙
       </button>
       <nav>
-        <a href="#home">Home</a><a href="#about">About</a
-        ><a href="#skills">Skills</a><a href="#work">Work</a
-        ><a href="#contact">Contact</a>
+        <a href="#home" data-text="Home" aria-label="Home"></a>
+        <a href="#about" data-text="About" aria-label="About"></a>
+        <a href="#skills" data-text="Skills" aria-label="Skills"></a>
+        <a href="#work" data-text="Work" aria-label="Work"></a>
+        <a href="#contact" data-text="Contact" aria-label="Contact"></a>
       </nav>
     </header>
     <canvas id="c" aria-hidden="true"></canvas>
@@ -667,6 +709,7 @@
     </section>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
       (function () {
         const $ = (s) => document.querySelector(s),
@@ -1047,7 +1090,50 @@
           base = Math.atan2(-mid.x, mid.z);
         G.rotation.x = 0.28;
 
-        /* port with crane */
+        /* GLB loader helper */
+        const loader = new THREE.GLTFLoader();
+        function loadGLB(path, onLoad) {
+          loader.load(
+            path,
+            (gltf) => onLoad(gltf.scene),
+            null,
+            (err) => console.warn('GLB load error:', path, err),
+          );
+        }
+
+        /* Home scene: delivery truck replacing the box ship */
+        const pivot = new T.Group();
+        G.add(pivot);
+        let deliveryModelLoaded = false;
+        loadGLB('kits/car-kit/Models/GLB format/delivery.glb', (model) => {
+          model.traverse((ch) => {
+            if (ch.isMesh) {
+              ch.castShadow = false;
+            }
+          });
+
+          const bb = new T.Box3().setFromObject(model);
+          const size = new T.Vector3();
+          bb.getSize(size);
+          const center = new T.Vector3();
+          bb.getCenter(center);
+
+          model.position.set(-center.x, -bb.min.y, -center.z);
+
+          const maxDim = Math.max(size.x, Math.max(size.y, size.z));
+          const scale = 0.5 / maxDim;
+
+          const wrapper = new T.Group();
+          wrapper.add(model);
+          wrapper.scale.setScalar(scale);
+          // Offset so the cab faces forward (-Z direction in the matrix).
+          // Kenney cars often face +Z or +X natively.
+          wrapper.rotation.y = Math.PI;
+
+          pivot.add(wrapper);
+          ship.visible = false; // Hide fallback box ship
+          deliveryModelLoaded = true;
+        });
         const P = new T.Group();
         P.position.x = 40;
         S.add(P);
@@ -1067,9 +1153,14 @@
           }
         const cm = new T.MeshStandardMaterial({ color: ACC, roughness: 0.5 });
         [-7.4, 3.4].forEach((x) => {
-          const l = new T.Mesh(new T.BoxGeometry(0.25, 5.9, 0.25), cm);
-          l.position.set(x, 2.45, 1.4);
-          P.add(l);
+          [-1.4, 1.4].forEach((dz) => {
+            const l = new T.Mesh(new T.BoxGeometry(0.25, 5.9, 0.25), cm);
+            l.position.set(x, 2.45, 1.4 + dz);
+            P.add(l);
+          });
+          const crossBeam = new T.Mesh(new T.BoxGeometry(0.25, 0.3, 3.05), cm);
+          crossBeam.position.set(x, 5.5, 1.4);
+          P.add(crossBeam);
         });
         const beam = new T.Mesh(new T.BoxGeometry(11, 0.3, 0.4), cm);
         beam.position.set(-2, 5.5, 1.4);
@@ -1085,16 +1176,457 @@
           new T.MeshStandardMaterial({ color: 0x2b2625 }),
         );
         P.add(rope);
-        for (let n = 0; n < 6; n++) {
-          const w = new T.Mesh(
-            new T.BoxGeometry(2, 1 + (n % 3) * 0.6, 1.2),
-            new T.MeshStandardMaterial({ color: 0xd9d6d4, roughness: 0.9 }),
-          );
-          w.position.set(-9 + n * 3.6, -0.5 + (1 + (n % 3) * 0.6) / 2, -9);
-          P.add(w);
+
+        /* About/Port scene: railway and train */
+        const RAIL_Z = 1.4;
+        const RAIL_Y = -0.49;
+        const PLANE_HALF = 20;
+        const PARK_X = 0;
+        let START_X = -PLANE_HALF - 10;
+
+        const trainGroup = new T.Group();
+        trainGroup.position.set(0, RAIL_Y, 0);
+        P.add(trainGroup);
+
+        const gravelMat = new T.MeshStandardMaterial({
+          color: 0x444444,
+          roughness: 1,
+        });
+        const gravel = new T.Mesh(new T.PlaneGeometry(40, 1.6), gravelMat);
+        gravel.rotation.x = -Math.PI / 2;
+        gravel.position.set(0, 0.01, RAIL_Z);
+        trainGroup.add(gravel);
+
+        const trainRig = new T.Group();
+        trainRig.position.set(START_X, 0, 0);
+        trainGroup.add(trainRig);
+
+        const trainWheels = [];
+        const smokePuffs = [];
+        const smokeMat = new T.MeshBasicMaterial({
+          color: 0xd9d6d4,
+          transparent: true,
+          opacity: 0.6,
+        });
+        const smokeGeo = new T.SphereGeometry(0.12, 8, 8);
+        const numPuffs = mob ? 4 : 8;
+        for (let i = 0; i < numPuffs; i++) {
+          const p = new T.Mesh(smokeGeo, smokeMat);
+          p.visible = false;
+          trainRig.add(p);
+          smokePuffs.push({ mesh: p, life: 0, delay: i * (1.0 / numPuffs) });
         }
 
-        /* skills wall */
+        const signalGroup = new T.Group();
+        signalGroup.position.set(3, 0, RAIL_Z - 0.9);
+        trainGroup.add(signalGroup);
+        const sigPost = new T.Mesh(new T.BoxGeometry(0.1, 1.5, 0.1), cm);
+        sigPost.position.y = 0.75;
+        signalGroup.add(sigPost);
+        const sigLightMat = new T.MeshBasicMaterial({ color: 0x00ff00 });
+        const sigLight = new T.Mesh(
+          new T.SphereGeometry(0.08, 8, 8),
+          sigLightMat,
+        );
+        sigLight.position.set(0, 1.4, 0.1);
+        signalGroup.add(sigLight);
+
+        let trainState = 0; // 0=parked/idle, 1=arriving
+        let trainTime = 0;
+        let railTopY = 0;
+        let locoFrontX = 3.5;
+        let locoTopY = 2;
+
+        function normalizeModel(model, scale, faceX = true) {
+          const holder = new T.Group();
+          holder.scale.setScalar(scale);
+          const bb = new T.Box3().setFromObject(model);
+          const center = new T.Vector3();
+          bb.getCenter(center);
+
+          model.position.set(-center.x, -bb.min.y, -center.z);
+          holder.add(model);
+
+          const hbb = new T.Box3().setFromObject(holder);
+          const hSize = new T.Vector3();
+          hbb.getSize(hSize);
+
+          if (hSize.z > hSize.x) {
+            holder.rotation.y = Math.PI / 2;
+          }
+          if (!faceX) {
+            holder.rotation.y += Math.PI;
+          }
+          return holder;
+        }
+
+        const loadP = (url) => new Promise((resolve) => loadGLB(url, resolve));
+
+        Promise.all([
+          loadP('kits/train-kit/Models/GLB format/railroad-straight.glb'),
+          loadP('kits/train-kit/Models/GLB format/train-locomotive-a.glb'),
+          loadP('kits/train-kit/Models/GLB format/train-carriage-flatbed.glb'),
+        ]).then(([trackModel, locoModel, wagonModel]) => {
+          // Track
+          const trackHolder = normalizeModel(trackModel, 1.1);
+          const tbb = new T.Box3().setFromObject(trackHolder);
+          railTopY = tbb.max.y;
+          trainRig.position.y = railTopY;
+
+          const tSize = new T.Vector3();
+          tbb.getSize(tSize);
+          const tLen = tSize.x || 2.4;
+
+          const span = PLANE_HALF * 2;
+          const count = Math.max(1, Math.round(span / tLen));
+          const sx = span / (count * tLen);
+
+          for (let n = 0; n < count; n++) {
+            const piece = trackHolder.clone();
+            piece.scale.x *= sx;
+            piece.position.set(-PLANE_HALF + (n + 0.5) * tLen * sx, 0, RAIL_Z);
+            trainGroup.add(piece);
+          }
+
+          const modelsToExtract = [];
+
+          // Loco
+          const locoHolder = normalizeModel(locoModel, 0.95);
+          const lbb = new T.Box3().setFromObject(locoHolder);
+          const lSize = new T.Vector3();
+          lbb.getSize(lSize);
+          const locoLen = lSize.x;
+
+          const targetFrontX = 2.4;
+          const locoX = targetFrontX - locoLen / 2 + 0.2;
+          locoHolder.position.set(locoX, 0, RAIL_Z);
+          trainRig.add(locoHolder);
+          modelsToExtract.push(locoModel);
+
+          locoFrontX = targetFrontX;
+          locoTopY = lbb.max.y;
+
+          // Wagons
+          const gap = 0.06;
+          let trainBackX = locoX - locoLen / 2;
+
+          const numWagons = 3;
+          for (let idx = 0; idx < numWagons; idx++) {
+            const wModel = wagonModel.clone();
+            const wHolder = normalizeModel(wModel, 0.95);
+            const wbb = new T.Box3().setFromObject(wHolder);
+            const wSize = new T.Vector3();
+            wbb.getSize(wSize);
+            const wLen = wSize.x;
+            const wInnerW = Math.min(wSize.z * 0.85, 1.0);
+
+            const wagonX = trainBackX - gap - wLen / 2;
+            wHolder.position.set(wagonX, 0, RAIL_Z);
+            trainRig.add(wHolder);
+            modelsToExtract.push(wModel);
+
+            trainBackX = wagonX - wLen / 2;
+
+            P.updateMatrixWorld(true);
+
+            const rcaster = new T.Raycaster();
+            const wCenter = trainRig.localToWorld(
+              new T.Vector3(wagonX, 2.0, RAIL_Z),
+            );
+            rcaster.set(wCenter, new T.Vector3(0, -1, 0));
+            const hits = rcaster.intersectObject(wHolder, true);
+            let deckY = 0.5;
+            if (hits.length > 0) {
+              deckY = trainRig.worldToLocal(hits[0].point).y;
+            }
+
+            const cCol = PAL[(idx + 2) % 6];
+            const cBox = cont(cCol);
+            cBox.scale.set((wLen * 0.9) / 2.4, 1.0, wInnerW / 1.0);
+            cBox.position.set(wagonX, deckY + 0.5 * cBox.scale.y, RAIL_Z);
+            trainRig.add(cBox);
+          }
+
+          P.updateMatrixWorld(true);
+
+          try {
+            const rawWheels = [];
+            modelsToExtract.forEach((mod) => {
+              mod.traverse((ch) => {
+                if (ch.isMesh && ch.name.toLowerCase().includes('wheel')) {
+                  rawWheels.push(ch);
+                }
+              });
+            });
+
+            // CASE 2 Split logic
+            function splitMesh(mesh) {
+              const geom = mesh.geometry;
+              const pos = geom.attributes.position;
+              if (!pos) return [];
+
+              const posArr = pos.array;
+              const index = geom.index ? geom.index.array : null;
+              const numVerts = pos.count;
+
+              const parent = new Int32Array(numVerts);
+              for (let i = 0; i < numVerts; i++) parent[i] = i;
+
+              function find(i) {
+                let root = i;
+                while (root !== parent[root]) root = parent[root];
+                let curr = i;
+                while (curr !== root) {
+                  let nxt = parent[curr];
+                  parent[curr] = root;
+                  curr = nxt;
+                }
+                return root;
+              }
+
+              function union(i, j) {
+                const rootI = find(i);
+                const rootJ = find(j);
+                if (rootI !== rootJ) parent[rootI] = rootJ;
+              }
+
+              const map = new Map();
+              for (let i = 0; i < numVerts; i++) {
+                const px = Math.round(posArr[i * 3] * 1e4);
+                const py = Math.round(posArr[i * 3 + 1] * 1e4);
+                const pz = Math.round(posArr[i * 3 + 2] * 1e4);
+                const key = `${px},${py},${pz}`;
+                if (map.has(key)) union(i, map.get(key));
+                else map.set(key, i);
+              }
+
+              const numTris = index ? index.length / 3 : numVerts / 3;
+              for (let i = 0; i < numTris; i++) {
+                const a = index ? index[i * 3] : i * 3;
+                const b = index ? index[i * 3 + 1] : i * 3 + 1;
+                const c = index ? index[i * 3 + 2] : i * 3 + 2;
+                union(a, b);
+                union(b, c);
+              }
+
+              const comps = new Map();
+              for (let i = 0; i < numTris; i++) {
+                const a = index ? index[i * 3] : i * 3;
+                const root = find(a);
+                if (!comps.has(root)) comps.set(root, []);
+                comps.get(root).push(i);
+              }
+
+              const wheelComps = [];
+              const nonWheelTris = [];
+
+              for (let [root, triIndices] of comps.entries()) {
+                let minX = Infinity,
+                  minY = Infinity,
+                  minZ = Infinity;
+                let maxX = -Infinity,
+                  maxY = -Infinity,
+                  maxZ = -Infinity;
+                for (let ti of triIndices) {
+                  for (let j = 0; j < 3; j++) {
+                    const vi = index ? index[ti * 3 + j] : ti * 3 + j;
+                    const px = posArr[vi * 3],
+                      py = posArr[vi * 3 + 1],
+                      pz = posArr[vi * 3 + 2];
+                    minX = Math.min(minX, px);
+                    minY = Math.min(minY, py);
+                    minZ = Math.min(minZ, pz);
+                    maxX = Math.max(maxX, px);
+                    maxY = Math.max(maxY, py);
+                    maxZ = Math.max(maxZ, pz);
+                  }
+                }
+                const dx = maxX - minX,
+                  dy = maxY - minY,
+                  dz = maxZ - minZ;
+                const maxD = Math.max(dx, dy, dz);
+                const minD = Math.min(dx, dy, dz);
+                const midD = dx + dy + dz - maxD - minD;
+
+                if (midD >= maxD * 0.85 && minD < maxD * 0.6) {
+                  wheelComps.push({
+                    triIndices,
+                    min: [minX, minY, minZ],
+                    max: [maxX, maxY, maxZ],
+                  });
+                } else {
+                  for (let ti of triIndices) nonWheelTris.push(ti);
+                }
+              }
+
+              if (wheelComps.length === 0) return []; // CASE 3: No discs separated
+
+              const newMeshes = [];
+              const mat = mesh.material;
+              for (let wc of wheelComps) {
+                const newGeom = new T.BufferGeometry();
+                newGeom.setAttribute('position', geom.attributes.position);
+                if (geom.attributes.normal)
+                  newGeom.setAttribute('normal', geom.attributes.normal);
+                if (geom.attributes.uv)
+                  newGeom.setAttribute('uv', geom.attributes.uv);
+
+                const newIndex = new (index ? index.constructor : Uint32Array)(
+                  wc.triIndices.length * 3,
+                );
+                for (let i = 0; i < wc.triIndices.length; i++) {
+                  const ti = wc.triIndices[i];
+                  newIndex[i * 3] = index ? index[ti * 3] : ti * 3;
+                  newIndex[i * 3 + 1] = index ? index[ti * 3 + 1] : ti * 3 + 1;
+                  newIndex[i * 3 + 2] = index ? index[ti * 3 + 2] : ti * 3 + 2;
+                }
+                newGeom.setIndex(new T.BufferAttribute(newIndex, 1));
+
+                newGeom.boundingBox = new T.Box3(
+                  new T.Vector3(wc.min[0], wc.min[1], wc.min[2]),
+                  new T.Vector3(wc.max[0], wc.max[1], wc.max[2]),
+                );
+                const center = new T.Vector3();
+                newGeom.boundingBox.getCenter(center);
+                newGeom.boundingSphere = new T.Sphere(
+                  center,
+                  center.distanceTo(newGeom.boundingBox.max),
+                );
+
+                const newMesh = new T.Mesh(newGeom, mat);
+                newMesh.name = mesh.name + '_disc';
+
+                newMesh.position.copy(mesh.position);
+                newMesh.rotation.copy(mesh.rotation);
+                newMesh.scale.copy(mesh.scale);
+                if (mesh.parent) mesh.parent.add(newMesh);
+
+                newMeshes.push(newMesh);
+              }
+
+              let kMinX = Infinity,
+                kMinY = Infinity,
+                kMinZ = Infinity;
+              let kMaxX = -Infinity,
+                kMaxY = -Infinity,
+                kMaxZ = -Infinity;
+
+              const keepIndex = new (index ? index.constructor : Uint32Array)(
+                nonWheelTris.length * 3,
+              );
+              for (let i = 0; i < nonWheelTris.length; i++) {
+                const ti = nonWheelTris[i];
+                keepIndex[i * 3] = index ? index[ti * 3] : ti * 3;
+                keepIndex[i * 3 + 1] = index ? index[ti * 3 + 1] : ti * 3 + 1;
+                keepIndex[i * 3 + 2] = index ? index[ti * 3 + 2] : ti * 3 + 2;
+
+                for (let j = 0; j < 3; j++) {
+                  const vi = index ? index[ti * 3 + j] : ti * 3 + j;
+                  const px = posArr[vi * 3],
+                    py = posArr[vi * 3 + 1],
+                    pz = posArr[vi * 3 + 2];
+                  kMinX = Math.min(kMinX, px);
+                  kMinY = Math.min(kMinY, py);
+                  kMinZ = Math.min(kMinZ, pz);
+                  kMaxX = Math.max(kMaxX, px);
+                  kMaxY = Math.max(kMaxY, py);
+                  kMaxZ = Math.max(kMaxZ, pz);
+                }
+              }
+
+              mesh.geometry = mesh.geometry.clone();
+              mesh.geometry.setIndex(new T.BufferAttribute(keepIndex, 1));
+
+              if (nonWheelTris.length > 0) {
+                mesh.geometry.boundingBox = new T.Box3(
+                  new T.Vector3(kMinX, kMinY, kMinZ),
+                  new T.Vector3(kMaxX, kMaxY, kMaxZ),
+                );
+                const kCenter = new T.Vector3();
+                mesh.geometry.boundingBox.getCenter(kCenter);
+                mesh.geometry.boundingSphere = new T.Sphere(
+                  kCenter,
+                  kCenter.distanceTo(mesh.geometry.boundingBox.max),
+                );
+              }
+
+              return newMeshes;
+            }
+
+            const discsToPivot = [];
+
+            rawWheels.forEach((ch) => {
+              const wbb = new T.Box3().setFromObject(ch);
+              const wSize = new T.Vector3();
+              wbb.getSize(wSize);
+
+              const minDim = Math.min(wSize.x, wSize.y, wSize.z);
+              const maxDim = Math.max(wSize.x, wSize.y, wSize.z);
+              const midDim = wSize.x + wSize.y + wSize.z - maxDim - minDim;
+
+              // CASE 1 Check: is the entire mesh a round disc?
+              if (midDim >= maxDim * 0.85 && minDim < maxDim * 0.6) {
+                discsToPivot.push(ch);
+              } else {
+                // CASE 2 Split
+                const extractedDiscs = splitMesh(ch);
+                // The extracted meshes are now separate, so add them to discsToPivot
+                extractedDiscs.forEach((d) => discsToPivot.push(d));
+              }
+            });
+
+            // STEP 1 - Apply pivots
+            P.updateMatrixWorld(true);
+
+            discsToPivot.forEach((disc) => {
+              const wbb = new T.Box3().setFromObject(disc);
+              const wSize = new T.Vector3();
+              wbb.getSize(wSize);
+
+              const maxDim = Math.max(wSize.x, wSize.y, wSize.z);
+              const radius = maxDim / 2;
+
+              const center = new T.Vector3();
+              wbb.getCenter(center);
+
+              const pivot = new T.Group();
+              trainRig.worldToLocal(center);
+              pivot.position.copy(center);
+              trainRig.add(pivot);
+
+              pivot.attach(disc);
+
+              // Smallest dimension in trainRig space is the rotation axis.
+              // For Box3, we compute in trainRig space by localizing the bounds.
+              // But wait, wbb is in world space. Since trainRig only translates along X,
+              // world space dimensions perfectly align with trainRig space dimensions!
+              // Z is the width (axle direction). We will rotate around Z.
+              // The user specified: pivot.rotation.z -= dX / radius.
+              // So we don't need to dynamically detect the axis here, just use Z in the animation.
+              trainWheels.push({ pivot, radius });
+            });
+          } catch (e) {
+            console.error('Wheel extraction failed:', e);
+          }
+
+          P.updateMatrixWorld(true);
+          const fullTrainBB = new T.Box3().setFromObject(trainRig);
+          const minVec = new T.Vector3(
+            fullTrainBB.min.x === Infinity ? 0 : fullTrainBB.min.x,
+            0,
+            0,
+          );
+          trainRig.worldToLocal(minVec);
+          const finalTrainBackX = minVec.x;
+
+          const oldStartX = START_X;
+          START_X = -PLANE_HALF - finalTrainBackX;
+
+          if (trainRig.position.x === oldStartX) {
+            trainRig.position.x = START_X;
+          }
+        });
+
         const W = new T.Group();
         W.position.x = 80;
         S.add(W);
@@ -1145,58 +1677,21 @@
               new T.MeshBasicMaterial({ color: ACC }),
             ),
           );
-          const w = new T.Mesh(
-            new T.BoxGeometry(1.3, 0.8, 0.9),
-            new T.MeshStandardMaterial({ color: 0xd9d6d4, roughness: 0.8 }),
-          );
-          w.position.set(0, -0.1, -1.3);
-          g.add(w);
           E.add(g);
           return g;
         });
         const truck = new T.Group();
-        const tl = new T.Mesh(
-          new T.BoxGeometry(1.3, 0.5, 0.46),
-          new T.MeshStandardMaterial({
-            color: 0xffffff,
-            map: stripe,
-            roughness: 0.55,
-            metalness: 0.2,
-          }),
-        );
-        tl.position.y = 0.05;
-        const tc = new T.Mesh(
-          new T.BoxGeometry(0.4, 0.4, 0.46),
-          new T.MeshStandardMaterial({ color: ACC, roughness: 0.5 }),
-        );
-        tc.position.set(0.85, -0.03, 0);
-        const wsh = new T.Mesh(
-          new T.BoxGeometry(0.04, 0.16, 0.4),
-          new T.MeshStandardMaterial({
-            color: 0x1a1a1a,
-            roughness: 0.2,
-            metalness: 0.6,
-          }),
-        );
-        wsh.position.set(1.06, 0.05, 0);
-        truck.add(tl, tc, wsh);
-        const wmat = new T.MeshStandardMaterial({
-          color: 0x1a1a1a,
-          roughness: 0.9,
-        });
-        [-0.45, 0.1, 0.85].forEach((x) =>
-          [-1, 1].forEach((z) => {
-            const w = new T.Mesh(
-              new T.CylinderGeometry(0.13, 0.13, 0.1, 12),
-              wmat,
-            );
-            w.rotation.x = Math.PI / 2;
-            w.position.set(x, -0.22, z * 0.24);
-            truck.add(w);
-          }),
-        );
-        truck.position.y = 0.3;
+        truck.position.y = 0.22;
         E.add(truck);
+        /* Work section: load sedan-sports GLB, parent into the existing truck group */
+        loadGLB('kits/car-kit/Models/GLB format/sedan-sports.glb', (model) => {
+          model.scale.setScalar(0.52);
+          /* sedan-sports faces +Z by default; route tangent math expects +X forward */
+          model.rotation.y = Math.PI / 2;
+          model.position.y = -0.22; // sit on road
+          truck.add(model);
+        });
+
         const gm = new T.MeshStandardMaterial({
             color: 0xe3e3e3,
             roughness: 1,
@@ -1205,24 +1700,167 @@
         gnd.rotation.x = -Math.PI / 2;
         gnd.position.set(0, -1.08, -2);
         E.add(gnd);
-        const TN = 16,
-          tr = new T.InstancedMesh(
-            new T.ConeGeometry(0.45, 1.3, 6),
-            new T.MeshStandardMaterial({ color: 0x00716e, roughness: 0.8 }),
-            TN,
-          ),
-          d0 = new T.Object3D();
-        for (let n = 0; n < TN; n++) {
-          d0.position.set(
-            -10 + n * 1.3 + Math.sin(n * 5) * 0.4,
-            -0.4,
-            -4.5 - (n % 3) * 1.2,
-          );
-          d0.scale.setScalar(0.8 + (n % 4) * 0.12);
-          d0.updateMatrix();
-          tr.setMatrixAt(n, d0.matrix);
+
+        // --- CITY KIT PLACEMENT ---
+        const cityModels = {};
+        function loadCityModel(name, cb) {
+          if (cityModels[name]) {
+            if (cityModels[name] instanceof T.Group)
+              cb(cityModels[name].clone());
+            else cityModels[name].push(cb);
+          } else {
+            cityModels[name] = [cb];
+            loadGLB(
+              `kits/city-kit-commercial_2.1/Models/GLB format/${name}.glb`,
+              (model) => {
+                if (!model) {
+                  console.warn(`Missing model: ${name}`);
+                  const dummy = new T.Group();
+                  dummy.userData.size = new T.Vector3(1, 1, 1);
+                  const cbs = cityModels[name];
+                  cityModels[name] = dummy;
+                  cbs.forEach((f) => f(dummy.clone()));
+                  return;
+                }
+                const holder = new T.Group();
+                const bb = new T.Box3().setFromObject(model);
+                const center = new T.Vector3();
+                bb.getCenter(center);
+                model.position.set(-center.x, -bb.min.y, -center.z);
+                holder.add(model);
+
+                const finalHolder = holder;
+                const size = new T.Vector3();
+                bb.getSize(size);
+                finalHolder.userData.size = size;
+
+                const cbs = cityModels[name];
+                cityModels[name] = finalHolder;
+                cbs.forEach((f) => f(finalHolder.clone()));
+              },
+            );
+          }
         }
-        E.add(tr);
+
+        const FRONT_YAW = 0;
+        const heroNames = [
+          'building-a',
+          'building-d',
+          'building-h',
+          'building-skyscraper-b',
+          'building-skyscraper-a',
+        ];
+        const heroBuildings = [];
+
+        heroNames.forEach((name, i) => {
+          const p = rc.getPoint(NT[i]);
+          loadCityModel(name, (clone) => {
+            const size = clone.userData.size;
+            const targetWidth = name.includes('skyscraper') ? 2.2 : 1.8;
+            const baseScale = targetWidth / Math.max(size.x, size.z, 0.1);
+            clone.userData.baseScale = baseScale;
+            clone.scale.setScalar(baseScale);
+            clone.position.set(p.x, -1.08, p.z - 2.4);
+            clone.rotation.y = FRONT_YAW;
+            E.add(clone);
+            heroBuildings[i] = clone;
+          });
+        });
+
+        if (innerWidth >= 720) {
+          const midNames = [
+            'building-b',
+            'building-c',
+            'building-e',
+            'building-f',
+            'building-g',
+            'building-i',
+            'building-j',
+            'building-k',
+          ];
+          let cx = -10;
+          let midIdx = 0;
+          while (cx < 10) {
+            let tooClose = false;
+            for (let i = 0; i < NT.length; i++) {
+              if (Math.abs(cx - rc.getPoint(NT[i]).x) < 1.5) tooClose = true;
+            }
+            if (!tooClose) {
+              const name = midNames[midIdx % midNames.length];
+              const z = -4.5 - Math.random() * 1.5;
+              const x = cx;
+              const hScale = 0.9 + Math.random() * 0.5;
+              loadCityModel(name, (clone) => {
+                const size = clone.userData.size;
+                const baseScale = 1.8 / Math.max(size.x, size.z, 0.1);
+                clone.scale.set(baseScale, baseScale * hScale, baseScale);
+                clone.position.set(x, -1.08, z);
+                clone.rotation.y = FRONT_YAW;
+                E.add(clone);
+              });
+              midIdx++;
+            }
+            cx += 0.4 + Math.random() * 0.4 + 1.8;
+          }
+        }
+
+        const farNames = [];
+        for (let i = 0; i < 14; i++)
+          farNames.push(`low-detail-building-${String.fromCharCode(97 + i)}`);
+        const skyNames = [
+          'building-skyscraper-c',
+          'building-skyscraper-d',
+          'building-skyscraper-e',
+        ];
+        const numFar = innerWidth < 720 ? 6 : 12;
+        for (let i = 0; i < numFar; i++) {
+          const isSky = i === 3 || i === 8;
+          const name = isSky
+            ? skyNames[i % skyNames.length]
+            : farNames[i % farNames.length];
+          const z = -9 - Math.random() * 3;
+          const x = -15 + i * (30 / numFar);
+          const scaleMult = isSky ? 2.5 : 1.5 + Math.random();
+          loadCityModel(name, (clone) => {
+            const size = clone.userData.size;
+            const baseScale = scaleMult / Math.max(size.x, size.z, 0.1);
+            clone.scale.set(
+              baseScale,
+              baseScale * (0.8 + Math.random() * 0.4),
+              baseScale,
+            );
+            clone.position.set(x, -1.08, z);
+            clone.rotation.y = FRONT_YAW;
+            E.add(clone);
+          });
+        }
+
+        const parasols = ['detail-parasol-a', 'detail-parasol-b'];
+        const awnings = ['detail-awning', 'detail-overhang'];
+        NT.forEach((t, i) => {
+          const p = rc.getPoint(t);
+          const pName = parasols[i % 2];
+          loadCityModel(pName, (clone) => {
+            const size = clone.userData.size;
+            const baseScale = 0.8 / Math.max(size.x, size.z, 0.1);
+            clone.scale.setScalar(baseScale);
+            clone.position.set(p.x - 0.5, -1.08, p.z - 1.2);
+            clone.rotation.y = Math.random() * Math.PI;
+            E.add(clone);
+          });
+          if (i === 1 || i === 3) {
+            const aName = awnings[i === 1 ? 0 : 1];
+            loadCityModel(aName, (clone) => {
+              const size = clone.userData.size;
+              const baseScale = 1.2 / Math.max(size.x, size.z, 0.1);
+              clone.scale.setScalar(baseScale);
+              clone.position.set(p.x, -1.08, p.z - 2.0);
+              clone.rotation.y = FRONT_YAW;
+              E.add(clone);
+            });
+          }
+        });
+        // --- END CITY KIT PLACEMENT ---
         let tu = NT[0];
 
         /* contact: opening container, beans */
@@ -1307,8 +1945,13 @@
           S.fog = new T.Fog(bg, 14, 55);
           dotM.color.set(css('--dot'));
           starM.color.set(css('--dot'));
-          ball.material.color.set(css('--ball'));
-          gm.color.set(css('--ball'));
+
+          const ballCol = new T.Color(css('--ball'));
+          ball.material.color.copy(ballCol);
+          gm.color.copy(ballCol);
+
+          // Gravel is slightly darker than the ground (ball color)
+          gravelMat.color.copy(ballCol).lerp(new T.Color(0x000000), 0.2);
         }
         theme();
         matchMedia('(prefers-color-scheme: dark)').addEventListener(
@@ -1341,6 +1984,599 @@
             [160, -0.1, 0],
           ],
         ];
+        /* ===== QUICK BUNDLE: shared floor, scene fades, contact shadows ===== */
+        const FY = -1.1;
+        G.position.y = 1.7;
+        P.position.y = -0.6;
+        C.position.y -= 0.05;
+        [
+          [0, 1.7],
+          [1, -0.6],
+        ].forEach(([i, d]) => {
+          K[i][0][1] += d;
+          K[i][1][1] += d;
+        });
+        gr.visible = false;
+        gnd.visible = false;
+        const floorM = new T.MeshBasicMaterial({ color: 0xf3f3f3 });
+        const floor = new T.Mesh(
+          new T.PlaneGeometry(mob ? 400 : 900, mob ? 400 : 900),
+          floorM,
+        );
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.set(80, FY, 0);
+        S.add(floor);
+        const cvs = (n, fn) => {
+          const c = document.createElement('canvas');
+          c.width = c.height = n;
+          fn(c.getContext('2d'), n);
+          return new T.CanvasTexture(c);
+        };
+        const soft = (x, n, r0) => {
+          x.globalCompositeOperation = 'destination-in';
+          const g = x.createRadialGradient(
+            n / 2,
+            n / 2,
+            n * r0,
+            n / 2,
+            n / 2,
+            n / 2,
+          );
+          g.addColorStop(0, '#000');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          x.fillStyle = g;
+          x.fillRect(0, 0, n, n);
+        };
+        const pad = (par, tex, w, d, y) => {
+          const m = new T.Mesh(
+            new T.PlaneGeometry(w, d),
+            new T.MeshBasicMaterial({
+              map: tex,
+              transparent: true,
+              depthWrite: false,
+            }),
+          );
+          m.rotation.x = -Math.PI / 2;
+          m.position.y = y;
+          m.userData.sh = 1;
+          par.add(m);
+          return m;
+        };
+        const PN = mob ? 256 : 512;
+        pad(
+          P,
+          cvs(PN, (x, n) => {
+            x.strokeStyle = 'rgba(120,120,120,.55)';
+            x.lineWidth = 1;
+            for (let i = 0; i <= 44; i++) {
+              const p = (i * n) / 44;
+              x.beginPath();
+              x.moveTo(p, 0);
+              x.lineTo(p, n);
+              x.moveTo(0, p);
+              x.lineTo(n, p);
+              x.stroke();
+            }
+            soft(x, n, 0.5);
+          }),
+          44,
+          44,
+          FY - P.position.y + 0.005,
+        );
+        pad(
+          W,
+          cvs(PN, (x, n) => {
+            x.fillStyle = 'rgba(120,120,120,.16)';
+            x.fillRect(0, 0, n, n);
+            x.strokeStyle = 'rgba(120,120,120,.6)';
+            x.lineWidth = 3;
+            [0.27, 0.73].forEach((u) =>
+              x.strokeRect(n * (u - 0.17), n * 0.3, n * 0.34, n * 0.4),
+            );
+            soft(x, n, 0.3);
+          }),
+          9,
+          9,
+          FY - W.position.y + 0.005,
+        );
+        pad(
+          C,
+          cvs(PN, (x, n) => {
+            x.fillStyle = 'rgba(120,120,120,.22)';
+            x.fillRect(0, 0, n, n);
+            soft(x, n, 0.15);
+          }),
+          9,
+          9,
+          (FY - C.position.y) / 1.5 + 0.003,
+        );
+        {
+          const pts = rc.getSpacedPoints(64),
+            pos = [],
+            uv = [],
+            idx = [];
+          pts.forEach((p, i) => {
+            const q = pts[Math.min(64, i + 1)],
+              r = pts[Math.max(0, i - 1)],
+              dx = q.x - r.x,
+              dz = q.z - r.z,
+              l = Math.hypot(dx, dz) || 1,
+              nx = (-dz / l) * 1.1,
+              nz = (dx / l) * 1.1;
+            pos.push(
+              p.x + nx,
+              FY + 0.006,
+              p.z + nz,
+              p.x - nx,
+              FY + 0.006,
+              p.z - nz,
+            );
+            uv.push(0, i / 64, 1, i / 64);
+            if (i < 64)
+              idx.push(
+                i * 2,
+                i * 2 + 1,
+                i * 2 + 2,
+                i * 2 + 1,
+                i * 2 + 3,
+                i * 2 + 2,
+              );
+          });
+          const g = new T.BufferGeometry();
+          g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+          g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+          g.setIndex(idx);
+          const rm = new T.Mesh(
+            g,
+            new T.MeshBasicMaterial({
+              map: cvs(64, (x, n) => {
+                x.fillStyle = 'rgba(70,70,70,.28)';
+                x.fillRect(0, 0, n, n);
+                const g2 = x.createLinearGradient(0, 0, n, 0);
+                g2.addColorStop(0, 'rgba(0,0,0,0)');
+                g2.addColorStop(0.3, '#000');
+                g2.addColorStop(0.7, '#000');
+                g2.addColorStop(1, 'rgba(0,0,0,0)');
+                x.globalCompositeOperation = 'destination-in';
+                x.fillStyle = g2;
+                x.fillRect(0, 0, n, n);
+              }),
+              transparent: true,
+              depthWrite: false,
+              side: T.DoubleSide,
+            }),
+          );
+          rm.userData.sh = 1;
+          E.add(rm);
+        }
+        /* shadows */
+        const shTex = cvs(128, (x, n) => {
+          const g = x.createRadialGradient(
+            n / 2,
+            n / 2,
+            0,
+            n / 2,
+            n / 2,
+            n / 2,
+          );
+          g.addColorStop(0, 'rgba(0,0,0,.4)');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          x.fillStyle = g;
+          x.fillRect(0, 0, n, n);
+        });
+        const shM = [0, 1, 2, 3, 4].map(
+          () =>
+            new T.MeshBasicMaterial({
+              map: shTex,
+              transparent: true,
+              depthWrite: false,
+            }),
+        );
+        const blob = (par, i, cx, cz, w, d, y) => {
+          const m = new T.Mesh(new T.PlaneGeometry(1, 1), shM[i]);
+          m.rotation.x = -Math.PI / 2;
+          m.scale.set(w, d, 1);
+          m.position.set(cx, y, cz);
+          m.userData.sh = 1;
+          m.renderOrder = 1;
+          par.add(m);
+          return m;
+        };
+        const sc = [G, P, W, E, C],
+          fw = [1, 1, 1, 1, 1],
+          lists = [[], [], [], [], []],
+          owner = new Map(),
+          done = new WeakSet();
+        const gb = blob(S, 0, 0, 0, 4.8, 4.8, FY + 0.01);
+        lists[0].push(shM[0]);
+        {
+          const bb = new T.Box3();
+          P.updateMatrixWorld(true);
+          P.children.forEach((c) => {
+            if (c === trainGroup || c === gr || c.userData.sh) return;
+            bb.expandByObject(c);
+          });
+          if (!bb.isEmpty())
+            blob(
+              P,
+              1,
+              bb.min.x - P.position.x + (bb.max.x - bb.min.x) / 2,
+              (bb.min.z + bb.max.z) / 2,
+              bb.max.x - bb.min.x + 2,
+              bb.max.z - bb.min.z + 2,
+              FY - P.position.y + 0.012,
+            );
+        }
+        const trs = blob(trainGroup, 1, -3, RAIL_Z, 12, 1.5, 0.012),
+          hgs = blob(P, 1, 0, 1.4, 3, 1.6, FY - P.position.y + 0.012);
+        blob(W, 2, 0, 0, 7.5, 2.4, FY - W.position.y + 0.012);
+        const cars = blob(E, 3, 0, 0, 1.8, 1, FY + 0.012);
+        blob(C, 4, 0, 0, 4, 2.6, (FY - C.position.y) / 1.5 + 0.006);
+        let fc = 0,
+          tdone = 0;
+        const sm = (a, b, x) => {
+          x = Math.max(0, Math.min(1, (x - a) / (b - a)));
+          return x * x * (3 - 2 * x);
+        };
+        const ap = (m, w) => {
+          const u = m.userData,
+            t = w < 0.999 ? true : u.bt;
+          if (m.transparent !== t) m.needsUpdate = true;
+          m.transparent = t;
+          m.opacity = w < 0.999 ? u.bo * w : u.bo;
+        };
+        function scan() {
+          sc.forEach((g, i) =>
+            g.traverse((o) => {
+              if (!o.material) return;
+              const a = Array.isArray(o.material) ? o.material : [o.material];
+              a.forEach((m, j) => {
+                if (m.userData.__b) return;
+                if (owner.has(m) && owner.get(m) !== i) {
+                  m = m.clone();
+                  a === o.material ? (o.material[j] = m) : (o.material = m);
+                }
+                owner.set(m, i);
+                m.userData.__b = 1;
+                m.userData.bo = m.opacity;
+                m.userData.bt = m.transparent;
+                lists[i].push(m);
+                ap(m, fw[i]);
+              });
+            }),
+          );
+          if (!tdone && trainRig.children.length >= 4) {
+            tdone = 1;
+            const b = new T.Box3().setFromObject(trainRig),
+              w0 = new T.Vector3();
+            trainRig.getWorldPosition(w0);
+            trs.userData.off = (b.min.x + b.max.x) / 2 - w0.x;
+            trs.scale.set(b.max.x - b.min.x + 1, 1.5, 1);
+          }
+          E.children.forEach((c) => {
+            if (done.has(c) || c.userData.sh || c === truck || c === gnd)
+              return;
+            done.add(c);
+            const b = new T.Box3().setFromObject(c),
+              z = b.getSize(new T.Vector3());
+            if (b.isEmpty() || z.x > 4.5 || z.y < 0.6) return;
+            blob(
+              E,
+              3,
+              (b.min.x + b.max.x) / 2 - E.position.x,
+              (b.min.z + b.max.z) / 2,
+              z.x * 1.3,
+              z.z * 1.3,
+              FY + 0.01,
+            );
+          });
+        }
+        function depthUpdate(dt) {
+          fc++;
+          if (fc % 45 === 1) scan();
+          if (fc % 20 === 1) {
+            const bg = new T.Color(css('--bg')),
+              dk = bg.r + bg.g + bg.b < 1.2;
+            floorM.color.copy(bg).multiplyScalar(dk ? 1.12 : 0.985);
+          }
+          S.fog.near = 16 * k;
+          S.fog.far = 60 * k;
+          sc.forEach((g, i) => {
+            const w = 0.22 + 0.78 * (1 - sm(0.55, 1.0, Math.abs(cs - i)));
+            if (Math.abs(w - fw[i]) > 0.002 || w > 0.001 !== g.visible) {
+              fw[i] = w;
+              g.visible = w > 0.001;
+              lists[i].forEach((m) => ap(m, w));
+            }
+          });
+          const lt = darkMul();
+          shM.forEach((m, i) => {
+            m.userData.bo = lt * (i === 2 ? 1 : 0.9);
+          });
+          trs.position.x = trainRig.position.x + (trs.userData.off || -3);
+          const hy = typeof hang !== 'undefined' ? hang.position.y : 3.2;
+          hgs.position.x = typeof hang !== 'undefined' ? hang.position.x : 0;
+          hgs.scale.set(3 + 0.4 * (hy - 3.2), 1.6, 1);
+          fkTick(dt);
+          cars.position.x = truck.position.x;
+          cars.position.z = truck.position.z;
+        }
+        function darkMul() {
+          const bg = new T.Color(css('--bg'));
+          return bg.r + bg.g + bg.b < 1.2 ? 0.55 : 1;
+        }
+        /* ===== CONTINUITY PASS: track ends, road ends, corridors, threads ===== */
+        {
+          const dm = new T.MeshStandardMaterial({
+              color: 0x4a4443,
+              roughness: 0.8,
+            }),
+            rd = new T.MeshStandardMaterial({
+              color: 0xeb2316,
+              roughness: 0.6,
+            });
+          const bx = (w, h, d, m, x, y, z, par) => {
+            const o = new T.Mesh(new T.BoxGeometry(w, h, d), m);
+            o.position.set(x, y, z);
+            par.add(o);
+            return o;
+          };
+          bx(0.3, 0.6, 1.3, rd, 20.4, 0.55, RAIL_Z, trainGroup);
+          [-0.45, 0.45].forEach((o) =>
+            bx(0.12, 0.5, 0.12, dm, 20.4, 0.25, RAIL_Z + o, trainGroup),
+          );
+          const gt = (rev) => {
+            const c = document.createElement('canvas');
+            c.width = 64;
+            c.height = 4;
+            const x = c.getContext('2d'),
+              g = x.createLinearGradient(0, 0, 64, 0);
+            g.addColorStop(rev ? 1 : 0, '#000');
+            g.addColorStop(rev ? 0 : 1, '#fff');
+            x.fillStyle = g;
+            x.fillRect(0, 0, 64, 4);
+            return new T.CanvasTexture(c);
+          };
+          const stub = (rev, w, col, op, y) => {
+            const p = rc.getPoint(rev ? 1 : 0),
+              tn = rc.getTangent(rev ? 1 : 0).clone();
+            tn.y = 0;
+            tn.normalize();
+            const L = 14;
+            const m = new T.Mesh(
+              new T.PlaneGeometry(L, w),
+              new T.MeshBasicMaterial({
+                color: col,
+                transparent: true,
+                opacity: op,
+                alphaMap: gt(rev),
+                depthWrite: false,
+              }),
+            );
+            m.rotation.order = 'YXZ';
+            m.rotation.set(-Math.PI / 2, Math.atan2(-tn.z, tn.x), 0);
+            m.position.set(
+              p.x + tn.x * (rev ? L / 2 : -L / 2),
+              y,
+              p.z + tn.z * (rev ? L / 2 : -L / 2),
+            );
+            m.userData.sh = 1;
+            E.add(m);
+            return p;
+          };
+          const p0 = stub(false, 0.36, ACC, 1, rc.getPoint(0).y),
+            p1 = stub(true, 0.36, ACC, 1, rc.getPoint(1).y);
+          stub(false, 2.2, 0x464646, 0.28, FY + 0.007);
+          stub(true, 2.2, 0x464646, 0.28, FY + 0.007);
+          const dc = document.createElement('canvas');
+          dc.width = 128;
+          dc.height = 8;
+          {
+            const x = dc.getContext('2d');
+            x.fillStyle = 'rgba(250,78,66,.75)';
+            x.fillRect(0, 0, 64, 8);
+          }
+          const line = (ax, az, bx2, bz) => {
+            const dx = bx2 - ax,
+              dz = bz - az,
+              L = Math.hypot(dx, dz),
+              t = new T.CanvasTexture(dc);
+            t.wrapS = T.RepeatWrapping;
+            t.repeat.set(L / 1.2, 1);
+            const m = new T.Mesh(
+              new T.PlaneGeometry(L, 0.18),
+              new T.MeshBasicMaterial({
+                map: t,
+                transparent: true,
+                depthWrite: false,
+              }),
+            );
+            m.rotation.order = 'YXZ';
+            m.rotation.set(-Math.PI / 2, Math.atan2(-dz, dx), 0);
+            m.position.set((ax + bx2) / 2, FY + 0.008, (az + bz) / 2);
+            S.add(m);
+          };
+          const w0 = E.localToWorld(p0.clone()),
+            w1 = E.localToWorld(p1.clone());
+          line(2.8, RAIL_Z, 18.5, RAIL_Z);
+          line(60.5, RAIL_Z, 75.5, RAIL_Z);
+          line(84.5, RAIL_Z, w0.x - 7, w0.z);
+          line(w1.x + 7, w1.z, 152.5, 0);
+          const cor = [
+              [5, 19],
+              [61, 75],
+              [87, 106],
+              [134, 150],
+            ],
+            rnd = (n) => {
+              const v = Math.sin(n * 127.1) * 43758.5453;
+              return v - Math.floor(v);
+            };
+          const tr = new T.InstancedMesh(
+            new T.ConeGeometry(0.45, 1.3, 6),
+            new T.MeshStandardMaterial({ color: 0x00716e, roughness: 0.8 }),
+            40,
+          );
+          const bo = new T.InstancedMesh(
+              new T.BoxGeometry(1.2, 0.8, 0.7),
+              new T.MeshStandardMaterial({ roughness: 0.7 }),
+              24,
+            ),
+            d0 = new T.Object3D(),
+            cols = [0x676261, 0xd9d6d4, 0xeb2316];
+          const put = (m, n, y, sy) => {
+            const c = cor[1 + (n % 3)],
+              z =
+                rnd(n + 3) < 0.8
+                  ? -(3.8 + rnd(n + 9) * 6)
+                  : 3.8 + rnd(n + 5) * 1.8;
+            d0.position.set(c[0] + rnd(n + 1) * (c[1] - c[0]), FY + y * sy, z);
+            d0.scale.setScalar(sy);
+            d0.rotation.y = rnd(n + 7) * 3;
+            d0.updateMatrix();
+            m.setMatrixAt(n, d0.matrix);
+          };
+          for (let n = 0; n < 40; n++)
+            put(tr, n, 0.65, 0.8 + rnd(n + 11) * 0.5);
+          for (let n = 0; n < 24; n++) {
+            put(bo, n, 0.4, 0.8 + rnd(n + 13) * 0.6);
+            bo.setColorAt(n, new T.Color(cols[n % 3]));
+          }
+          S.add(tr, bo);
+        }
+        /* ===== FACTORY KIT: compact factory hall (Home -> About) ===== */
+        const FKP = 'kits/factory-kit/Models/GLB format/',
+          fkC = {},
+          fkBoxes = [];
+        const U = 0.85,
+          X0 = 9.2,
+          Z0 = -8,
+          FL = FY + 0.02,
+          PI = Math.PI;
+        const fkTick = (dt) => {
+          if (reduce) return;
+          fkBoxes.forEach((b) => {
+            b.position.x += dt * 0.8;
+            if (b.position.x > X0 + 8.8 * U) b.position.x = X0 + 3.2 * U;
+          });
+        };
+        function fkLoad(name, cb) {
+          if (fkC[name] instanceof T.Object3D) return cb(fkC[name].clone(true));
+          if (fkC[name]) return fkC[name].push(cb);
+          fkC[name] = [cb];
+          loadGLB(FKP + name + '.glb', (m) => {
+            const q = fkC[name];
+            fkC[name] = m;
+            q.forEach((f) => f(m.clone(true)));
+          });
+        }
+        /* raw kit pieces: 1 kit unit = U world units, origin kept so pieces snap on the grid */
+        function fkW(name, x, y, z, ry, s, cb) {
+          fkLoad(name, (m) => {
+            const h = new T.Group();
+            h.add(m);
+            h.scale.setScalar(s);
+            h.rotation.y = ry || 0;
+            h.position.set(x, y, z);
+            S.add(h);
+            if (cb) cb(h);
+          });
+        }
+        const fkG = (name, gx, gz, o = {}) =>
+          fkW(
+            name,
+            X0 + gx * U,
+            FL + (o.y || 0) * U,
+            Z0 + gz * U,
+            o.ry,
+            (o.s || 1) * U,
+            o.cb,
+          );
+        const FW = 10; /* hall width in kit units */
+        /* floor: large tiles with checkerboard accents */
+        for (let i = 0; i < 4; i++)
+          for (let j = 0; j < 3; j++)
+            fkG(
+              (i + j) % 2 ? 'top-large-checkerboard' : 'floor-large',
+              2 + i * 2,
+              2.2 + j * 2,
+            );
+        /* U-shaped hall: back wall, two wings, corners */
+        fkG('structure-corner-outer', 0, 0, { ry: PI });
+        fkG('structure-corner-outer', FW, 0, { ry: PI / 2 });
+        [
+          'structure-wall',
+          'structure-window',
+          'structure-doorway',
+          'structure-window',
+          'structure-wall',
+          'structure-doorway',
+          'structure-window',
+          'structure-wall',
+        ].forEach((n, i) => fkG(n, 1 + i, 0, { ry: PI }));
+        [1.5, 2.5, 3.5].forEach((z, i) => {
+          fkG(i === 1 ? 'structure-window' : 'structure-wall', 0, z + 0.0, {
+            ry: -PI / 2,
+          });
+          fkG(i === 1 ? 'structure-window' : 'structure-wall', FW, z, {
+            ry: PI / 2,
+          });
+        });
+        /* stairs and catwalk against the back wall */
+        fkG('catwalk-stairs', 2.2, 1.6, { ry: PI });
+        fkG('catwalk-straight', 4.2, 1.2, { y: 1.4 });
+        fkG('catwalk-straight', 5.2, 1.2, { y: 1.4 });
+        /* production line: hopper -> machine -> conveyor -> machine -> robot arm */
+        fkG('hopper-high-round', 2, 3.4);
+        fkG('machine-window', 3.2, 3.6, { ry: PI / 2 });
+        [4.6, 6.6, 8.6].forEach((x, i) =>
+          fkG('conveyor-long', x, 3.6, {
+            cb:
+              i === 0
+                ? () =>
+                    [3.4, 5.4, 7.2].forEach((bx2, n) =>
+                      fkG(
+                        ['box-small', 'box-large', 'box-small'][n],
+                        bx2,
+                        3.6,
+                        { y: 0.4, cb: (b) => fkBoxes.push(b) },
+                      ),
+                    )
+                : null,
+          }),
+        );
+        fkG('machine', 5.4, 2.3, { ry: PI });
+        fkG('machine-fortified', 7, 2.3, { ry: PI });
+        fkG('hopper-square', 8.6, 2.3);
+        fkG('robot-arm-a', 3.6, 2.4);
+        fkG('robot-arm-b', 9.4, 4.4, { ry: -PI / 2 });
+        fkG('pipe-large-long', 6, 0.9, { y: 1.9 });
+        fkG('pipe-large-long', 8, 0.9, { y: 1.9 });
+        fkG('pipe-large-bend', 9.4, 1.7, { y: 1.9, ry: PI / 2 });
+        /* front yard: hazard markings, cones, boxes, control props */
+        fkG('indicator-special-cross', 3, 6.4);
+        fkG('indicator-special-lines', 7, 6.6);
+        fkG('indicator-special-arrow', 5, 6.4);
+        fkG('box-large', 8.8, 5.6);
+        fkG('box-large', 9.6, 6.1, { y: 0 });
+        fkG('box-small', 8.9, 5.6, { y: 0.55 });
+        fkG('scanner-low', 1.6, 5.2, { ry: PI / 2 });
+        fkG('screen-wide', 1.4, 4.2, { ry: PI / 2 });
+        fkG('lever-single', 2.4, 5.6);
+        [
+          [1.4, 6.8],
+          [4.1, 5.6],
+          [6.2, 6.3],
+          [9.3, 6.9],
+          [0.8, 3.1],
+        ].forEach(([x, z]) => fkG('cone', x, z));
+        fkG('warning-traffic', 6.8, 5.5);
+        fkG('warning-orange', 4.8, 5.7);
+        /* gate where the rails begin */
+        fkW('structure-doorway-wide', 19.3, FY, RAIL_Z, -PI / 2, U);
+        [1.5, 2.5, -1.5, -2.5].forEach((o) =>
+          fkW('structure-wall', 19.3, FY, RAIL_Z + o * U, -PI / 2, U),
+        );
         let k = 1,
           mx = 0,
           my = 0,
@@ -1429,12 +2665,37 @@
           pos.y -= py * 0.4;
           cam.position.copy(pos);
           cam.lookAt(look);
+
+          trainGroup.visible = Math.abs(cs - 1) < 1.2;
+          depthUpdate(dt);
+
           if (near(0)) {
             G.rotation.y = base + off + Math.sin(t * 0.3) * 0.3;
             G.updateMatrixWorld();
             const u = (t * 0.06) % 1;
-            ship.position.copy(arc.getPoint(u));
-            ship.lookAt(G.localToWorld(arc.getPoint(Math.min(1, u + 0.01))));
+            const pos = arc.getPoint(u);
+            const next = arc.getPoint(Math.min(1, u + 0.01));
+
+            // Fallback old box ship logic
+            if (!deliveryModelLoaded) {
+              ship.position.copy(pos);
+              ship.lookAt(G.localToWorld(next.clone()));
+            }
+
+            // Pivot orientation for GLB truck
+            const fwd = next.clone().sub(pos).normalize();
+            const up = pos.clone().normalize();
+            const right = new T.Vector3().crossVectors(fwd, up).normalize();
+            const up2 = new T.Vector3().crossVectors(right, fwd).normalize();
+            const mRot = new T.Matrix4().makeBasis(
+              right,
+              up2,
+              fwd.clone().negate(),
+            );
+
+            pivot.position.copy(pos);
+            pivot.quaternion.setFromRotationMatrix(mRot);
+
             marks.forEach((m) => m.scale.setScalar(1 + 0.4 * Math.sin(t * 3)));
           }
           if (near(1)) {
@@ -1446,7 +2707,63 @@
             tro.position.x = hx;
             rope.scale.y = bt - top;
             rope.position.set(hx, (bt + top) / 2, 1.4);
+
+            // Train animation
+            const ad = Math.abs(cs - 1);
+            if (reduce) {
+              trainRig.position.x = PARK_X;
+              sigLightMat.color.setHex(0x00ff00);
+            } else {
+              if (ad > 1.2) {
+                trainState = 0;
+                trainRig.position.x = START_X;
+                trainTime = 0;
+              } else if (ad < 0.45 && trainState === 0) {
+                trainState = 1;
+              }
+
+              let moving = false;
+              if (trainState === 1) {
+                trainTime += dt;
+                let progress = Math.min(trainTime / 5.0, 1.0);
+                // Ease out cubic
+                let ease = 1 - Math.pow(1 - progress, 3);
+                let oldX = trainRig.position.x;
+                trainRig.position.x = START_X + (PARK_X - START_X) * ease;
+
+                if (progress < 1.0) {
+                  moving = true;
+                  let dX = trainRig.position.x - oldX;
+                  trainWheels.forEach((w) => {
+                    w.pivot.rotation.z -= dX / w.radius;
+                  });
+                }
+              }
+
+              if (moving) {
+                sigLightMat.color.setHex((t * 4) % 2 < 1 ? 0xff0000 : 0x220000);
+              } else {
+                sigLightMat.color.setHex(0x00ff00);
+              }
+
+              const puffSpeed = moving ? 2.0 : 0.5;
+              smokePuffs.forEach((puff) => {
+                puff.life += dt * puffSpeed;
+                if (puff.life > 1) puff.life -= 1;
+                let l = puff.life;
+                puff.mesh.visible = true;
+                puff.mesh.position.set(
+                  locoFrontX - l * (moving ? 1.5 : 0.5),
+                  locoTopY + l * 2,
+                  RAIL_Z,
+                );
+                let s = 1 + l * 2;
+                puff.mesh.scale.set(s, s, s);
+                puff.mesh.material.opacity = (1 - l) * 0.6;
+              });
+            }
           }
+
           if (near(2))
             sk.forEach((m, j) => {
               const tz = j === act ? 1.1 : j === hov ? 0.5 : 0;
@@ -1464,6 +2781,21 @@
             nodes.forEach((n, j) =>
               n.scale.setScalar(j === wi ? 1.5 + 0.2 * Math.sin(t * 4) : 1),
             );
+            heroBuildings.forEach((hb, j) => {
+              if (!hb) return;
+              const targetY = j === wi ? -1.08 + 0.15 : -1.08;
+              const targetScale =
+                j === wi ? hb.userData.baseScale * 1.06 : hb.userData.baseScale;
+              if (reduce) {
+                hb.position.y = targetY;
+                hb.scale.setScalar(targetScale);
+              } else {
+                hb.position.y += (targetY - hb.position.y) * dt * 5;
+                const cScale = hb.scale.x;
+                const nScale = cScale + (targetScale - cScale) * dt * 5;
+                hb.scale.setScalar(nScale);
+              }
+            });
           }
           const o =
             Math.pow(cl((cs - 3.45) / 0.55, 0, 1), 2) *
