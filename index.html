@@ -4,13 +4,11 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+      content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Tuan Kiet – Coffee export logistics</title>
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap"
-    />
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" />
     <style>
       :root {
         --bg: #f3f3f3;
@@ -24,7 +22,7 @@
         --ball: #e3e3e3;
         --accent-2: #fa4e42;
         --accent-tint: #ffb79d;
-        --font-sans: "Inter Tight", "Hanken Grotesk", system-ui, sans-serif;
+        --font-sans: 'Inter Tight', 'Hanken Grotesk', system-ui, sans-serif;
         --r-card: 6px;
         --r-pill: 999px;
         --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -43,7 +41,7 @@
         padding-bottom: env(safe-area-inset-bottom, 0px);
       }
       @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) {
+        :root:not([data-theme='light']) {
           --bg: #0e0c0c;
           --fg: #f3f3f3;
           --muted: #b3afae;
@@ -56,7 +54,7 @@
           --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
       }
-      :root[data-theme="dark"] {
+      :root[data-theme='dark'] {
         --bg: #0e0c0c;
         --fg: #f3f3f3;
         --muted: #b3afae;
@@ -150,7 +148,7 @@
         z-index: 10;
       }
       nav::before {
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         bottom: 0;
@@ -278,7 +276,7 @@
         border: 1px solid var(--accent);
       }
       .btn::after {
-        content: "→";
+        content: '→';
         display: grid;
         place-items: center;
         width: 32px;
@@ -533,10 +531,10 @@
         text-align: left;
       }
       .ah::after {
-        content: "+";
+        content: '+';
       }
-      .ah[aria-expanded="true"]::after {
-        content: "\2013";
+      .ah[aria-expanded='true']::after {
+        content: '\2013';
       }
       .ab {
         display: grid;
@@ -570,8 +568,8 @@
     <script>
       /* prevent FOUC: apply saved theme before first paint */
       (function () {
-        var t = localStorage.getItem("theme");
-        if (t) document.documentElement.setAttribute("data-theme", t);
+        var t = localStorage.getItem('theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
       })();
     </script>
   </head>
@@ -582,8 +580,7 @@
       ><button
         id="theme-toggle"
         aria-label="Toggle colour theme"
-        title="Toggle light / dark"
-      >
+        title="Toggle light / dark">
         🌙
       </button>
       <nav>
@@ -599,8 +596,7 @@
       id="bgl"
       aria-hidden="true"
       viewBox="0 0 1000 600"
-      preserveAspectRatio="none"
-    >
+      preserveAspectRatio="none">
       <path d="M-20 430C250 120 600 540 1020 150" />
       <path d="M-20 520C300 300 650 600 1020 330" />
     </svg>
@@ -718,93 +714,93 @@
       (function () {
         const $ = (s) => document.querySelector(s),
           $$ = (s) => [...document.querySelectorAll(s)];
-        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
         const SK = [
           [
-            "Certifications",
-            "Mock data: replace with your real credentials.",
-            "CERTIFICATIONS",
+            'Certifications',
+            'Mock data: replace with your real credentials.',
+            'CERTIFICATIONS',
             [
               [
-                "IELTS",
-                "Overall 7.0 · 2023",
-                "Academic module, used for international contracts and carrier calls.",
+                'IELTS',
+                'Overall 7.0 · 2023',
+                'Academic module, used for international contracts and carrier calls.',
               ],
               [
-                "MOS Excel",
-                "Expert · 2022",
-                "Microsoft Office Specialist: pivot tables and cost models for freight reports.",
+                'MOS Excel',
+                'Expert · 2022',
+                'Microsoft Office Specialist: pivot tables and cost models for freight reports.',
               ],
               [
-                "Incoterms 2020",
-                "Course · 2022",
-                "FOB, CIF and DAP responsibilities across the shipment.",
+                'Incoterms 2020',
+                'Course · 2022',
+                'FOB, CIF and DAP responsibilities across the shipment.',
               ],
             ],
           ],
           [
-            "GPA",
-            "Mock data: replace with your real grades.",
-            "GPA",
+            'GPA',
+            'Mock data: replace with your real grades.',
+            'GPA',
             [
               [
-                "Overall GPA",
-                "3.6 / 4.0",
-                "International trade degree, top 15% of the cohort.",
+                'Overall GPA',
+                '3.6 / 4.0',
+                'International trade degree, top 15% of the cohort.',
               ],
               [
-                "Major GPA",
-                "3.8 / 4.0",
-                "Logistics, customs and international payment courses.",
+                'Major GPA',
+                '3.8 / 4.0',
+                'Logistics, customs and international payment courses.',
               ],
               [
-                "Thesis",
-                "Grade A",
-                "Coffee export route comparison, Ho Chi Minh City to Genoa.",
+                'Thesis',
+                'Grade A',
+                'Coffee export route comparison, Ho Chi Minh City to Genoa.',
               ],
             ],
           ],
           [
-            "Achievements",
-            "Mock data: replace with your real results.",
-            "ACHIEVEMENTS",
+            'Achievements',
+            'Mock data: replace with your real results.',
+            'ACHIEVEMENTS',
             [
               [
-                "Zero-delay quarter",
-                "Q3 2024",
-                "All 40 containers cleared customs on the first attempt.",
+                'Zero-delay quarter',
+                'Q3 2024',
+                'All 40 containers cleared customs on the first attempt.',
               ],
               [
-                "Freight cost saving",
-                "-12% per container",
-                "Renegotiated carrier rates and consolidated bookings.",
+                'Freight cost saving',
+                '-12% per container',
+                'Renegotiated carrier rates and consolidated bookings.',
               ],
               [
-                "New talent award",
-                "2021",
-                "Fastest coordinator onboarded in the team.",
+                'New talent award',
+                '2021',
+                'Fastest coordinator onboarded in the team.',
               ],
             ],
           ],
           [
-            "Soft skills",
-            "Mock data: replace with your own examples.",
-            "SOFT SKILLS",
+            'Soft skills',
+            'Mock data: replace with your own examples.',
+            'SOFT SKILLS',
             [
               [
-                "Communication",
-                "Daily",
-                "Clear updates between buyers, carriers and customs agents.",
+                'Communication',
+                'Daily',
+                'Clear updates between buyers, carriers and customs agents.',
               ],
               [
-                "Negotiation",
-                "Rates and terms",
-                "Win-win deals with forwarders and shipping lines.",
+                'Negotiation',
+                'Rates and terms',
+                'Win-win deals with forwarders and shipping lines.',
               ],
               [
-                "Time management",
-                "Deadlines",
-                "Cut-off dates, vessel schedules and document deadlines.",
+                'Time management',
+                'Deadlines',
+                'Cut-off dates, vessel schedules and document deadlines.',
               ],
             ],
           ],
@@ -812,67 +808,67 @@
         const NT = [0.1, 0.3, 0.5, 0.7, 0.9];
         let act = -1,
           onPick = () => {};
-        const chips = $("#chips");
+        const chips = $('#chips');
         SK.forEach((k, i) => {
-          const b = document.createElement("button");
-          b.className = "chip";
+          const b = document.createElement('button');
+          b.className = 'chip';
           b.textContent = k[0];
           b.onclick = () => pick(i);
           chips.appendChild(b);
         });
-        const acc = $("#acc");
+        const acc = $('#acc');
         function pick(i) {
           act = i;
-          $$(".chip").forEach((c, j) => c.classList.toggle("on", j === i));
-          $("#cap").textContent = SK[i][1];
-          acc.innerHTML = "";
+          $$('.chip').forEach((c, j) => c.classList.toggle('on', j === i));
+          $('#cap').textContent = SK[i][1];
+          acc.innerHTML = '';
           SK[i][3].forEach((it) => {
-            const h = document.createElement("button");
-            h.className = "ah";
-            h.setAttribute("aria-expanded", "false");
-            h.innerHTML = "<span>" + it[0] + "</span>";
-            const b = document.createElement("div");
-            b.className = "ab";
+            const h = document.createElement('button');
+            h.className = 'ah';
+            h.setAttribute('aria-expanded', 'false');
+            h.innerHTML = '<span>' + it[0] + '</span>';
+            const b = document.createElement('div');
+            b.className = 'ab';
             b.innerHTML =
-              "<div><p><b>" + it[1] + "</b><br>" + it[2] + "</p></div>";
+              '<div><p><b>' + it[1] + '</b><br>' + it[2] + '</p></div>';
             h.onclick = () => {
-              const o = h.getAttribute("aria-expanded") === "true";
-              $$(".ah").forEach((x) =>
-                x.setAttribute("aria-expanded", "false"),
+              const o = h.getAttribute('aria-expanded') === 'true';
+              $$('.ah').forEach((x) =>
+                x.setAttribute('aria-expanded', 'false'),
               );
-              $$(".ab").forEach((x) => x.classList.remove("o"));
+              $$('.ab').forEach((x) => x.classList.remove('o'));
               if (!o) {
-                h.setAttribute("aria-expanded", "true");
-                b.classList.add("o");
+                h.setAttribute('aria-expanded', 'true');
+                b.classList.add('o');
               }
             };
             acc.append(h, b);
           });
-          const f = acc.querySelector(".ah");
+          const f = acc.querySelector('.ah');
           if (f) f.click();
           onPick();
         }
         pick(0);
-        const wl = $$(".wl li"),
-          wd = $$(".wstep i");
+        const wl = $$('.wl li'),
+          wd = $$('.wstep i');
         let wi = -1,
           wp = 0;
         function setWork(i) {
           if (i === wi) return;
           wi = i;
-          wl.forEach((l, j) => l.classList.toggle("on", j === i));
-          wd.forEach((d, j) => d.classList.toggle("on", j <= i));
-          $("#wnum").textContent = i + 1 + " / " + wl.length;
+          wl.forEach((l, j) => l.classList.toggle('on', j === i));
+          wd.forEach((d, j) => d.classList.toggle('on', j <= i));
+          $('#wnum').textContent = i + 1 + ' / ' + wl.length;
         }
         setWork(0);
-        const panels = $$(".panel"),
-          secs = $$("section"),
-          links = $$("nav a");
+        const panels = $$('.panel'),
+          secs = $$('section'),
+          links = $$('nav a');
         let counted = 0;
         function count() {
           if (counted) return;
           counted = 1;
-          $$(".stats b").forEach((e) => {
+          $$('.stats b').forEach((e) => {
             const n = +e.dataset.n,
               s = e.dataset.s;
             let t0 = null;
@@ -880,7 +876,7 @@
               t0 = t0 || t;
               const u = reduce ? 1 : Math.min(1, (t - t0) / 1400);
               e.textContent =
-                Math.round(n * (1 - Math.pow(1 - u, 3))) + (u >= 1 ? s : "");
+                Math.round(n * (1 - Math.pow(1 - u, 3))) + (u >= 1 ? s : '');
               if (u < 1) requestAnimationFrame(f);
             })(performance.now());
           });
@@ -899,31 +895,31 @@
               ? i + Math.max(0, (y - tops[i]) / (tops[i + 1] - tops[i]))
               : 4;
           const r0 = s;
-          if (i === 3 && !document.body.classList.contains("nogl")) {
+          if (i === 3 && !document.body.classList.contains('nogl')) {
             const q = (y - tops[3]) / (tops[4] - tops[3]);
             wp = Math.max(0, Math.min(1, q / 0.88));
             s = 3 + Math.max(0, (q - 0.88) / 0.12);
           } else wp = i > 3 ? 1 : 0;
-          $("#bgl").style.transform = "translateY(" + -r0 * 30 + "px)";
-          $("#bar").style.transform = "scaleX(" + r0 / 4 + ")";
+          $('#bgl').style.transform = 'translateY(' + -r0 * 30 + 'px)';
+          $('#bar').style.transform = 'scaleX(' + r0 / 4 + ')';
         }
         let cs = 0;
         function ui() {
           const r = Math.round(cs);
           panels.forEach((p, i) =>
             p.classList.toggle(
-              "in",
+              'in',
               i === 3 ? cs > 2.55 && cs < 3.6 : Math.abs(cs - i) < 0.45,
             ),
           );
-          links.forEach((a, i) => a.classList.toggle("on", i === r));
+          links.forEach((a, i) => a.classList.toggle('on', i === r));
           if (r === 1) count();
         }
 
         let R;
         try {
           R = new THREE.WebGLRenderer({
-            canvas: $("#c"),
+            canvas: $('#c'),
             antialias: innerWidth > 720,
           });
         } catch (e) {
@@ -931,9 +927,9 @@
         }
         meas();
         calc();
-        addEventListener("scroll", calc, { passive: true });
+        addEventListener('scroll', calc, { passive: true });
         if (!R) {
-          document.body.classList.add("nogl");
+          document.body.classList.add('nogl');
           return;
         }
         const T = THREE,
@@ -950,33 +946,33 @@
         const css = (n) =>
           getComputedStyle(document.documentElement).getPropertyValue(n).trim();
         const stripe = (() => {
-          const c = document.createElement("canvas");
+          const c = document.createElement('canvas');
           c.width = 256;
           c.height = 64;
-          const x = c.getContext("2d");
-          x.fillStyle = "#fff";
+          const x = c.getContext('2d');
+          x.fillStyle = '#fff';
           x.fillRect(0, 0, 256, 64);
-          x.fillStyle = "rgba(0,0,0,.17)";
+          x.fillStyle = 'rgba(0,0,0,.17)';
           for (let i = 4; i < 256; i += 10) x.fillRect(i, 0, 4, 64);
           return new T.CanvasTexture(c);
         })();
         function tag(txt, col) {
-          const c = document.createElement("canvas");
+          const c = document.createElement('canvas');
           c.width = 512;
           c.height = 214;
-          const x = c.getContext("2d");
+          const x = c.getContext('2d');
           x.fillStyle = col;
           x.fillRect(0, 0, 512, 214);
-          x.fillStyle = "rgba(0,0,0,.2)";
+          x.fillStyle = 'rgba(0,0,0,.2)';
           for (let i = 0; i < 512; i += 32) x.fillRect(i, 0, 6, 214);
           // Use dark text on light fills, white on dark fills
           const lightFills = [0xffb79d, 0xd9d6d4];
-          const colHex = parseInt(col.replace("#", ""), 16);
+          const colHex = parseInt(col.replace('#', ''), 16);
           const isLight = lightFills.includes(colHex);
-          x.fillStyle = isLight ? "#030000" : "#fff";
+          x.fillStyle = isLight ? '#030000' : '#fff';
           x.font = '500 42px "Inter Tight",system-ui,sans-serif';
-          x.textAlign = "center";
-          x.textBaseline = "middle";
+          x.textAlign = 'center';
+          x.textBaseline = 'middle';
           x.fillText(txt, 256, 107);
           return new T.CanvasTexture(c);
         }
@@ -989,7 +985,7 @@
           });
           const f = txt
             ? new T.MeshStandardMaterial({
-                map: tag(txt, "#" + new T.Color(col).getHexString()),
+                map: tag(txt, '#' + new T.Color(col).getHexString()),
               })
             : m;
           const b = new T.Mesh(new T.BoxGeometry(2.4, 1, 1), [
@@ -1047,7 +1043,7 @@
           );
         }
         const pg = new T.BufferGeometry();
-        pg.setAttribute("position", new T.BufferAttribute(pp, 3));
+        pg.setAttribute('position', new T.BufferAttribute(pp, 3));
         const dotM = new T.PointsMaterial({ size: 0.035 });
         G.add(new T.Points(pg, dotM));
         const A = ll(10.8, 106.7),
@@ -1101,7 +1097,7 @@
             path,
             (gltf) => onLoad(gltf.scene),
             null,
-            (err) => console.warn("GLB load error:", path, err),
+            (err) => console.warn('GLB load error:', path, err),
           );
         }
 
@@ -1109,7 +1105,7 @@
         const pivot = new T.Group();
         G.add(pivot);
         let deliveryModelLoaded = false;
-        loadGLB("kits/car-kit/Models/GLB format/delivery.glb", (model) => {
+        loadGLB('kits/car-kit/Models/GLB format/delivery.glb', (model) => {
           model.traverse((ch) => {
             if (ch.isMesh) {
               ch.castShadow = false;
@@ -1180,14 +1176,6 @@
           new T.MeshStandardMaterial({ color: 0x2b2625 }),
         );
         P.add(rope);
-        for (let n = 0; n < 3; n++) {
-          const w = new T.Mesh(
-            new T.BoxGeometry(2, 1.2, 1.2),
-            new T.MeshStandardMaterial({ color: 0xd9d6d4, roughness: 0.9 }),
-          );
-          w.position.set(-10 + n * 4, -0.5 + 0.6, -9);
-          P.add(w);
-        }
 
         /* About/Port scene: railway and train */
         const RAIL_Z = 1.4;
@@ -1275,9 +1263,9 @@
         const loadP = (url) => new Promise((resolve) => loadGLB(url, resolve));
 
         Promise.all([
-          loadP("kits/train-kit/Models/GLB format/railroad-straight.glb"),
-          loadP("kits/train-kit/Models/GLB format/train-locomotive-a.glb"),
-          loadP("kits/train-kit/Models/GLB format/train-carriage-flatbed.glb"),
+          loadP('kits/train-kit/Models/GLB format/railroad-straight.glb'),
+          loadP('kits/train-kit/Models/GLB format/train-locomotive-a.glb'),
+          loadP('kits/train-kit/Models/GLB format/train-carriage-flatbed.glb'),
         ]).then(([trackModel, locoModel, wagonModel]) => {
           // Track
           const trackHolder = normalizeModel(trackModel, 1.1);
@@ -1365,7 +1353,7 @@
             const rawWheels = [];
             modelsToExtract.forEach((mod) => {
               mod.traverse((ch) => {
-                if (ch.isMesh && ch.name.toLowerCase().includes("wheel")) {
+                if (ch.isMesh && ch.name.toLowerCase().includes('wheel')) {
                   rawWheels.push(ch);
                 }
               });
@@ -1477,11 +1465,11 @@
               const mat = mesh.material;
               for (let wc of wheelComps) {
                 const newGeom = new T.BufferGeometry();
-                newGeom.setAttribute("position", geom.attributes.position);
+                newGeom.setAttribute('position', geom.attributes.position);
                 if (geom.attributes.normal)
-                  newGeom.setAttribute("normal", geom.attributes.normal);
+                  newGeom.setAttribute('normal', geom.attributes.normal);
                 if (geom.attributes.uv)
-                  newGeom.setAttribute("uv", geom.attributes.uv);
+                  newGeom.setAttribute('uv', geom.attributes.uv);
 
                 const newIndex = new (index ? index.constructor : Uint32Array)(
                   wc.triIndices.length * 3,
@@ -1506,7 +1494,7 @@
                 );
 
                 const newMesh = new T.Mesh(newGeom, mat);
-                newMesh.name = mesh.name + "_disc";
+                newMesh.name = mesh.name + '_disc';
 
                 newMesh.position.copy(mesh.position);
                 newMesh.rotation.copy(mesh.rotation);
@@ -1618,7 +1606,7 @@
               trainWheels.push({ pivot, radius });
             });
           } catch (e) {
-            console.error("Wheel extraction failed:", e);
+            console.error('Wheel extraction failed:', e);
           }
 
           P.updateMatrixWorld(true);
@@ -1696,7 +1684,7 @@
         truck.position.y = 0.22;
         E.add(truck);
         /* Work section: load sedan-sports GLB, parent into the existing truck group */
-        loadGLB("kits/car-kit/Models/GLB format/sedan-sports.glb", (model) => {
+        loadGLB('kits/car-kit/Models/GLB format/sedan-sports.glb', (model) => {
           model.scale.setScalar(0.52);
           /* sedan-sports faces +Z by default; route tangent math expects +X forward */
           model.rotation.y = Math.PI / 2;
@@ -1756,11 +1744,11 @@
 
         const FRONT_YAW = 0;
         const heroNames = [
-          "building-a",
-          "building-d",
-          "building-h",
-          "building-skyscraper-b",
-          "building-skyscraper-a",
+          'building-a',
+          'building-d',
+          'building-h',
+          'building-skyscraper-b',
+          'building-skyscraper-a',
         ];
         const heroBuildings = [];
 
@@ -1768,7 +1756,7 @@
           const p = rc.getPoint(NT[i]);
           loadCityModel(name, (clone) => {
             const size = clone.userData.size;
-            const targetWidth = name.includes("skyscraper") ? 2.2 : 1.8;
+            const targetWidth = name.includes('skyscraper') ? 2.2 : 1.8;
             const baseScale = targetWidth / Math.max(size.x, size.z, 0.1);
             clone.userData.baseScale = baseScale;
             clone.scale.setScalar(baseScale);
@@ -1781,14 +1769,14 @@
 
         if (innerWidth >= 720) {
           const midNames = [
-            "building-b",
-            "building-c",
-            "building-e",
-            "building-f",
-            "building-g",
-            "building-i",
-            "building-j",
-            "building-k",
+            'building-b',
+            'building-c',
+            'building-e',
+            'building-f',
+            'building-g',
+            'building-i',
+            'building-j',
+            'building-k',
           ];
           let cx = -10;
           let midIdx = 0;
@@ -1820,9 +1808,9 @@
         for (let i = 0; i < 14; i++)
           farNames.push(`low-detail-building-${String.fromCharCode(97 + i)}`);
         const skyNames = [
-          "building-skyscraper-c",
-          "building-skyscraper-d",
-          "building-skyscraper-e",
+          'building-skyscraper-c',
+          'building-skyscraper-d',
+          'building-skyscraper-e',
         ];
         const numFar = innerWidth < 720 ? 6 : 12;
         for (let i = 0; i < numFar; i++) {
@@ -1847,8 +1835,8 @@
           });
         }
 
-        const parasols = ["detail-parasol-a", "detail-parasol-b"];
-        const awnings = ["detail-awning", "detail-overhang"];
+        const parasols = ['detail-parasol-a', 'detail-parasol-b'];
+        const awnings = ['detail-awning', 'detail-overhang'];
         NT.forEach((t, i) => {
           const p = rc.getPoint(t);
           const pName = parasols[i % 2];
@@ -1918,7 +1906,7 @@
           bp = new Float32Array(BN * 3),
           bs = Array.from({ length: BN }, Math.random),
           bg = new T.BufferGeometry();
-        bg.setAttribute("position", new T.BufferAttribute(bp, 3));
+        bg.setAttribute('position', new T.BufferAttribute(bp, 3));
         const beans = new T.Points(
           bg,
           new T.PointsMaterial({
@@ -1943,7 +1931,7 @@
             i * 3,
           );
         const sg = new T.BufferGeometry();
-        sg.setAttribute("position", new T.BufferAttribute(SP, 3));
+        sg.setAttribute('position', new T.BufferAttribute(SP, 3));
         const starM = new T.PointsMaterial({
           size: 0.05,
           transparent: true,
@@ -1952,13 +1940,13 @@
         S.add(new T.Points(sg, starM));
 
         function theme() {
-          const bg = new T.Color(css("--bg"));
+          const bg = new T.Color(css('--bg'));
           S.background = bg;
           S.fog = new T.Fog(bg, 14, 55);
-          dotM.color.set(css("--dot"));
-          starM.color.set(css("--dot"));
+          dotM.color.set(css('--dot'));
+          starM.color.set(css('--dot'));
 
-          const ballCol = new T.Color(css("--ball"));
+          const ballCol = new T.Color(css('--ball'));
           ball.material.color.copy(ballCol);
           gm.color.copy(ballCol);
 
@@ -1966,8 +1954,8 @@
           gravelMat.color.copy(ballCol).lerp(new T.Color(0x000000), 0.2);
         }
         theme();
-        matchMedia("(prefers-color-scheme: dark)").addEventListener(
-          "change",
+        matchMedia('(prefers-color-scheme: dark)').addEventListener(
+          'change',
           theme,
         );
         new MutationObserver(theme).observe(document.documentElement, {
@@ -1996,6 +1984,603 @@
             [160, -0.1, 0],
           ],
         ];
+        /* ===== QUICK BUNDLE: shared floor, scene fades, contact shadows ===== */
+        const FY = -1.1;
+        G.position.y = 1.7;
+        P.position.y = -0.6;
+        C.position.y -= 0.05;
+        [
+          [0, 1.7],
+          [1, -0.6],
+        ].forEach(([i, d]) => {
+          K[i][0][1] += d;
+          K[i][1][1] += d;
+        });
+        gr.visible = false;
+        gnd.visible = false;
+        const floorM = new T.MeshBasicMaterial({ color: 0xf3f3f3 });
+        const floor = new T.Mesh(
+          new T.PlaneGeometry(mob ? 400 : 900, mob ? 400 : 900),
+          floorM,
+        );
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.set(80, FY, 0);
+        S.add(floor);
+        const cvs = (n, fn) => {
+          const c = document.createElement('canvas');
+          c.width = c.height = n;
+          fn(c.getContext('2d'), n);
+          return new T.CanvasTexture(c);
+        };
+        const soft = (x, n, r0) => {
+          x.globalCompositeOperation = 'destination-in';
+          const g = x.createRadialGradient(
+            n / 2,
+            n / 2,
+            n * r0,
+            n / 2,
+            n / 2,
+            n / 2,
+          );
+          g.addColorStop(0, '#000');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          x.fillStyle = g;
+          x.fillRect(0, 0, n, n);
+        };
+        const pad = (par, tex, w, d, y) => {
+          const m = new T.Mesh(
+            new T.PlaneGeometry(w, d),
+            new T.MeshBasicMaterial({
+              map: tex,
+              transparent: true,
+              depthWrite: false,
+            }),
+          );
+          m.rotation.x = -Math.PI / 2;
+          m.position.y = y;
+          m.userData.sh = 1;
+          par.add(m);
+          return m;
+        };
+        const PN = mob ? 256 : 512;
+        pad(
+          P,
+          cvs(PN, (x, n) => {
+            x.strokeStyle = 'rgba(120,120,120,.55)';
+            x.lineWidth = 1;
+            for (let i = 0; i <= 44; i++) {
+              const p = (i * n) / 44;
+              x.beginPath();
+              x.moveTo(p, 0);
+              x.lineTo(p, n);
+              x.moveTo(0, p);
+              x.lineTo(n, p);
+              x.stroke();
+            }
+            soft(x, n, 0.5);
+          }),
+          44,
+          44,
+          FY - P.position.y + 0.005,
+        );
+        pad(
+          W,
+          cvs(PN, (x, n) => {
+            x.fillStyle = 'rgba(120,120,120,.16)';
+            x.fillRect(0, 0, n, n);
+            x.strokeStyle = 'rgba(120,120,120,.6)';
+            x.lineWidth = 3;
+            [0.27, 0.73].forEach((u) =>
+              x.strokeRect(n * (u - 0.17), n * 0.3, n * 0.34, n * 0.4),
+            );
+            soft(x, n, 0.3);
+          }),
+          9,
+          9,
+          FY - W.position.y + 0.005,
+        );
+        pad(
+          C,
+          cvs(PN, (x, n) => {
+            x.fillStyle = 'rgba(120,120,120,.22)';
+            x.fillRect(0, 0, n, n);
+            soft(x, n, 0.15);
+          }),
+          9,
+          9,
+          (FY - C.position.y) / 1.5 + 0.003,
+        );
+        {
+          const pts = rc.getSpacedPoints(64),
+            pos = [],
+            uv = [],
+            idx = [];
+          pts.forEach((p, i) => {
+            const q = pts[Math.min(64, i + 1)],
+              r = pts[Math.max(0, i - 1)],
+              dx = q.x - r.x,
+              dz = q.z - r.z,
+              l = Math.hypot(dx, dz) || 1,
+              nx = (-dz / l) * 1.1,
+              nz = (dx / l) * 1.1;
+            pos.push(
+              p.x + nx,
+              FY + 0.006,
+              p.z + nz,
+              p.x - nx,
+              FY + 0.006,
+              p.z - nz,
+            );
+            uv.push(0, i / 64, 1, i / 64);
+            if (i < 64)
+              idx.push(
+                i * 2,
+                i * 2 + 1,
+                i * 2 + 2,
+                i * 2 + 1,
+                i * 2 + 3,
+                i * 2 + 2,
+              );
+          });
+          const g = new T.BufferGeometry();
+          g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+          g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+          g.setIndex(idx);
+          const rm = new T.Mesh(
+            g,
+            new T.MeshBasicMaterial({
+              map: cvs(64, (x, n) => {
+                x.fillStyle = 'rgba(70,70,70,.28)';
+                x.fillRect(0, 0, n, n);
+                const g2 = x.createLinearGradient(0, 0, n, 0);
+                g2.addColorStop(0, 'rgba(0,0,0,0)');
+                g2.addColorStop(0.3, '#000');
+                g2.addColorStop(0.7, '#000');
+                g2.addColorStop(1, 'rgba(0,0,0,0)');
+                x.globalCompositeOperation = 'destination-in';
+                x.fillStyle = g2;
+                x.fillRect(0, 0, n, n);
+              }),
+              transparent: true,
+              depthWrite: false,
+              side: T.DoubleSide,
+            }),
+          );
+          rm.userData.sh = 1;
+          E.add(rm);
+        }
+        /* shadows */
+        const shTex = cvs(128, (x, n) => {
+          const g = x.createRadialGradient(
+            n / 2,
+            n / 2,
+            0,
+            n / 2,
+            n / 2,
+            n / 2,
+          );
+          g.addColorStop(0, 'rgba(0,0,0,.4)');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          x.fillStyle = g;
+          x.fillRect(0, 0, n, n);
+        });
+        const shM = [0, 1, 2, 3, 4].map(
+          () =>
+            new T.MeshBasicMaterial({
+              map: shTex,
+              transparent: true,
+              depthWrite: false,
+            }),
+        );
+        const blob = (par, i, cx, cz, w, d, y) => {
+          const m = new T.Mesh(new T.PlaneGeometry(1, 1), shM[i]);
+          m.rotation.x = -Math.PI / 2;
+          m.scale.set(w, d, 1);
+          m.position.set(cx, y, cz);
+          m.userData.sh = 1;
+          m.renderOrder = 1;
+          par.add(m);
+          return m;
+        };
+        const sc = [G, P, W, E, C],
+          fw = [1, 1, 1, 1, 1],
+          lists = [[], [], [], [], []],
+          owner = new Map(),
+          done = new WeakSet();
+        const gb = blob(S, 0, 0, 0, 4.8, 4.8, FY + 0.01);
+        lists[0].push(shM[0]);
+        {
+          const bb = new T.Box3();
+          P.updateMatrixWorld(true);
+          P.children.forEach((c) => {
+            if (c === trainGroup || c === gr || c.userData.sh) return;
+            bb.expandByObject(c);
+          });
+          if (!bb.isEmpty())
+            blob(
+              P,
+              1,
+              bb.min.x - P.position.x + (bb.max.x - bb.min.x) / 2,
+              (bb.min.z + bb.max.z) / 2,
+              bb.max.x - bb.min.x + 2,
+              bb.max.z - bb.min.z + 2,
+              FY - P.position.y + 0.012,
+            );
+        }
+        const trs = blob(trainGroup, 1, -3, RAIL_Z, 12, 1.5, 0.012),
+          hgs = blob(P, 1, 0, 1.4, 3, 1.6, FY - P.position.y + 0.012);
+        blob(W, 2, 0, 0, 7.5, 2.4, FY - W.position.y + 0.012);
+        const cars = blob(E, 3, 0, 0, 1.8, 1, FY + 0.012);
+        blob(C, 4, 0, 0, 4, 2.6, (FY - C.position.y) / 1.5 + 0.006);
+        let fc = 0,
+          tdone = 0;
+        const sm = (a, b, x) => {
+          x = Math.max(0, Math.min(1, (x - a) / (b - a)));
+          return x * x * (3 - 2 * x);
+        };
+        const ap = (m, w) => {
+          const u = m.userData,
+            t = w < 0.999 ? true : u.bt;
+          if (m.transparent !== t) m.needsUpdate = true;
+          m.transparent = t;
+          m.opacity = w < 0.999 ? u.bo * w : u.bo;
+        };
+        function scan() {
+          sc.forEach((g, i) =>
+            g.traverse((o) => {
+              if (!o.material) return;
+              const a = Array.isArray(o.material) ? o.material : [o.material];
+              a.forEach((m, j) => {
+                if (m.userData.__b) return;
+                if (owner.has(m) && owner.get(m) !== i) {
+                  m = m.clone();
+                  a === o.material ? (o.material[j] = m) : (o.material = m);
+                }
+                owner.set(m, i);
+                m.userData.__b = 1;
+                m.userData.bo = m.opacity;
+                m.userData.bt = m.transparent;
+                lists[i].push(m);
+                ap(m, fw[i]);
+              });
+            }),
+          );
+          if (!tdone && trainRig.children.length >= 4) {
+            tdone = 1;
+            const b = new T.Box3().setFromObject(trainRig),
+              w0 = new T.Vector3();
+            trainRig.getWorldPosition(w0);
+            trs.userData.off = (b.min.x + b.max.x) / 2 - w0.x;
+            trs.scale.set(b.max.x - b.min.x + 1, 1.5, 1);
+          }
+          E.children.forEach((c) => {
+            if (done.has(c) || c.userData.sh || c === truck || c === gnd)
+              return;
+            done.add(c);
+            const b = new T.Box3().setFromObject(c),
+              z = b.getSize(new T.Vector3());
+            if (b.isEmpty() || z.x > 4.5 || z.y < 0.6) return;
+            blob(
+              E,
+              3,
+              (b.min.x + b.max.x) / 2 - E.position.x,
+              (b.min.z + b.max.z) / 2,
+              z.x * 1.3,
+              z.z * 1.3,
+              FY + 0.01,
+            );
+          });
+        }
+        function depthUpdate(dt) {
+          fc++;
+          if (fc % 45 === 1) scan();
+          if (fc % 20 === 1) {
+            const bg = new T.Color(css('--bg')),
+              dk = bg.r + bg.g + bg.b < 1.2;
+            floorM.color.copy(bg).multiplyScalar(dk ? 1.12 : 0.985);
+          }
+          S.fog.near = 16 * k;
+          S.fog.far = 60 * k;
+          sc.forEach((g, i) => {
+            const w = 0.22 + 0.78 * (1 - sm(0.55, 1.0, Math.abs(cs - i)));
+            if (Math.abs(w - fw[i]) > 0.002 || w > 0.001 !== g.visible) {
+              fw[i] = w;
+              g.visible = w > 0.001;
+              lists[i].forEach((m) => ap(m, w));
+            }
+          });
+          const lt = darkMul();
+          shM.forEach((m, i) => {
+            m.userData.bo = lt * (i === 2 ? 1 : 0.9);
+          });
+          trs.position.x = trainRig.position.x + (trs.userData.off || -3);
+          const hy = typeof hang !== 'undefined' ? hang.position.y : 3.2;
+          hgs.position.x = typeof hang !== 'undefined' ? hang.position.x : 0;
+          hgs.scale.set(3 + 0.4 * (hy - 3.2), 1.6, 1);
+          fkTick(dt);
+          cars.position.x = truck.position.x;
+          cars.position.z = truck.position.z;
+        }
+        function darkMul() {
+          const bg = new T.Color(css('--bg'));
+          return bg.r + bg.g + bg.b < 1.2 ? 0.55 : 1;
+        }
+        /* ===== CONTINUITY PASS: track ends, road ends, corridors, threads ===== */
+        {
+          const dm = new T.MeshStandardMaterial({
+              color: 0x4a4443,
+              roughness: 0.8,
+            }),
+            rd = new T.MeshStandardMaterial({
+              color: 0xeb2316,
+              roughness: 0.6,
+            });
+          const bx = (w, h, d, m, x, y, z, par) => {
+            const o = new T.Mesh(new T.BoxGeometry(w, h, d), m);
+            o.position.set(x, y, z);
+            par.add(o);
+            return o;
+          };
+          bx(0.3, 0.6, 1.3, rd, 20.4, 0.55, RAIL_Z, trainGroup);
+          [-0.45, 0.45].forEach((o) =>
+            bx(0.12, 0.5, 0.12, dm, 20.4, 0.25, RAIL_Z + o, trainGroup),
+          );
+          const gt = (rev) => {
+            const c = document.createElement('canvas');
+            c.width = 64;
+            c.height = 4;
+            const x = c.getContext('2d'),
+              g = x.createLinearGradient(0, 0, 64, 0);
+            g.addColorStop(rev ? 1 : 0, '#000');
+            g.addColorStop(rev ? 0 : 1, '#fff');
+            x.fillStyle = g;
+            x.fillRect(0, 0, 64, 4);
+            return new T.CanvasTexture(c);
+          };
+          const stub = (rev, w, col, op, y) => {
+            const p = rc.getPoint(rev ? 1 : 0),
+              tn = rc.getTangent(rev ? 1 : 0).clone();
+            tn.y = 0;
+            tn.normalize();
+            const L = 14;
+            const m = new T.Mesh(
+              new T.PlaneGeometry(L, w),
+              new T.MeshBasicMaterial({
+                color: col,
+                transparent: true,
+                opacity: op,
+                alphaMap: gt(rev),
+                depthWrite: false,
+              }),
+            );
+            m.rotation.order = 'YXZ';
+            m.rotation.set(-Math.PI / 2, Math.atan2(-tn.z, tn.x), 0);
+            m.position.set(
+              p.x + tn.x * (rev ? L / 2 : -L / 2),
+              y,
+              p.z + tn.z * (rev ? L / 2 : -L / 2),
+            );
+            m.userData.sh = 1;
+            E.add(m);
+            return p;
+          };
+          const p0 = stub(false, 0.36, ACC, 1, rc.getPoint(0).y),
+            p1 = stub(true, 0.36, ACC, 1, rc.getPoint(1).y);
+          stub(false, 2.2, 0x464646, 0.28, FY + 0.007);
+          stub(true, 2.2, 0x464646, 0.28, FY + 0.007);
+          const dc = document.createElement('canvas');
+          dc.width = 128;
+          dc.height = 8;
+          {
+            const x = dc.getContext('2d');
+            x.fillStyle = 'rgba(250,78,66,.75)';
+            x.fillRect(0, 0, 64, 8);
+          }
+          const line = (ax, az, bx2, bz) => {
+            const dx = bx2 - ax,
+              dz = bz - az,
+              L = Math.hypot(dx, dz),
+              t = new T.CanvasTexture(dc);
+            t.wrapS = T.RepeatWrapping;
+            t.repeat.set(L / 1.2, 1);
+            const m = new T.Mesh(
+              new T.PlaneGeometry(L, 0.18),
+              new T.MeshBasicMaterial({
+                map: t,
+                transparent: true,
+                depthWrite: false,
+              }),
+            );
+            m.rotation.order = 'YXZ';
+            m.rotation.set(-Math.PI / 2, Math.atan2(-dz, dx), 0);
+            m.position.set((ax + bx2) / 2, FY + 0.008, (az + bz) / 2);
+            S.add(m);
+          };
+          const w0 = E.localToWorld(p0.clone()),
+            w1 = E.localToWorld(p1.clone());
+          line(2.8, RAIL_Z, 18.5, RAIL_Z);
+          line(60.5, RAIL_Z, 75.5, RAIL_Z);
+          line(84.5, RAIL_Z, w0.x - 7, w0.z);
+          line(w1.x + 7, w1.z, 152.5, 0);
+          const cor = [
+              [5, 19],
+              [61, 75],
+              [87, 106],
+              [134, 150],
+            ],
+            rnd = (n) => {
+              const v = Math.sin(n * 127.1) * 43758.5453;
+              return v - Math.floor(v);
+            };
+          const tr = new T.InstancedMesh(
+            new T.ConeGeometry(0.45, 1.3, 6),
+            new T.MeshStandardMaterial({ color: 0x00716e, roughness: 0.8 }),
+            40,
+          );
+          const bo = new T.InstancedMesh(
+              new T.BoxGeometry(1.2, 0.8, 0.7),
+              new T.MeshStandardMaterial({ roughness: 0.7 }),
+              24,
+            ),
+            d0 = new T.Object3D(),
+            cols = [0x676261, 0xd9d6d4, 0xeb2316];
+          const put = (m, n, y, sy) => {
+            const c = cor[1 + (n % 3)],
+              z =
+                rnd(n + 3) < 0.8
+                  ? -(3.8 + rnd(n + 9) * 6)
+                  : 3.8 + rnd(n + 5) * 1.8;
+            d0.position.set(c[0] + rnd(n + 1) * (c[1] - c[0]), FY + y * sy, z);
+            d0.scale.setScalar(sy);
+            d0.rotation.y = rnd(n + 7) * 3;
+            d0.updateMatrix();
+            m.setMatrixAt(n, d0.matrix);
+          };
+          for (let n = 0; n < 40; n++)
+            put(tr, n, 0.65, 0.8 + rnd(n + 11) * 0.5);
+          for (let n = 0; n < 24; n++) {
+            put(bo, n, 0.4, 0.8 + rnd(n + 13) * 0.6);
+            bo.setColorAt(n, new T.Color(cols[n % 3]));
+          }
+          S.add(tr, bo);
+        }
+        /* ===== FACTORY KIT: Home -> About transition ===== */
+        const FKP = 'kits/factory-kit/Models/GLB format/',
+          fkC = {},
+          fkBoxes = [];
+        const fkTick = (dt) => {
+          if (reduce) return;
+          fkBoxes.forEach((b) => {
+            b.position.x += dt * 0.9;
+            if (b.position.x > 18.5) b.position.x = 8.9;
+          });
+        };
+        const fkShM = new T.MeshBasicMaterial({
+          map: shTex,
+          transparent: true,
+          depthWrite: false,
+          opacity: 0.55,
+        });
+        function fkLoad(name, cb) {
+          if (fkC[name] instanceof T.Object3D) return cb(fkC[name].clone(true));
+          if (fkC[name]) return fkC[name].push(cb);
+          fkC[name] = [cb];
+          loadGLB(FKP + name + '.glb', (m) => {
+            const q = fkC[name];
+            fkC[name] = m;
+            q.forEach((f) => f(m.clone(true)));
+          });
+        }
+        function fkPlace(name, x, z, o = {}) {
+          if (!o.fix) {
+            x = 19 - (19 - x) * 0.7;
+            if (o.h) o = { ...o, h: o.h * 0.78 };
+            if (o.w) o = { ...o, w: o.w * 0.7 };
+          }
+          fkLoad(name, (m) => {
+            const h = new T.Group(),
+              bb = new T.Box3().setFromObject(m),
+              c = bb.getCenter(new T.Vector3()),
+              z0 = bb.getSize(new T.Vector3());
+            m.position.set(-c.x, -bb.min.y, -c.z);
+            h.add(m);
+            const sc = o.h
+              ? o.h / z0.y
+              : o.w
+                ? o.w / Math.max(z0.x, z0.z)
+                : o.s || 1;
+            h.scale.setScalar(sc);
+            const rot = o.ax ? (o.ax === 'x') !== z0.x >= z0.z : false;
+            h.rotation.y = (rot ? Math.PI / 2 : 0) + (o.ry || 0);
+            h.position.set(x, FY + (o.y || 0), z);
+            S.add(h);
+            const fx = (rot ? z0.z : z0.x) * sc,
+              fz = (rot ? z0.x : z0.z) * sc;
+            if (!o.nosh) {
+              const sh = new T.Mesh(new T.PlaneGeometry(1, 1), fkShM);
+              sh.rotation.x = -Math.PI / 2;
+              sh.scale.set(fx * 1.35, fz * 1.35, 1);
+              sh.position.set(x, FY + 0.011, z);
+              sh.renderOrder = 1;
+              S.add(sh);
+            }
+            if (o.cb) o.cb(h, new T.Vector3(fx, z0.y * sc, fz));
+          });
+        }
+        /* conveyor line with moving crates */
+        [5.5, 8.5, 11.5, 14.5, 17.5].forEach((x, i) =>
+          fkPlace('conveyor-long', x, -1.6, {
+            w: 3,
+            ax: 'x',
+            cb: (h, sz) => {
+              if (i) return;
+              [6, 9.4, 12.8, 16.2].forEach((bx2, n) =>
+                fkPlace(
+                  ['box-small', 'box-large', 'box-wide', 'box-small'][n],
+                  bx2,
+                  -1.6,
+                  { h: 0.5, y: sz.y, nosh: 1, cb: (b) => fkBoxes.push(b) },
+                ),
+              );
+            },
+          }),
+        );
+        /* machines, hoppers, pipes, robots, crane, screens */
+        fkPlace('hopper-high-round', 7.5, -5, { h: 3.2 });
+        fkPlace('hopper-high-square', 11, -5.2, { h: 3 });
+        fkPlace('pipe-large-long', 9.2, -5.1, {
+          w: 3,
+          ax: 'x',
+          y: 1.3,
+          nosh: 1,
+        });
+        fkPlace('pipe-large-bend', 12.9, -5.1, { h: 1.2, y: 1.3, nosh: 1 });
+        fkPlace('machine', 14, -4.7, { h: 2 });
+        fkPlace('machine-fortified', 16.1, -4.7, { h: 2.1 });
+        fkPlace('machine-window', 18, -4.5, { h: 1.8 });
+        fkPlace('machine-bed', 5.2, -4.2, { h: 1.1 });
+        fkPlace('robot-arm-a', 8.3, -2.9, { h: 2.3 });
+        fkPlace('robot-arm-b', 13, -2.9, { h: 2.3 });
+        fkPlace('crane', 16.2, -3, { h: 3.4 });
+        fkPlace('screen-wide', 10.7, -2.8, { h: 1.1 });
+        fkPlace('catwalk-straight', 11.5, -7.3, { w: 6, ax: 'x', y: 1.05 });
+        fkPlace('catwalk-stairs', 8, -7.3, { h: 1.6, ry: Math.PI / 2 });
+        /* factory hall backdrop */
+        [
+          ['structure-tall', 6, 5.2],
+          ['structure-medium', 9.5, 3.7],
+          ['structure-high', 13, 4.4],
+          ['structure-yellow-medium', 16.4, 3.4],
+          ['structure-tall', 19.2, 5.6],
+        ].forEach(([n, x, h]) => fkPlace(n, x, -10.2, { h }));
+        /* gate where the rails begin */
+        fkPlace('structure-doorway-wide', 19, RAIL_Z, {
+          h: 2.6,
+          ax: 'z',
+          fix: true,
+        });
+        [-2.4, 2.4].forEach((o) =>
+          fkPlace('structure-wall', 19, RAIL_Z + o, {
+            h: 2.6,
+            ax: 'z',
+            fix: true,
+          }),
+        );
+        /* safety props along the thread */
+        [4.8, 7.6, 14.2, 17.6].forEach((x) =>
+          fkPlace('cone', x, 3.2, { h: 0.45 }),
+        );
+        fkPlace('warning-traffic', 9.2, 4.4, { h: 1 });
+        fkPlace('warning-orange', 15.4, 4.6, { h: 1.2 });
+        fkPlace('box-large', 6.2, 4.6, { h: 0.9 });
+        fkPlace('box-wide', 12.4, 4.8, { h: 0.8 });
+        /* the same kit gives the About scene its back wall */
+        [
+          ['structure-tall', 30, 4],
+          ['structure-medium', 34, 3],
+          ['hopper-high-square', 38.5, 3.4],
+          ['structure-high', 42, 4.4],
+        ].forEach(([n, x, h]) => fkPlace(n, x, -9.5, { h, fix: true }));
         let k = 1,
           mx = 0,
           my = 0,
@@ -2006,7 +2591,7 @@
           lx = 0,
           t = 0,
           last = performance.now();
-        const cv = $("#c"),
+        const cv = $('#c'),
           ray = new T.Raycaster(),
           v2 = new T.Vector2();
         function size() {
@@ -2029,16 +2614,16 @@
           calc();
         }
         size();
-        addEventListener("resize", size);
-        addEventListener("load", meas);
-        addEventListener("pointerdown", (e) => {
+        addEventListener('resize', size);
+        addEventListener('load', meas);
+        addEventListener('pointerdown', (e) => {
           if (e.target === cv && cs < 0.6) {
             drag = 1;
             lx = e.clientX;
           }
         });
-        addEventListener("pointerup", () => (drag = 0));
-        addEventListener("pointermove", (e) => {
+        addEventListener('pointerup', () => (drag = 0));
+        addEventListener('pointermove', (e) => {
           mx = (e.clientX / innerWidth) * 2 - 1;
           my = (e.clientY / innerHeight) * 2 - 1;
           if (drag) {
@@ -2053,11 +2638,11 @@
             if (n !== hov) {
               hov = n;
               lit();
-              cv.style.cursor = n >= 0 ? "pointer" : "";
+              cv.style.cursor = n >= 0 ? 'pointer' : '';
             }
           }
         });
-        addEventListener("click", (e) => {
+        addEventListener('click', (e) => {
           if (e.target === cv && hov >= 0) pick(hov);
         });
         const near = (n) => Math.abs(cs - n) < 1.4,
@@ -2086,6 +2671,7 @@
           cam.lookAt(look);
 
           trainGroup.visible = Math.abs(cs - 1) < 1.2;
+          depthUpdate(dt);
 
           if (near(0)) {
             G.rotation.y = base + off + Math.sin(t * 0.3) * 0.3;
@@ -2243,33 +2829,33 @@
     </script>
     <script>
       (function () {
-        var btn = document.getElementById("theme-toggle");
+        var btn = document.getElementById('theme-toggle');
         var root = document.documentElement;
 
         /* determine current effective theme */
         function getEffective() {
-          var saved = localStorage.getItem("theme");
+          var saved = localStorage.getItem('theme');
           if (saved) return saved;
-          return matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
+          return matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
         }
 
         function applyTheme(theme) {
-          root.setAttribute("data-theme", theme);
-          localStorage.setItem("theme", theme);
-          btn.textContent = theme === "dark" ? "☀" : "🌙";
+          root.setAttribute('data-theme', theme);
+          localStorage.setItem('theme', theme);
+          btn.textContent = theme === 'dark' ? '☀' : '🌙';
           btn.setAttribute(
-            "aria-label",
-            theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+            'aria-label',
+            theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
           );
         }
 
         /* initialise icon from current state */
         applyTheme(getEffective());
 
-        btn.addEventListener("click", function () {
-          var next = getEffective() === "dark" ? "light" : "dark";
+        btn.addEventListener('click', function () {
+          var next = getEffective() === 'dark' ? 'light' : 'dark';
           applyTheme(next);
         });
       })();
