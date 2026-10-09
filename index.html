@@ -2444,23 +2444,22 @@
           }
           S.add(tr, bo);
         }
-        /* ===== FACTORY KIT: Home -> About transition ===== */
+        /* ===== FACTORY KIT: compact factory hall (Home -> About) ===== */
         const FKP = 'kits/factory-kit/Models/GLB format/',
           fkC = {},
           fkBoxes = [];
+        const U = 0.85,
+          X0 = 9.2,
+          Z0 = -8,
+          FL = FY + 0.02,
+          PI = Math.PI;
         const fkTick = (dt) => {
           if (reduce) return;
           fkBoxes.forEach((b) => {
-            b.position.x += dt * 0.9;
-            if (b.position.x > 18.5) b.position.x = 8.9;
+            b.position.x += dt * 0.8;
+            if (b.position.x > X0 + 8.8 * U) b.position.x = X0 + 3.2 * U;
           });
         };
-        const fkShM = new T.MeshBasicMaterial({
-          map: shTex,
-          transparent: true,
-          depthWrite: false,
-          opacity: 0.55,
-        });
         function fkLoad(name, cb) {
           if (fkC[name] instanceof T.Object3D) return cb(fkC[name].clone(true));
           if (fkC[name]) return fkC[name].push(cb);
@@ -2471,116 +2470,113 @@
             q.forEach((f) => f(m.clone(true)));
           });
         }
-        function fkPlace(name, x, z, o = {}) {
-          if (!o.fix) {
-            x = 19 - (19 - x) * 0.7;
-            if (o.h) o = { ...o, h: o.h * 0.78 };
-            if (o.w) o = { ...o, w: o.w * 0.7 };
-          }
+        /* raw kit pieces: 1 kit unit = U world units, origin kept so pieces snap on the grid */
+        function fkW(name, x, y, z, ry, s, cb) {
           fkLoad(name, (m) => {
-            const h = new T.Group(),
-              bb = new T.Box3().setFromObject(m),
-              c = bb.getCenter(new T.Vector3()),
-              z0 = bb.getSize(new T.Vector3());
-            m.position.set(-c.x, -bb.min.y, -c.z);
+            const h = new T.Group();
             h.add(m);
-            const sc = o.h
-              ? o.h / z0.y
-              : o.w
-                ? o.w / Math.max(z0.x, z0.z)
-                : o.s || 1;
-            h.scale.setScalar(sc);
-            const rot = o.ax ? (o.ax === 'x') !== z0.x >= z0.z : false;
-            h.rotation.y = (rot ? Math.PI / 2 : 0) + (o.ry || 0);
-            h.position.set(x, FY + (o.y || 0), z);
+            h.scale.setScalar(s);
+            h.rotation.y = ry || 0;
+            h.position.set(x, y, z);
             S.add(h);
-            const fx = (rot ? z0.z : z0.x) * sc,
-              fz = (rot ? z0.x : z0.z) * sc;
-            if (!o.nosh) {
-              const sh = new T.Mesh(new T.PlaneGeometry(1, 1), fkShM);
-              sh.rotation.x = -Math.PI / 2;
-              sh.scale.set(fx * 1.35, fz * 1.35, 1);
-              sh.position.set(x, FY + 0.011, z);
-              sh.renderOrder = 1;
-              S.add(sh);
-            }
-            if (o.cb) o.cb(h, new T.Vector3(fx, z0.y * sc, fz));
+            if (cb) cb(h);
           });
         }
-        /* conveyor line with moving crates */
-        [5.5, 8.5, 11.5, 14.5, 17.5].forEach((x, i) =>
-          fkPlace('conveyor-long', x, -1.6, {
-            w: 3,
-            ax: 'x',
-            cb: (h, sz) => {
-              if (i) return;
-              [6, 9.4, 12.8, 16.2].forEach((bx2, n) =>
-                fkPlace(
-                  ['box-small', 'box-large', 'box-wide', 'box-small'][n],
-                  bx2,
-                  -1.6,
-                  { h: 0.5, y: sz.y, nosh: 1, cb: (b) => fkBoxes.push(b) },
-                ),
-              );
-            },
+        const fkG = (name, gx, gz, o = {}) =>
+          fkW(
+            name,
+            X0 + gx * U,
+            FL + (o.y || 0) * U,
+            Z0 + gz * U,
+            o.ry,
+            (o.s || 1) * U,
+            o.cb,
+          );
+        const FW = 10; /* hall width in kit units */
+        /* floor: large tiles with checkerboard accents */
+        for (let i = 0; i < 4; i++)
+          for (let j = 0; j < 3; j++)
+            fkG(
+              (i + j) % 2 ? 'top-large-checkerboard' : 'floor-large',
+              2 + i * 2,
+              2.2 + j * 2,
+            );
+        /* U-shaped hall: back wall, two wings, corners */
+        fkG('structure-corner-outer', 0, 0, { ry: PI });
+        fkG('structure-corner-outer', FW, 0, { ry: PI / 2 });
+        [
+          'structure-wall',
+          'structure-window',
+          'structure-doorway',
+          'structure-window',
+          'structure-wall',
+          'structure-doorway',
+          'structure-window',
+          'structure-wall',
+        ].forEach((n, i) => fkG(n, 1 + i, 0, { ry: PI }));
+        [1.5, 2.5, 3.5].forEach((z, i) => {
+          fkG(i === 1 ? 'structure-window' : 'structure-wall', 0, z + 0.0, {
+            ry: -PI / 2,
+          });
+          fkG(i === 1 ? 'structure-window' : 'structure-wall', FW, z, {
+            ry: PI / 2,
+          });
+        });
+        /* stairs and catwalk against the back wall */
+        fkG('catwalk-stairs', 2.2, 1.6, { ry: PI });
+        fkG('catwalk-straight', 4.2, 1.2, { y: 1.4 });
+        fkG('catwalk-straight', 5.2, 1.2, { y: 1.4 });
+        /* production line: hopper -> machine -> conveyor -> machine -> robot arm */
+        fkG('hopper-high-round', 2, 3.4);
+        fkG('machine-window', 3.2, 3.6, { ry: PI / 2 });
+        [4.6, 6.6, 8.6].forEach((x, i) =>
+          fkG('conveyor-long', x, 3.6, {
+            cb:
+              i === 0
+                ? () =>
+                    [3.4, 5.4, 7.2].forEach((bx2, n) =>
+                      fkG(
+                        ['box-small', 'box-large', 'box-small'][n],
+                        bx2,
+                        3.6,
+                        { y: 0.4, cb: (b) => fkBoxes.push(b) },
+                      ),
+                    )
+                : null,
           }),
         );
-        /* machines, hoppers, pipes, robots, crane, screens */
-        fkPlace('hopper-high-round', 7.5, -5, { h: 3.2 });
-        fkPlace('hopper-high-square', 11, -5.2, { h: 3 });
-        fkPlace('pipe-large-long', 9.2, -5.1, {
-          w: 3,
-          ax: 'x',
-          y: 1.3,
-          nosh: 1,
-        });
-        fkPlace('pipe-large-bend', 12.9, -5.1, { h: 1.2, y: 1.3, nosh: 1 });
-        fkPlace('machine', 14, -4.7, { h: 2 });
-        fkPlace('machine-fortified', 16.1, -4.7, { h: 2.1 });
-        fkPlace('machine-window', 18, -4.5, { h: 1.8 });
-        fkPlace('machine-bed', 5.2, -4.2, { h: 1.1 });
-        fkPlace('robot-arm-a', 8.3, -2.9, { h: 2.3 });
-        fkPlace('robot-arm-b', 13, -2.9, { h: 2.3 });
-        fkPlace('crane', 16.2, -3, { h: 3.4 });
-        fkPlace('screen-wide', 10.7, -2.8, { h: 1.1 });
-        fkPlace('catwalk-straight', 11.5, -7.3, { w: 6, ax: 'x', y: 1.05 });
-        fkPlace('catwalk-stairs', 8, -7.3, { h: 1.6, ry: Math.PI / 2 });
-        /* factory hall backdrop */
+        fkG('machine', 5.4, 2.3, { ry: PI });
+        fkG('machine-fortified', 7, 2.3, { ry: PI });
+        fkG('hopper-square', 8.6, 2.3);
+        fkG('robot-arm-a', 3.6, 2.4);
+        fkG('robot-arm-b', 9.4, 4.4, { ry: -PI / 2 });
+        fkG('pipe-large-long', 6, 0.9, { y: 1.9 });
+        fkG('pipe-large-long', 8, 0.9, { y: 1.9 });
+        fkG('pipe-large-bend', 9.4, 1.7, { y: 1.9, ry: PI / 2 });
+        /* front yard: hazard markings, cones, boxes, control props */
+        fkG('indicator-special-cross', 3, 6.4);
+        fkG('indicator-special-lines', 7, 6.6);
+        fkG('indicator-special-arrow', 5, 6.4);
+        fkG('box-large', 8.8, 5.6);
+        fkG('box-large', 9.6, 6.1, { y: 0 });
+        fkG('box-small', 8.9, 5.6, { y: 0.55 });
+        fkG('scanner-low', 1.6, 5.2, { ry: PI / 2 });
+        fkG('screen-wide', 1.4, 4.2, { ry: PI / 2 });
+        fkG('lever-single', 2.4, 5.6);
         [
-          ['structure-tall', 6, 5.2],
-          ['structure-medium', 9.5, 3.7],
-          ['structure-high', 13, 4.4],
-          ['structure-yellow-medium', 16.4, 3.4],
-          ['structure-tall', 19.2, 5.6],
-        ].forEach(([n, x, h]) => fkPlace(n, x, -10.2, { h }));
+          [1.4, 6.8],
+          [4.1, 5.6],
+          [6.2, 6.3],
+          [9.3, 6.9],
+          [0.8, 3.1],
+        ].forEach(([x, z]) => fkG('cone', x, z));
+        fkG('warning-traffic', 6.8, 5.5);
+        fkG('warning-orange', 4.8, 5.7);
         /* gate where the rails begin */
-        fkPlace('structure-doorway-wide', 19, RAIL_Z, {
-          h: 2.6,
-          ax: 'z',
-          fix: true,
-        });
-        [-2.4, 2.4].forEach((o) =>
-          fkPlace('structure-wall', 19, RAIL_Z + o, {
-            h: 2.6,
-            ax: 'z',
-            fix: true,
-          }),
+        fkW('structure-doorway-wide', 19.3, FY, RAIL_Z, -PI / 2, U);
+        [1.5, 2.5, -1.5, -2.5].forEach((o) =>
+          fkW('structure-wall', 19.3, FY, RAIL_Z + o * U, -PI / 2, U),
         );
-        /* safety props along the thread */
-        [4.8, 7.6, 14.2, 17.6].forEach((x) =>
-          fkPlace('cone', x, 3.2, { h: 0.45 }),
-        );
-        fkPlace('warning-traffic', 9.2, 4.4, { h: 1 });
-        fkPlace('warning-orange', 15.4, 4.6, { h: 1.2 });
-        fkPlace('box-large', 6.2, 4.6, { h: 0.9 });
-        fkPlace('box-wide', 12.4, 4.8, { h: 0.8 });
-        /* the same kit gives the About scene its back wall */
-        [
-          ['structure-tall', 30, 4],
-          ['structure-medium', 34, 3],
-          ['hopper-high-square', 38.5, 3.4],
-          ['structure-high', 42, 4.4],
-        ].forEach(([n, x, h]) => fkPlace(n, x, -9.5, { h, fix: true }));
         let k = 1,
           mx = 0,
           my = 0,
