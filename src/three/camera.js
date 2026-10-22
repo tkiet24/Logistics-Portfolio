@@ -49,7 +49,9 @@ export function createCameraRig(config, initialProgress = 0) {
       if (Math.abs(progress - target) < 0.0001) progress = target;
       const skillsWeight =
         smoothstep(1.4, 1.9, progress) * (1 - smoothstep(2.1, 2.6, progress));
-      const nextShift = desktop ? -(0.17 + skillsWeight * 0.04) : 0;
+      const skillsCardRight = Math.min(88, Math.max(24, viewportWidth * 0.05)) + Math.min(viewportWidth * 0.34, 540);
+      const skillsShift = (skillsCardRight - 60) / (2 * viewportWidth);
+      const nextShift = desktop ? -MathUtils.lerp(0.17, skillsShift, skillsWeight) : 0;
       if (nextShift !== viewShift) {
         viewShift = nextShift;
         camera.setViewOffset(
@@ -75,7 +77,7 @@ export function createCameraRig(config, initialProgress = 0) {
       position.x *= config.layout.sceneSpacing / 40;
       look.x *= config.layout.sceneSpacing / 40;
       const skillsZoom = desktop
-        ? Math.max(zoom * 0.94, 0.94, 1.6 / (viewportWidth / viewportHeight))
+        ? Math.max(zoom * 0.94, 0.94, 1.95 / (viewportWidth / viewportHeight))
         : zoom;
       position
         .sub(look)

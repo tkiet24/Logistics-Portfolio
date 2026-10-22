@@ -341,6 +341,84 @@ nav a.on::before,
 nav a:hover::before {
   transform: scaleX(1);
 }
+/* One compact route index; labels reveal toward the open canvas. */
+@media (min-width: 861px) {
+  #section-nav {
+    position: fixed;
+    inset: 50% 12px auto auto;
+    z-index: 12;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 4px;
+    transform: translateY(-50%);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: var(--panel);
+    box-shadow: 0 8px 30px #00000012;
+  }
+  #section-nav a {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+  }
+  #section-nav a::before {
+    content: attr(data-step);
+    position: static;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    font: 400 10px/1 var(--font-mono);
+    transform: none;
+    transition: background .25s, color .25s, border-color .25s;
+  }
+  #section-nav a::after {
+    position: absolute;
+    right: 58px;
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--fg);
+    font: 500 11px/1.5 var(--font-sans);
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+  }
+  #section-nav a.on::before {
+    background: var(--accent);
+    color: var(--onacc);
+    box-shadow: 0 0 0 4px var(--accent-tint);
+  }
+  #section-nav a:hover::before,
+  #section-nav a:focus-visible::before {
+    border-color: var(--accent);
+  }
+  #section-nav a.on::after,
+  #section-nav a:hover::after,
+  #section-nav a:focus-visible::after {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  #section-nav a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+}
+@media (max-width: 860px) {
+  #section-nav {
+    position: fixed;
+    inset: calc(82px + env(safe-area-inset-top, 0px)) var(--gutter) auto;
+    z-index: 12;
+  }
+}
 #theme-toggle {
   display: grid;
   place-items: center;
@@ -604,7 +682,7 @@ p {
 #skills .panel {
   display: flex;
   flex-direction: column;
-  width: min(38vw, 580px);
+  width: min(34vw, 540px);
   max-height: calc(100svh - 200px);
   overflow: visible;
 }
@@ -871,39 +949,6 @@ p {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.75;
-}
-.asset-footer {
-  position: relative;
-  z-index: 2;
-  padding: 20px var(--gutter) 30px;
-  border-top: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--muted);
-}
-.asset-credits {
-  max-width: 720px;
-}
-.asset-credits summary {
-  width: fit-content;
-  padding: 10px 0;
-  cursor: pointer;
-  font: 400 11px/1.6 var(--font-mono);
-}
-.asset-credits summary:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-}
-.model-credit {
-  max-width: none;
-  margin: 8px 0 0;
-  font: 400 11px/1.8 var(--font-sans);
-}
-.model-credit a {
-  color: inherit;
-  text-underline-offset: 3px;
-}
-.model-credit a:hover {
-  color: var(--accent);
 }
 #work {
   min-height: 380vh;

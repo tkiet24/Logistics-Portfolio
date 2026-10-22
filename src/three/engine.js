@@ -267,8 +267,9 @@ export function startEngine(config, ui) {
     scenes.forEach(({ scene, fade, visibility }, index) => {
       const distance = Math.abs(progress - index),
         visible = distance < 1.4;
+      const contactClearance = index === 3 ? 1 - smoothstep(3.55, 3.95, progress) : 1;
       fade.update(
-        visible ? 0.22 + 0.78 * (1 - smoothstep(0.55, 1.4, distance)) : 0,
+        visible ? (0.22 + 0.78 * (1 - smoothstep(0.55, 1.4, distance))) * contactClearance : 0,
       );
       if (!visible) return;
       scene.group.visible = visibility.intersects(frustum);

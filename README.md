@@ -29,7 +29,7 @@ npm run preview
 - [Configuration](docs/configuration.md): content, visual tokens, scene settings, and the model allowlist.
 - [Deployment](docs/deployment.md): local release checks and Vercel import settings.
 
-Source models live in `kits/`; production includes only allowlisted models and their dependencies. Keep model credits in `index.html` and the supplied asset licenses when reusing them.
+Source models live in `kits/`; production includes only allowlisted models and their dependencies. Model attribution is recorded in [model credits](docs/model-credits.md); retain the supplied asset licenses when reusing them.
 
 The CV download uses `CV_KieuNga_LogisticsIntern.pdf` from the project root. Keep that source file in Git; Vite bundles it under a fingerprinted URL, and `verify` checks that the output matches the original PDF.
 

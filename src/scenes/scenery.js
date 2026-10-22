@@ -116,7 +116,8 @@ export function createScenery(ctx) {
         loadSite(site);
       site.wasNear = near;
       site.fade.update(
-        1 - smoothstep(settings.fadeNear, settings.fadeFar, distance),
+        (1 - smoothstep(settings.fadeNear, settings.fadeFar, distance)) *
+          (1 - smoothstep(config.layout.sceneSpacing * 3.55, config.layout.sceneSpacing * 3.95, camera.position.x)),
       );
       if (!site.group.visible) continue;
       if (frustum && !site.visibility.intersects(frustum)) {

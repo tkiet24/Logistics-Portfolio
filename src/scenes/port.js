@@ -1,6 +1,7 @@
 import * as T from "three";
 import { extractTrainWheels } from "../three/wheels.js";
 import { createRailExit } from "../three/rail-exit.js";
+import { createPortGantry } from "../three/port-gantry.js";
 
 export function createScene(ctx) {
   const { config, quality } = ctx;
@@ -41,38 +42,16 @@ export function createScene(ctx) {
     }
   }
 
-  const craneMaterial = new T.MeshStandardMaterial({
-    color: palette.accent,
-    roughness: 0.5,
+  const gantry = createPortGantry({
+    groundY, railZ, containerScale: port.containerScale, lowDetail,
   });
-  for (const x of [-7.4, 3.4]) {
-    for (const dz of [-1.4, 1.4]) {
-      const leg = new T.Mesh(new T.BoxGeometry(0.25, 5.9, 0.25), craneMaterial);
-      leg.position.set(x, 2.45, railZ + dz);
-      P.add(leg);
-      ctx.shadow(P, x, railZ + dz, 1.1, 0.8, groundY + 0.012);
-    }
-    const crossBeam = new T.Mesh(
-      new T.BoxGeometry(0.25, 0.3, 3.05),
-      craneMaterial,
-    );
-    crossBeam.position.set(x, 5.5, railZ);
-    P.add(crossBeam);
-  }
-  const beam = new T.Mesh(new T.BoxGeometry(11, 0.3, 0.4), craneMaterial);
-  beam.position.set(-2, 5.5, railZ);
-  P.add(beam);
+  P.add(gantry.group);
+  for (const x of [-7.4, 3.4])
+    for (const side of [-1, 1])
+      ctx.shadow(P, x, railZ + side * 1.85, 1.6, 1, groundY + 0.012);
   const hangingContainer = ctx.cont(colours[2 % colours.length]);
   hangingContainer.scale.setScalar(port.containerScale);
   P.add(hangingContainer);
-  const trolley = new T.Mesh(new T.BoxGeometry(0.5, 0.25, 0.5), craneMaterial);
-  trolley.position.set(-2, 5.2, railZ);
-  P.add(trolley);
-  const rope = new T.Mesh(
-    new T.BoxGeometry(0.03, 1, 0.03),
-    new T.MeshStandardMaterial({ color: 0x2b2625 }),
-  );
-  P.add(rope);
   const hangingShadow = new T.Group();
   P.add(hangingShadow);
   ctx.shadow(hangingShadow, 0, railZ, 3, 1.6, groundY + 0.012);
@@ -338,12 +317,8 @@ export function createScene(ctx) {
   function positionCrane(time) {
     const x = -2 + Math.sin(time * 0.6) * 4.5;
     const y = 3.2 + Math.sin(time * 1.2) * 0.3;
-    const top = y + 0.5 * port.containerScale;
-    const bottom = 5.075;
     hangingContainer.position.set(x, y, railZ);
-    trolley.position.x = x;
-    rope.scale.y = Math.max(0, bottom - top);
-    rope.position.set(x, (bottom + top) / 2, railZ);
+    gantry.update(x, y);
     hangingShadow.position.x = x;
   }
 

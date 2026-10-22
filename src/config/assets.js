@@ -84,5 +84,7 @@ export const ASSET_SOURCES = [
   "kits/watercraft-pack/Models/GLB format/cargo-container-c.glb",
   "kits/watercraft-pack/Models/GLB format/ship-cargo-a.glb",
   "kits/watercraft-pack/Models/GLB format/boat-tug-a.glb",
+  "kits/watercraft-pack/Models/GLB format/boat-tug-b.glb",
+  "kits/watercraft-pack/Models/GLB format/cargo-pile-a.glb",
   "kits/watercraft-pack/Models/GLB format/buoy.glb",
 ];
