@@ -195,7 +195,11 @@ function fixture(
     },
     canvasTexture(size, paint) {
       paint(
-        { createLinearGradient: () => ({ addColorStop() {} }), fillRect() {} },
+        {
+          createLinearGradient: () => ({ addColorStop() {} }),
+          fillRect() {},
+          fillText() {},
+        },
         size,
       );
       return new T.Texture();
@@ -287,13 +291,22 @@ test(
           );
           if (index === 4) {
             close(f.scene.group.scale.x, config.contact.scale);
-            const beans = f.scene.group.children.find((part) => part.isPoints);
-            assert.equal(
-              beans.geometry.attributes.position.count,
-              mobile
-                ? config.contact.mobileBeanCount
-                : config.contact.beanCount,
+            const water = f.scene.group.getObjectByName(
+              "Animated harbour water",
             );
+            close(water.scale.x * 2, config.contact.waterWidth);
+            close(water.scale.y * 2, config.contact.waterDepth);
+            for (const [name, length] of [
+              ["ship-cargo-a", 4.8],
+              ["boat-tug-a", 1.1],
+            ]) {
+              const model = modelFor(f, name);
+              const source = await template(model.userData.fixtureSource);
+              const size = new T.Box3()
+                .setFromObject(source)
+                .getSize(new T.Vector3());
+              close(Math.max(size.x, size.z) * model.scale.x, length);
+            }
           }
         });
   },
@@ -325,6 +338,85 @@ test("Home normalizes actual Earth and aircraft models using configured dimensio
   f.scene.update({ ...frame, reducedMotion: true });
   const aircraft = modelFor(f, "cargo_plane").parent.parent;
   assert.ok(aircraft.position.length() > config.home.earthRadius);
+  assert.ok(f.scene.group.getObjectByName("Departure beacon"));
+  assert.ok(f.scene.group.getObjectByName("Arrival beacon"));
+  f.scene.group.traverse((part) =>
+    assert.notEqual(
+      part.geometry?.type,
+      "TubeGeometry",
+      "No visible flight route or trail remains",
+    ),
+  );
+});
+
+test("About uses the real traffic light at the configured height and switches its lenses", async () => {
+  const f = fixture(port);
+  await f.settle();
+  assert.deepEqual(f.errors, []);
+  const model = modelFor(f, "traffic_light");
+  const bounds = new T.Box3().setFromObject(model);
+  close(bounds.max.y - bounds.min.y, f.config.port.signalHeight, 1e-5);
+  const lenses = [];
+  model.traverse((part) => {
+    if (part.isMesh && part.name.startsWith("lichtanimation"))
+      lenses.push(part);
+  });
+  assert.equal(lenses.length, 3);
+  const expectSignal = (moving) => {
+    assert.equal(model.getObjectByName("Signal green halo").visible, moving);
+    assert.equal(model.getObjectByName("Signal red halo").visible, !moving);
+    assert.equal(model.getObjectByName("Signal amber halo").visible, false);
+    assert.equal(
+      model
+        .getObjectByName(`Signal ${moving ? "green" : "red"} illuminated lens`)
+        .material.color.getHex(),
+      moving ? 0x57e3a0 : 0xff3021,
+    );
+    assert.equal(
+      lenses.find((lens) => lens.name.includes("rot")).material
+        .emissiveIntensity,
+      moving ? 0.025 : 1.5,
+    );
+    assert.equal(
+      lenses.filter((lens) => lens.material.emissiveIntensity === 1.5).length,
+      1,
+    );
+  };
+  expectSignal(false); // Waiting for the section to become active.
+  f.scene.update({ ...frame, progress: 1 });
+  expectSignal(true);
+  const train = modelFor(f, "train-locomotive-a").parent.parent;
+  f.scene.update({
+    ...frame,
+    progress: 1,
+    dt:
+      f.config.port.arrivalSeconds -
+      f.config.port.redLeadSeconds -
+      frame.dt -
+      0.02,
+  });
+  expectSignal(true);
+  f.scene.update({ ...frame, progress: 1, dt: 0.04 });
+  expectSignal(false); // Red starts approximately two seconds before arrival.
+  const brakingPosition = train.position.x;
+  f.scene.update({ ...frame, progress: 1 });
+  assert.ok(train.position.x > brakingPosition && train.position.x < 0);
+  expectSignal(false);
+  f.scene.update({ ...frame, progress: 1, dt: f.config.port.arrivalSeconds });
+  expectSignal(false); // Natural arrival, without reduced motion.
+  f.scene.update({ ...frame, progress: 2.3 });
+  expectSignal(false);
+  f.scene.update({ ...frame, progress: 1 });
+  expectSignal(true); // Re-entering starts a fresh arrival.
+  f.scene.update({ ...frame, progress: 2.3 });
+  expectSignal(false); // Leaving mid-arrival resets the signal immediately.
+  f.scene.update({ ...frame, progress: 1 });
+  expectSignal(true);
+  f.scene.update({ ...frame, progress: 1, reducedMotion: true });
+  expectSignal(false);
+  const exit = f.scene.group.getObjectByName("Railway bend into the horizon");
+  const exitBounds = new T.Box3().setFromObject(exit);
+  assert.ok(exitBounds.min.z < -25);
 });
 
 test("Port fits its tracks, seats wagon cargo, preserves source geometry and centers reusable wheel pivots", async () => {
@@ -440,6 +532,10 @@ test("Work waits for city loads, settles heroes while stationary, and writes sel
   assert.equal(f.scene.animated, undefined);
   f.scene.update(frame);
   assert.deepEqual(f.writes, [0]);
+  assert.equal(
+    f.scene.group.getObjectByName("Journey checkpoint 1").userData.state,
+    "active",
+  );
   await f.releaseCar();
   assert.equal(ready, false, "Readiness includes city loads");
   await f.settle(true);
@@ -462,6 +558,14 @@ test("Work waits for city loads, settles heroes while stationary, and writes sel
   const angle = wheel.rotation.x;
   settleMotion(f.scene, { ...frame, workProgress: 1 });
   assert.equal(f.writes.at(-1), 4);
+  assert.equal(
+    f.scene.group.getObjectByName("Journey checkpoint 1").userData.state,
+    "complete",
+  );
+  assert.equal(
+    f.scene.group.getObjectByName("Journey checkpoint 5").userData.state,
+    "active",
+  );
   assert.notEqual(wheel.rotation.x, angle);
   const curve = new T.CatmullRomCurve3(
     f.config.work.route.map((point) => new T.Vector3(...point)),
@@ -469,10 +573,12 @@ test("Work waits for city loads, settles heroes while stationary, and writes sel
   curve.arcLengthDivisions = 400;
   const stops = distanceStops(curve, f.config.work.milestones),
     goal = curve.getPointAt(stops.at(-1));
+  const tangent = curve.getTangentAt(stops.at(-1));
+  goal.x -= tangent.z * f.config.work.road.laneOffset;
+  goal.z += tangent.x * f.config.work.road.laneOffset;
   close(car.position.x, goal.x);
   close(car.position.y, goal.y + 0.3);
   close(car.position.z, goal.z);
-  const tangent = curve.getTangentAt(stops.at(-1));
   close(shortestAngle(car.rotation.y, -Math.atan2(tangent.z, tangent.x)), 0);
   settleMotion(f.scene, frame);
   assert.equal(f.writes.at(-1), 0);
@@ -586,16 +692,56 @@ test("Work placement is independent of asset completion order and respects mobil
     close(Math.max(size.x, size.z) * holder.scale.x, width);
     close(holder.position.y, config.layout.floorY + 0.02);
   }
-  const road = f.scene.group.children.find(
-    (part) => part.geometry?.type === "BufferGeometry" && part.material?.map,
-  );
+  const road = f.scene.group.getObjectByName("Asphalt and lane markings");
   assert.ok(road.material.transparent);
   assert.equal(road.material.depthWrite, false);
 });
 
-test("Skills selection, Contact doors, and Factory conveyor respond to their controls", async () => {
+test("Skills fittings stay inside the container framing budget", () => {
+  const f = fixture(skills);
+  f.scene.group.updateWorldMatrix(true, true);
+  for (const container of f.scene.pickable) {
+    const inverse = container.matrixWorld.clone().invert();
+    const bounds = new T.Box3();
+    container.traverse((part) => {
+      if (!part.isMesh) return;
+      part.geometry.computeBoundingBox();
+      const local = new T.Matrix4().multiplyMatrices(inverse, part.matrixWorld);
+      if (part.isInstancedMesh) {
+        const instance = new T.Matrix4();
+        for (let i = 0; i < part.count; i++) {
+          part.getMatrixAt(i, instance);
+          bounds.union(
+            part.geometry.boundingBox
+              .clone()
+              .applyMatrix4(local.clone().multiply(instance)),
+          );
+        }
+      } else {
+        bounds.union(part.geometry.boundingBox.clone().applyMatrix4(local));
+      }
+    });
+    assert.ok(bounds.min.x >= -1.27 && bounds.max.x <= 1.27);
+    assert.ok(bounds.min.y >= -0.57 && bounds.max.y <= 0.57);
+    assert.ok(bounds.min.z >= -0.57 && bounds.max.z <= 0.57);
+  }
+});
+
+test("Skills selection and Factory conveyor respond to their controls", async () => {
   const s = fixture(skills);
   s.scene.select(2);
+  assert.equal(
+    s.scene.pickable[2]
+      .getObjectByName("Selection status rail")
+      .material.color.getHex(),
+    0x8bf2cd,
+  );
+  assert.notEqual(
+    s.scene.pickable[0]
+      .getObjectByName("Selection status rail")
+      .material.color.getHex(),
+    0x8bf2cd,
+  );
   s.scene.hover(1);
   s.scene.update({ ...frame, reducedMotion: true });
   close(s.scene.pickable[2].position.z, 1.1);
@@ -603,13 +749,6 @@ test("Skills selection, Contact doors, and Factory conveyor respond to their con
   s.scene.hover(-1);
   s.scene.update({ ...frame, reducedMotion: true });
   close(s.scene.pickable[1].position.z, 0);
-  const c = fixture(contact);
-  const doors = c.scene.group.children.filter((part) => part.isGroup);
-  c.scene.update({ ...frame, progress: 4 });
-  assert.equal(doors.length, 2);
-  for (const door of doors) close(Math.abs(door.rotation.y), 1.75);
-  c.scene.update({ ...frame, progress: 3 });
-  for (const door of doors) close(door.rotation.y, 0);
   const f = fixture(factory);
   await f.settle();
   const { unit, originX, originZ, conveyorSpeed } = f.config.factory;

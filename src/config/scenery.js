@@ -33,7 +33,7 @@ export const SCENERY_SITES = [
   },
   {
     name: "Distribution centre",
-    x: 93,
+    x: 90,
     z: -8.5,
     items: [
       ["city", "low-detail-building-wide-b", 0, -2.8, 3.2, 0],
@@ -45,8 +45,8 @@ export const SCENERY_SITES = [
   },
   {
     name: "Coffee handling facility",
-    x: 100.5,
-    z: -12,
+    x: 103,
+    z: -20,
     items: [
       ["factory", "hopper-high-round", -2.1, -1, 1.3, 0],
       ["factory", "hopper-high-round", 0, -1, 1.3, 0],
@@ -58,8 +58,8 @@ export const SCENERY_SITES = [
   },
   {
     name: "Freight transfer yard",
-    x: 140,
-    z: -8.5,
+    x: 153,
+    z: -16,
     items: [
       ["cargo", "cargo-container-a", -2.2, 0, 2.6, Math.PI / 2, 2],
       ["cargo", "cargo-container-c", 1.6, 0, 2.6, Math.PI / 2],
@@ -70,8 +70,8 @@ export const SCENERY_SITES = [
   },
   {
     name: "Local delivery hub",
-    x: 150,
-    z: -10.5,
+    x: 162,
+    z: -14,
     items: [
       ["city", "low-detail-building-wide-a", 0, -2.7, 3.2, 0],
       ["vehicle", "van", -2.8, 1.1, 2, -Math.PI / 2],

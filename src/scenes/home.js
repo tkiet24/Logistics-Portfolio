@@ -1,5 +1,6 @@
 import * as T from "three";
 import { createFlightCurve, latLon } from "../three/flight.js";
+import { createGlobeMarker } from "../three/globe-markers.js";
 import { paintAircraft } from "../three/aircraft-material.js";
 
 export function createScene(ctx) {
@@ -18,64 +19,13 @@ export function createScene(ctx) {
     -endpoints[0].clone().add(endpoints[1]).x,
     endpoints[0].clone().add(endpoints[1]).z,
   );
-  const segments = ctx.quality.mobile
-    ? Math.round(settings.routeSegments * 0.6)
-    : settings.routeSegments;
-  const trailSegments = ctx.quality.mobile
-    ? Math.round(settings.trailSegments * 0.6)
-    : settings.trailSegments;
-  for (const [radius, opacity] of [
-    [0.018, 0.12],
-    [0.005, 0.82],
-  ]) {
-    globe.add(
-      new T.Mesh(
-        new T.TubeGeometry(arc, segments, radius, 5, false),
-        new T.MeshBasicMaterial({
-          color: settings.routeColour,
-          transparent: true,
-          opacity,
-          depthWrite: false,
-        }),
-      ),
+  const markers = endpoints.map((point, index) => {
+    const marker = createGlobeMarker(
+      point,
+      index ? settings.arrivalColour : settings.departureColour,
+      index,
     );
-  }
-  const trail = new T.Mesh(
-    new T.TubeGeometry(arc, trailSegments, 0.009, 4, false),
-    new T.MeshBasicMaterial({
-      color: settings.trailColour,
-      transparent: true,
-      opacity: 0.9,
-      depthWrite: false,
-    }),
-  );
-  trail.geometry.setDrawRange(0, 0);
-  globe.add(trail);
-  const markers = endpoints.map((point) => {
-    const marker = new T.Group();
-    marker.add(
-      new T.Mesh(
-        new T.SphereGeometry(0.028, 12, 12),
-        new T.MeshBasicMaterial({ color: settings.trailColour }),
-      ),
-    );
-    const ring = new T.Mesh(
-      new T.RingGeometry(0.055, 0.073, 32),
-      new T.MeshBasicMaterial({
-        color: settings.routeColour,
-        transparent: true,
-        opacity: 0.75,
-        side: T.DoubleSide,
-        depthWrite: false,
-      }),
-    );
-    ring.quaternion.setFromUnitVectors(
-      new T.Vector3(0, 0, 1),
-      point.clone().normalize(),
-    );
-    marker.add(ring);
-    marker.position.copy(point);
-    globe.add(marker);
+    globe.add(marker.group);
     return marker;
   });
   const earth = new T.Group();
@@ -149,15 +99,8 @@ export function createScene(ctx) {
         : T.MathUtils.smoothstep(u, 0, 0.045) *
           (1 - T.MathUtils.smoothstep(u, 0.955, 1));
       for (const material of materials) ctx.fadeMaterial(material, fade);
-      const end = Math.floor(u * trailSegments),
-        start = Math.max(
-          0,
-          end - Math.round(trailSegments * settings.trailLength),
-        );
-      trail.geometry.setDrawRange(start * 24, (end - start) * 24);
-      ctx.fadeMaterial(trail.material, fade);
       for (const marker of markers)
-        marker.scale.setScalar(1 + 0.08 * Math.sin(time * 2.2));
+        marker.update(time, reducedMotion, ctx.fadeMaterial);
     },
   };
 }

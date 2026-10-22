@@ -8,6 +8,10 @@ export function createFade(group) {
     if (!base) return;
     const alpha =
       base.opacity * opacity * (material.userData.motionOpacity ?? 1);
+    if (material.userData.ditherOpacity) {
+      material.userData.ditherOpacity.value = alpha;
+      return;
+    }
     const transparent = base.transparent || alpha < 0.999;
     if (material.transparent !== transparent) material.needsUpdate = true;
     material.transparent = transparent;

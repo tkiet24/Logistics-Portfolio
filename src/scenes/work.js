@@ -1,4 +1,6 @@
 ﻿import * as T from "three";
+import { createCheckpoint } from "../three/checkpoint.js";
+import { createRoad } from "../three/ribbon.js";
 import {
   clamp,
   createRandom,
@@ -37,90 +39,24 @@ export function createScene(ctx) {
   let position = workStart;
   let activeIndex = -1;
 
-  // A narrow transparent ribbon follows the road and fades across its edges.
-  const roadSegments = lowDetail ? 60 : 100;
-  const roadPositions = new Float32Array((roadSegments + 1) * 6);
-  const roadUVs = new Float32Array((roadSegments + 1) * 4);
-  const roadIndices = new Uint16Array(roadSegments * 6);
-  for (let i = 0; i <= roadSegments; i++) {
-    const parameter = i / roadSegments;
-    curve.getPointAt(parameter, workPosition);
-    curve.getTangentAt(parameter, workDirection);
-    const length = Math.hypot(workDirection.x, workDirection.z) || 1;
-    const normalX = -workDirection.z / length;
-    const normalZ = workDirection.x / length;
-    for (let side = 0; side < 2; side++) {
-      const offset = side === 0 ? -1.1 : 1.1;
-      const vertex = i * 6 + side * 3;
-      roadPositions[vertex] = workPosition.x + normalX * offset;
-      roadPositions[vertex + 1] = workPosition.y - 0.08;
-      roadPositions[vertex + 2] = workPosition.z + normalZ * offset;
-      roadUVs[i * 4 + side * 2] = parameter;
-      roadUVs[i * 4 + side * 2 + 1] = side;
-    }
-    if (i < roadSegments) {
-      const vertex = i * 2;
-      roadIndices.set(
-        [vertex, vertex + 1, vertex + 2, vertex + 1, vertex + 3, vertex + 2],
-        i * 6,
-      );
-    }
-  }
-  const roadGeometry = new T.BufferGeometry();
-  roadGeometry.setAttribute(
-    "position",
-    new T.BufferAttribute(roadPositions, 3),
-  );
-  roadGeometry.setAttribute("uv", new T.BufferAttribute(roadUVs, 2));
-  roadGeometry.setIndex(new T.BufferAttribute(roadIndices, 1));
-  const roadTexture = ctx.canvasTexture(64, (canvas, size) => {
-    const fade = canvas.createLinearGradient(0, 0, 0, size);
-    fade.addColorStop(0, "rgba(110,110,110,0)");
-    fade.addColorStop(0.2, "rgba(110,110,110,.2)");
-    fade.addColorStop(0.5, "rgba(110,110,110,.3)");
-    fade.addColorStop(0.8, "rgba(110,110,110,.2)");
-    fade.addColorStop(1, "rgba(110,110,110,0)");
-    canvas.fillStyle = fade;
-    canvas.fillRect(0, 0, size, size);
-  });
-  group.add(
-    new T.Mesh(
-      roadGeometry,
-      new T.MeshBasicMaterial({
-        map: roadTexture,
-        transparent: true,
-        depthWrite: false,
-        side: T.DoubleSide,
-      }),
-    ),
-  );
-  group.add(
-    new T.Mesh(
-      new T.TubeGeometry(curve, 80, 0.07, 6),
-      new T.MeshBasicMaterial({ color: config.palette.accent }),
-    ),
-  );
-  const nodeGeometry = new T.SphereGeometry(
-    0.2,
-    lowDetail ? 10 : 16,
-    lowDetail ? 10 : 16,
-  );
-  const nodeMaterial = new T.MeshBasicMaterial({
-    color: config.palette.accent,
-  });
-  const nodes = milestonePoints.map((point) => {
-    const node = new T.Mesh(nodeGeometry, nodeMaterial);
-    node.position.copy(point);
-    group.add(node);
-    return node;
+  group.add(createRoad(curve, work.road, lowDetail));
+  const nodes = milestonePoints.map((point, index) => {
+    const checkpoint = createCheckpoint(ctx, index);
+    const tangent = curve.getTangent(work.milestones[index]);
+    const normal = new T.Vector3(-tangent.z, 0, tangent.x).normalize();
+    checkpoint.group.position
+      .copy(point)
+      .addScaledVector(normal, work.road.width / 2 + 0.42);
+    checkpoint.group.position.y = buildingY;
+    group.add(checkpoint.group);
+    return checkpoint;
   });
 
   function setWork(index) {
     if (index === activeIndex) return;
     activeIndex = index;
     ctx.ui.setWork(index);
-    for (let i = 0; i < nodes.length; i++)
-      nodes[i].scale.setScalar(i === index ? 1.5 : 1);
+    for (let i = 0; i < nodes.length; i++) nodes[i].setState(index);
   }
 
   // Curve.getTangentAt allocates temporary vectors internally in Three r128.
@@ -130,6 +66,8 @@ export function createScene(ctx) {
     curve.getPoint(Math.max(0, mapped - 0.0001), workDirection);
     curve.getPoint(Math.min(1, mapped + 0.0001), tangentSample);
     workDirection.subVectors(tangentSample, workDirection).normalize();
+    workPosition.x -= workDirection.z * work.road.laneOffset;
+    workPosition.z += workDirection.x * work.road.laneOffset;
   }
 
   const car = new T.Group();
@@ -150,7 +88,8 @@ export function createScene(ctx) {
       .load("kits/car-kit/Models/GLB format/sedan-sports.glb", (model) => {
         model.scale.setScalar(work.carScale);
         model.rotation.y = Math.PI / 2;
-        model.position.y = -0.22;
+        const bounds = new T.Box3().setFromObject(model);
+        model.position.y = -0.38 - bounds.min.y;
         model.traverse((part) => {
           if (!part.isMesh || !part.name.startsWith("wheel-")) return;
           if (!part.geometry.boundingBox) part.geometry.computeBoundingBox();

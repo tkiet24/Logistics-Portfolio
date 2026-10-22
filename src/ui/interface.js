@@ -1,4 +1,5 @@
 import { SKILLS } from "../config/content.js";
+import { formatStat } from "../core/stats.js";
 import { createScroll } from "./scroll.js";
 import { createTheme } from "./theme.js";
 
@@ -20,7 +21,9 @@ export function createUI(config) {
     bar = document.querySelector("#bar");
   const chips = document.querySelector("#chips"),
     caption = document.querySelector("#cap"),
-    accordion = document.querySelector("#acc");
+    accordion = document.querySelector("#acc"),
+    skillTitle = document.querySelector("#skill-title"),
+    skillNumber = document.querySelector("#skill-number");
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const scroll = createScroll(config, () => invalidate());
   const theme = createTheme(() => {
@@ -35,48 +38,73 @@ export function createUI(config) {
       chip.setAttribute("aria-pressed", String(i === index));
     });
     caption.textContent = SKILLS[index][1];
+    skillTitle.textContent = SKILLS[index][0];
+    skillNumber.textContent = `${String(index + 1).padStart(2, "0")} / ${String(SKILLS.length).padStart(2, "0")}`;
+    // A newly selected topic always starts at the top of its detail view.
+    accordion.scrollTop = 0;
     const fragment = document.createDocumentFragment();
     SKILLS[index][3].forEach(([title, label, description], i) => {
-      const button = document.createElement("button"),
+      const entry = document.createElement("article"),
+        heading = document.createElement("h4"),
+        button = document.createElement("button"),
         body = document.createElement("div"),
         inner = document.createElement("div"),
         paragraph = document.createElement("p"),
-        bold = document.createElement("b");
+        meta = document.createElement("span");
+      entry.className = i === 0 ? "skill-entry is-open" : "skill-entry";
+      heading.className = "skill-entry-heading";
       button.type = "button";
       button.className = "ah";
+      button.id = `skill-toggle-${index}-${i}`;
       button.textContent = title;
       button.setAttribute("aria-expanded", String(i === 0));
       body.id = `skill-${index}-${i}`;
       body.className = i === 0 ? "ab o" : "ab";
+      body.setAttribute("aria-hidden", String(i !== 0));
+      body.setAttribute("role", "region");
+      body.setAttribute("aria-labelledby", button.id);
       button.setAttribute("aria-controls", body.id);
-      bold.textContent = label;
-      paragraph.append(bold, document.createElement("br"), description);
-      inner.append(paragraph);
+      meta.className = "skill-meta";
+      meta.textContent = label;
+      paragraph.textContent = description;
+      inner.append(meta, paragraph);
       body.append(inner);
       button.addEventListener("click", () => {
         const wasOpen = button.getAttribute("aria-expanded") === "true";
         accordion
           .querySelectorAll(".ah")
           .forEach((item) => item.setAttribute("aria-expanded", "false"));
+        accordion.querySelectorAll(".ab").forEach((item) => {
+          item.classList.remove("o");
+          item.setAttribute("aria-hidden", "true");
+        });
         accordion
-          .querySelectorAll(".ab")
-          .forEach((item) => item.classList.remove("o"));
+          .querySelectorAll(".skill-entry")
+          .forEach((item) => item.classList.remove("is-open"));
         if (!wasOpen) {
           button.setAttribute("aria-expanded", "true");
           body.classList.add("o");
+          body.setAttribute("aria-hidden", "false");
+          entry.classList.add("is-open");
         }
       });
-      fragment.append(button, body);
+      heading.append(button);
+      entry.append(heading, body);
+      fragment.append(entry);
     });
     accordion.replaceChildren(fragment);
     onSkill(index);
     invalidate();
   }
   SKILLS.forEach(([label], index) => {
-    const button = document.createElement("button");
+    const button = document.createElement("button"),
+      labelText = document.createElement("span");
     button.type = "button";
     button.className = "chip";
-    button.textContent = label;
+    labelText.className = "chip-label";
+    labelText.textContent = label;
+    button.append(labelText);
+    button.setAttribute("aria-controls", "skill-title cap acc");
     button.addEventListener("click", () => select(index));
     chips.append(button);
   });
@@ -91,15 +119,18 @@ export function createUI(config) {
   function count() {
     if (counted) return;
     counted = true;
-    const stats = [...document.querySelectorAll(".stats b")],
+    const stats = [...document.querySelectorAll(".stats b[data-n]")],
       start = performance.now();
     function step(now) {
       const u = reducedMotion.matches ? 1 : Math.min(1, (now - start) / 1400),
         progress = 1 - (1 - u) ** 3;
       for (const stat of stats)
-        stat.textContent =
-          Math.round(+stat.dataset.n * progress) +
-          (u === 1 ? stat.dataset.s : "");
+        stat.textContent = formatStat(
+          Number(stat.dataset.n),
+          progress,
+          Number(stat.dataset.decimals || 0),
+          stat.dataset.s || "",
+        );
       if (u < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);

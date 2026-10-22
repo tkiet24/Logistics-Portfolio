@@ -1,8 +1,9 @@
 import * as T from "three";
 
-export function canvasTexture(size, paint) {
+export function canvasTexture(size, paint, height = size) {
   const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = size;
+  canvas.width = size;
+  canvas.height = height;
   paint(canvas.getContext("2d"), size);
   return new T.CanvasTexture(canvas);
 }

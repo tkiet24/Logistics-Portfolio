@@ -42,6 +42,7 @@ export const ASSET_SOURCES = [
   "kits/city-kit-commercial_2.1/Models/GLB format/low-detail-building-wide-a.glb",
   "kits/city-kit-commercial_2.1/Models/GLB format/low-detail-building-wide-b.glb",
   "kits/earth.glb",
+  "kits/traffic_light.glb",
   "kits/factory-kit/Models/GLB format/box-large.glb",
   "kits/factory-kit/Models/GLB format/box-small.glb",
   "kits/factory-kit/Models/GLB format/box-wide.glb",
@@ -81,4 +82,7 @@ export const ASSET_SOURCES = [
   "kits/watercraft-pack/Models/GLB format/cargo-container-a.glb",
   "kits/watercraft-pack/Models/GLB format/cargo-container-b.glb",
   "kits/watercraft-pack/Models/GLB format/cargo-container-c.glb",
+  "kits/watercraft-pack/Models/GLB format/ship-cargo-a.glb",
+  "kits/watercraft-pack/Models/GLB format/boat-tug-a.glb",
+  "kits/watercraft-pack/Models/GLB format/buoy.glb",
 ];

@@ -80,3 +80,38 @@ test("aircraft paint replaces dark albedo while keeping the detail mask and norm
   assert.ok(shader.fragmentShader.includes("totalEmissiveRadiance"));
   assert.ok(!shader.fragmentShader.includes("#include <map_fragment>"));
 });
+
+test("aircraft parts share pixel coverage and retain occlusion throughout flight and scene fades", () => {
+  const group = new T.Group();
+  const materials = [
+    new T.MeshStandardMaterial(),
+    new T.MeshStandardMaterial({ transparent: true, opacity: 0.4 }),
+  ];
+  for (const material of materials) {
+    paintAircraft(material, CONFIG.home);
+    group.add(new T.Mesh(new T.BoxGeometry(), material));
+  }
+  const fade = createFade(group);
+  fade.register();
+  for (const opacity of [0, 0.2, 0.5, 1]) {
+    fade.update(0.6);
+    for (const material of materials) fade.motion(material, opacity);
+    for (const material of materials) {
+      assert.equal(material.userData.ditherOpacity.value, 0.6 * opacity);
+      assert.equal(material.transparent, false);
+      assert.equal(material.depthWrite, true);
+      assert.equal(material.opacity, 1);
+    }
+  }
+  const shaders = materials.map((material) => {
+    const shader = { fragmentShader: T.ShaderLib.standard.fragmentShader };
+    material.onBeforeCompile(shader);
+    assert.equal(
+      shader.uniforms.aircraftOpacity,
+      material.userData.ditherOpacity,
+    );
+    return shader.fragmentShader;
+  });
+  assert.equal(shaders[0], shaders[1]);
+  assert.match(shaders[0], /gl_FragCoord/);
+});

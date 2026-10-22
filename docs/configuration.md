@@ -20,11 +20,11 @@ Edit source settings and rebuild production output. These modules are bundled by
 | `layout`              | `sceneSpacing`, `floorY`, camera keyframes/damping, desktop breakpoint, `workTravelFraction`                                                     |
 | `performance`         | Mobile breakpoint, desktop/mobile DPR caps and load concurrency, render cadence targets, preload distances, max frame delta, adaptive resolution |
 | `palette`             | Three.js accent and procedural container colors                                                                                                  |
-| `home`                | Globe radius, flight coordinates/speed/altitude, aircraft size/material treatment, route and trail                                               |
-| `port`                | Scene height, train/track/container scale, wagon count, rail offsets/length, arrival duration                                                    |
+| `home`                | Globe radius, flight coordinates/speed/altitude, aircraft size/material treatment, departure/arrival beacon colours                              |
+| `port`                | Scene height, train/track/container scale, wagon count, rail offsets/length, bend radius/exit length, signal height, arrival duration            |
 | `skills`              | Container scale, centered columns, horizontal `gap`, vertical `rowGap` (default 1.24)                                                            |
-| `work`                | Route, milestones, car scale, follow/steering damping, building widths, far counts, random seed                                                  |
-| `contact`             | Scene scale/rotation and desktop/mobile bean counts                                                                                              |
+| `work`                | Route, asphalt width/colour/exit dimensions, milestones, car scale, follow/steering damping, building widths, far counts, random seed            |
+| `contact`             | Harbour scale/rotation, basin dimensions, light/dark water colours, wave speed, vessel bobbing, tug and crane speeds                             |
 | `scenery` / `factory` | Site fade distances, model height/mobile limits, crane motion; factory scale, origin, conveyor speed                                             |
 
 For example, change `CONFIG.port.wagonCount` to change train length, or `CONFIG.work.buildingWidths.heroTower` to resize the tall Work milestones. Keep Work milestones ordered from 0 to 1, and align their count with the Work entries in `index.html`. Performance FPS fields set scheduling targets; they are not measured results.
@@ -40,6 +40,10 @@ The theme bridge reads `--bg` as `background`, `--ball` as `ground`, and `--dot`
 The [previous design brief](archive/previous-design-brief.md) retains historical visual guidance. Use the current CSS for active token values and `src/config/site.js` for runtime settings.
 
 ## Models and production URLs
+
+The CV button in `index.html` points to `CV_KieuNga_LogisticsIntern.pdf` and carries `data-cv`. Vite processes that anchor as an asset source, emitting a fingerprinted PDF URL that works without JavaScript. Keep the PDF in the repository and update the anchor when replacing it. Production verification checks that the bundled PDF matches the source bytes.
+
+About statistics use `data-n` for numeric targets and optional `data-decimals` for precision. GPA uses two decimal places. Text statistics such as MOS have no `data-n` and stay unchanged during the count-up.
 
 Scene code loads original paths such as `kits/train-kit/Models/GLB format/train-locomotive-a.glb`. Keep spaces and case exact, use forward slashes, and include each model in `ASSET_SOURCES`. The loader resolves paths through the generated `virtual:portfolio-assets` module.
 

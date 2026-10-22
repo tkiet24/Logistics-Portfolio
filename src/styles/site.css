@@ -294,7 +294,7 @@ header b::before {
   transform: translateY(-50%);
 }
 header b::after {
-  content: "EXPORT LOGISTICS";
+  content: attr(data-role);
   margin-top: 7px;
   color: var(--muted);
   font: 400 9px/1 var(--font-mono);
@@ -387,16 +387,16 @@ section::after {
   white-space: pre-wrap;
 }
 #home::after {
-  content: "HO CHI MINH CITY, VN   →   EUROPE                                     SCROLL TO EXPLORE ↓";
+  content: "HO CHI MINH CITY, VIETNAM                                     SCROLL TO EXPLORE ↓";
 }
 #about::after {
-  content: "02 / THE PROCESS                                           PRECISION AT EVERY HANDOVER";
+  content: "02 / MY BACKGROUND                                         LEARNING THROUGH EXPERIENCE";
 }
 #skills::after {
   content: "03 / THE TOOLKIT                                           SELECT. EXPLORE. CONNECT.";
 }
 #contact::after {
-  content: "TUAN KIET / EXPORT LOGISTICS                               FROM ORIGIN TO OPPORTUNITY ↗";
+  content: "BUI THI KIEU NGA / LOGISTICS & SUPPLY CHAIN                   LET’S CONNECT ↗";
 }
 .panel {
   position: relative;
@@ -422,10 +422,10 @@ section::after {
   letter-spacing: 0.13em;
 }
 #home .panel::before {
-  content: "01 / FROM VIETNAM, WITH PRECISION";
+  content: "01 / LOGISTICS & SUPPLY CHAIN STUDENT";
 }
 #about .panel::before {
-  content: "02 / BEHIND EVERY SHIPMENT";
+  content: "02 / EDUCATION & DIRECTION";
 }
 #skills .panel::before {
   content: "03 / KNOWLEDGE IN MOTION";
@@ -490,6 +490,9 @@ h2 {
 h1 {
   font-size: clamp(58px, 6.2vw, 104px);
   line-height: 0.99;
+}
+#home h1 {
+  font-size: clamp(48px, 5.4vw, 92px);
 }
 h2 {
   max-width: 600px;
@@ -559,54 +562,19 @@ p {
   border-color: var(--fg);
   box-shadow: none;
 }
-.hint {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 38px;
-  font: 400 10px/1.7 var(--font-mono);
-  letter-spacing: -0.02em;
-}
-.model-credit {
-  max-width: 440px;
-  margin-top: 14px;
-  font: 400 10px/1.7 var(--font-mono);
-}
-.model-credit a {
-  color: inherit;
-  text-underline-offset: 3px;
-}
-.model-credit a:hover {
-  color: var(--accent);
-}
-.hint::before {
-  content: "↓";
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 26px;
-  height: 34px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  color: var(--accent);
-  font-size: 15px;
-  animation: scroll-nudge 2.8s var(--ease) infinite;
-}
-@keyframes scroll-nudge {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  45% {
-    transform: translateY(5px);
-  }
-}
 .stats {
   display: grid;
   grid-template-columns: 1fr 1fr 1.2fr;
   margin-top: 38px;
   padding-top: 26px;
   border-top: 1px solid var(--line);
+}
+.education-note {
+  margin-top: 18px;
+  font: 400 11px/1.6 var(--font-mono);
+}
+.education-note + .stats {
+  margin-top: 24px;
 }
 .stats > div {
   padding: 0 20px;
@@ -632,70 +600,219 @@ p {
   color: var(--muted);
   font-size: 11px;
 }
+/* A solid skill profile keeps text separate from the animated 3D scene. */
 #skills .panel {
+  display: flex;
+  flex-direction: column;
+  width: min(38vw, 580px);
   max-height: calc(100svh - 200px);
-  overflow: auto;
-  scrollbar-width: none;
+  overflow: visible;
 }
-#skills .panel::-webkit-scrollbar {
-  display: none;
+#skills .panel::before {
+  flex-shrink: 0;
+  margin-bottom: 18px;
+}
+.skills-heading {
+  flex-shrink: 0;
 }
 #skills h2 {
-  font-size: clamp(38px, 3.6vw, 58px);
+  max-width: 600px;
+  font-size: clamp(32px, 3.1vw, 46px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
 }
-#skills .panel > p:first-of-type {
-  margin-top: 16px;
-  font-size: 14px;
+.skills-heading p {
+  max-width: 52ch;
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.skills-card {
+  display: grid;
+  grid-template-columns: minmax(132px, 0.85fr) minmax(0, 1.65fr);
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: 0 22px 50px -30px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+@media (min-width: 861px) {
+  .skills-heading {
+    width: min(60vw, 760px);
+  }
+  .skills-card {
+    grid-template-columns: minmax(124px, 0.8fr) minmax(0, 1.7fr);
+    flex: 0 1 auto;
+    max-height: 360px;
+    margin-top: 18px;
+    border-radius: 14px;
+  }
+  #skills .skills-nav {
+    padding: 14px 8px;
+  }
+  #skills .chip {
+    min-height: 48px;
+    padding: 9px 8px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  #skills .chip::before {
+    flex-basis: 18px;
+  }
+  #skills .skills-detail {
+    padding: 16px;
+  }
+  #skills .skills-detail-heading h3 {
+    font-size: 21px;
+  }
+  #skills #cap {
+    margin: 10px 0 12px;
+  }
+  #skills .ah {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+  #skills .ab p {
+    padding-bottom: 12px;
+    line-height: 1.6;
+  }
+}
+.skills-nav {
+  min-width: 0;
+  min-height: 0;
+  padding: 18px 12px;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.skills-nav-label {
+  margin: 0 8px 14px;
+  font: 400 9px/1.5 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 .chips {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 24px;
+  grid-template-columns: 1fr;
+  gap: 7px;
+  margin: 0;
   counter-reset: skill;
 }
 .chip {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 54px;
-  padding: 12px 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 60px;
+  padding: 12px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
   background: transparent;
-  color: var(--fg);
-  font: 500 14px/1.3 var(--font-sans);
+  color: var(--muted);
+  font: 500 13px/1.5 var(--font-sans);
   text-align: left;
   cursor: pointer;
   counter-increment: skill;
   transition:
-    color 0.25s,
-    border-color 0.25s,
-    background 0.25s,
-    transform 0.35s var(--ease);
+    color 0.2s,
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 .chip::before {
-  content: "0" counter(skill);
-  font: 400 10px var(--font-mono);
-  opacity: 0.65;
+  content: counter(skill, decimal-leading-zero);
+  flex: 0 0 23px;
+  color: var(--muted);
+  font: 400 10px/1 var(--font-mono);
+}
+.chip-label {
+  min-width: 0;
 }
 .chip:hover {
   background: var(--accent-tint);
-  border-color: var(--accent);
-  transform: translateY(-2px);
+  color: var(--fg);
 }
 .chip.on {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--onacc);
+  background: var(--accent-tint);
+  color: var(--fg);
+  box-shadow: inset 3px 0 var(--accent);
+}
+.chip.on::before {
+  color: var(--accent);
+}
+.chip:focus-visible,
+.ah:focus-visible {
+  position: relative;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.skills-detail {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 22px;
+}
+.skills-detail-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+}
+.skills-detail-heading h3 {
+  margin: 0;
+  color: var(--fg);
+  font: 500 clamp(19px, 1.6vw, 24px) / 1.3 var(--font-sans);
+  letter-spacing: -0.025em;
+}
+#skill-number {
+  flex-shrink: 0;
+  padding-top: 5px;
+  color: var(--muted);
+  font: 400 10px/1.5 var(--font-mono);
+  white-space: nowrap;
 }
 #cap {
-  min-height: 2em;
-  margin: 18px 0;
-  font: 400 10px/1.6 var(--font-mono);
+  flex-shrink: 0;
+  min-height: 0;
+  margin: 12px 0 18px;
+  color: var(--muted);
+  font: 400 12px/1.65 var(--font-sans);
 }
 .acc {
-  border-top: 1px solid var(--line);
+  min-height: 0;
+  overflow-y: auto;
+  overflow-anchor: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  padding: 2px 5px 2px 2px;
+}
+.skill-entry {
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.skill-entry:last-child {
+  margin-bottom: 0;
+}
+.skill-entry.is-open {
+  border-color: var(--accent);
+}
+.skill-entry-heading {
+  margin: 0;
+  font-size: inherit;
 }
 .ah {
   display: flex;
@@ -704,59 +821,89 @@ p {
   gap: 16px;
   width: 100%;
   min-height: 49px;
-  padding: 12px 0;
+  padding: 13px 14px;
   border: 0;
-  border-bottom: 1px solid var(--line);
-  background: none;
+  background: transparent;
   color: var(--fg);
-  font: 500 14px/1.4 var(--font-sans);
+  font: 500 13px/1.5 var(--font-sans);
   text-align: left;
   cursor: pointer;
-  transition: color 0.25s;
+  transition: background 0.2s;
+}
+.ah:hover {
+  background: var(--accent-tint);
 }
 .ah::after {
-  content: "+";
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  font: 400 16px/1 var(--font-sans);
-  transition:
-    transform 0.4s var(--ease),
-    background 0.3s,
-    color 0.3s;
-}
-.ah:hover,
-.ah[aria-expanded="true"] {
-  color: var(--accent);
+  content: "";
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  margin-right: 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.25s var(--ease);
 }
 .ah[aria-expanded="true"]::after {
-  transform: rotate(45deg);
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--onacc);
+  transform: rotate(225deg);
 }
 .ab {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.45s var(--ease);
+  transition: grid-template-rows 0.3s var(--ease);
 }
 .ab > div {
+  min-height: 0;
   overflow: hidden;
 }
 .ab.o {
   grid-template-rows: 1fr;
 }
-.ab p {
-  margin: 14px 0 18px;
-  font-size: 13px;
-  line-height: 1.7;
+.skill-meta {
+  display: block;
+  padding: 0 14px;
+  color: var(--accent);
+  font: 400 10px/1.6 var(--font-mono);
 }
-.ab b {
-  color: var(--fg);
-  font-weight: 500;
+.ab p {
+  margin: 8px 0 0;
+  padding: 0 14px 15px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.asset-footer {
+  position: relative;
+  z-index: 2;
+  padding: 20px var(--gutter) 30px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+}
+.asset-credits {
+  max-width: 720px;
+}
+.asset-credits summary {
+  width: fit-content;
+  padding: 10px 0;
+  cursor: pointer;
+  font: 400 11px/1.6 var(--font-mono);
+}
+.asset-credits summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.model-credit {
+  max-width: none;
+  margin: 8px 0 0;
+  font: 400 11px/1.8 var(--font-sans);
+}
+.model-credit a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+.model-credit a:hover {
+  color: var(--accent);
 }
 #work {
   min-height: 380vh;
@@ -814,6 +961,16 @@ p {
   color: var(--accent);
   font: 400 10px/1.5 var(--font-mono);
 }
+.status-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 3px 7px;
+  border: 1px solid currentColor;
+  border-radius: var(--r-card);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 .wl li p {
   margin-top: 18px;
   font-size: 15px;
@@ -841,6 +998,24 @@ p {
 }
 #contact h2 {
   max-width: 570px;
+}
+.contact-details {
+  display: grid;
+  gap: 9px;
+  margin-top: 26px;
+  color: var(--muted);
+  font: 400 12px/1.6 var(--font-sans);
+}
+.contact-details a {
+  width: fit-content;
+  max-width: 100%;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.contact-details a:hover {
+  color: var(--accent);
 }
 /* Preserve the original no-WebGL experience, including all timeline entries. */
 .nogl #c {
@@ -895,9 +1070,6 @@ p {
   }
   .panel::before {
     margin-bottom: 18px;
-  }
-  .hint {
-    margin-top: 24px;
   }
   #skills .panel {
     max-height: calc(100svh - 134px);
@@ -983,16 +1155,16 @@ p {
     letter-spacing: 0.01em;
   }
   #home::after {
-    content: "HO CHI MINH CITY, VN → EUROPE                 SCROLL ↓";
+    content: "HO CHI MINH CITY, VIETNAM                 SCROLL ↓";
   }
   #about::after {
-    content: "02 / THE PROCESS                           EVERY DETAIL COUNTS";
+    content: "02 / MY BACKGROUND                        EDUCATION & EXPERIENCE";
   }
   #skills::after {
     content: "03 / THE TOOLKIT                           KNOWLEDGE IN MOTION";
   }
   #contact::after {
-    content: "TUAN KIET / EXPORT LOGISTICS                 LET’S CONNECT ↗";
+    content: "BUI THI KIEU NGA / LOGISTICS                 LET’S CONNECT ↗";
   }
   .panel {
     width: 100%;
@@ -1040,10 +1212,6 @@ p {
     height: 34px;
     font-size: 20px;
   }
-  .hint {
-    margin-top: 24px;
-    font-size: 9px;
-  }
   .stats {
     margin-top: 28px;
     padding-top: 22px;
@@ -1059,23 +1227,21 @@ p {
     font-size: 10px;
   }
   #skills .panel {
+    width: 100%;
     max-height: none;
     overflow: visible;
   }
   #skills h2 {
-    font-size: clamp(36px, 7.5vw, 54px);
+    font-size: clamp(30px, 5.3vw, 40px);
   }
-  .chips {
-    margin-top: 20px;
+  .skills-detail {
+    padding: 18px;
   }
-  .chip {
-    min-height: 50px;
-    padding: 10px 12px;
-    gap: 8px;
-    font-size: 13px;
+  .skills-card {
+    flex: none;
   }
-  #cap {
-    margin-block: 14px;
+  .acc {
+    overflow: visible;
   }
   #work {
     padding-top: 320px;
@@ -1118,8 +1284,41 @@ p {
   .chip {
     font-size: 12px;
   }
-  .hint {
-    font-size: 8px;
+}
+@media (max-width: 580px) {
+  .skills-card {
+    grid-template-columns: 1fr;
+    margin-top: 18px;
+    border-radius: 14px;
+  }
+  .skills-nav {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 10px;
+    overflow: visible;
+  }
+  .skills-nav-label {
+    display: none;
+  }
+  .chips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .chip {
+    min-height: 54px;
+    padding: 9px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .chip::before {
+    flex-basis: 20px;
+    font-size: 9px;
+  }
+  .skills-heading p {
+    font-size: 12px;
+  }
+  .skills-detail-heading h3 {
+    font-size: 21px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

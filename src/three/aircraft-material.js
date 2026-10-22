@@ -7,8 +7,23 @@ export function paintAircraft(material, settings) {
   material.roughness = settings.paintRoughness;
   material.emissive.set(settings.aircraftColour);
   material.emissiveIntensity = settings.paintFill;
-  material.transparent = true;
+  // All aircraft parts discard the same screen pixels. Retaining depth writes
+  // prevents inner meshes from showing through a fading outer shell.
+  material.transparent = false;
+  material.depthWrite = true;
+  material.opacity = 1;
+  material.userData.ditherOpacity = { value: 1 };
   material.onBeforeCompile = (shader) => {
+    shader.uniforms ??= {};
+    shader.uniforms.aircraftOpacity = material.userData.ditherOpacity;
+    shader.fragmentShader =
+      "uniform float aircraftOpacity;\n" + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <alphatest_fragment>",
+      `float coverage = fract(52.9829189 * fract(dot(floor(gl_FragCoord.xy), vec2(0.06711056, 0.00583715))));
+       if (aircraftOpacity <= coverage) discard;
+       diffuseColor.a = 1.0;`,
+    );
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <map_fragment>",
       `
@@ -24,6 +39,6 @@ export function paintAircraft(material, settings) {
     `,
     );
   };
-  material.customProgramCacheKey = () => "cargo-aircraft-grey-paint-v2";
+  material.customProgramCacheKey = () => "cargo-aircraft-grey-dither-v3";
   material.needsUpdate = true;
 }

@@ -195,6 +195,26 @@ async function verifyReference(reference, owner) {
 
 const indexFile = path.join(dist, "index.html");
 const html = (await readLocal(indexFile)).toString("utf8");
+const cvAnchor = html.match(/<a\b(?=[^>]*\bdata-cv(?:\s|=|>))[^>]*>/i)?.[0];
+assert.ok(cvAnchor, "Missing CV download link");
+const cvHref = cvAnchor.match(/\bhref\s*=\s*["']([^"']+)["']/i)?.[1];
+assert.ok(cvHref, "CV download has no URL");
+const cvUrl = new URL(cvHref, new URL("index.html", base));
+assert.equal(cvUrl.origin, base.origin, "CV must be bundled locally");
+assert.match(
+  cvUrl.pathname,
+  /\/assets\/[^/]+-[A-Za-z\d_-]{8,}\.pdf$/,
+  "CV must have a fingerprinted URL",
+);
+const cvFile = path.resolve(
+  dist,
+  decodeURIComponent(cvUrl.pathname.slice(base.pathname.length)),
+);
+assert.deepEqual(
+  await readLocal(cvFile),
+  await readFile(path.join(root, "CV_KieuNga_LogisticsIntern.pdf")),
+  "Bundled CV must preserve the original PDF bytes",
+);
 for (const match of html.matchAll(
   /\b(?:src|href|poster)\s*=\s*["']([^"']+)["']/gi,
 )) {
@@ -244,6 +264,7 @@ for (const file of scripts) {
     await verifyReference(match[1] ?? match[2], file);
 }
 
+console.log("CV download verified: fingerprinted PDF matches the source.");
 console.log(
   `Build verified: ${ASSET_SOURCES.length} GLBs, ${expected.size - ASSET_SOURCES.length} external resources, ${scripts.length} JS, ${styles.length} CSS; ${(emittedBytes / 1048576).toFixed(2)} MiB model assets. Base: ${manifest.base}`,
 );

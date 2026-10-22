@@ -7,6 +7,10 @@ export function createCameraRig(config, initialProgress = 0) {
     look = new Vector3();
   let progress = initialProgress,
     zoom = 1;
+  let viewportWidth = 1,
+    viewportHeight = 1,
+    desktop = false,
+    viewShift = NaN;
   let pointerX = 0,
     pointerY = 0,
     parallaxX = 0,
@@ -21,10 +25,13 @@ export function createCameraRig(config, initialProgress = 0) {
       pointerY = y;
     },
     resize(width, height) {
+      viewportWidth = width;
+      viewportHeight = height;
+      viewShift = NaN;
       const aspect = width / height;
       camera.aspect = aspect;
       zoom = aspect < 1.2 ? Math.min(2.6, 1.25 / aspect + 0.2) : 1;
-      const desktop = width > config.layout.desktopBreakpoint;
+      desktop = width > config.layout.desktopBreakpoint;
       camera.setViewOffset(
         width,
         height,
@@ -40,6 +47,20 @@ export function createCameraRig(config, initialProgress = 0) {
         ? target
         : damp(progress, target, config.layout.cameraDamping, dt);
       if (Math.abs(progress - target) < 0.0001) progress = target;
+      const skillsWeight =
+        smoothstep(1.4, 1.9, progress) * (1 - smoothstep(2.1, 2.6, progress));
+      const nextShift = desktop ? -(0.17 + skillsWeight * 0.04) : 0;
+      if (nextShift !== viewShift) {
+        viewShift = nextShift;
+        camera.setViewOffset(
+          viewportWidth,
+          viewportHeight,
+          viewportWidth * viewShift,
+          desktop ? 0 : viewportHeight * 0.14,
+          viewportWidth,
+          viewportHeight,
+        );
+      }
       const index = Math.min(3, Math.floor(progress)),
         ease = smoothstep(0, 1, progress - index);
       const a = config.layout.cameraKeyframes[index],
@@ -53,7 +74,13 @@ export function createCameraRig(config, initialProgress = 0) {
       }
       position.x *= config.layout.sceneSpacing / 40;
       look.x *= config.layout.sceneSpacing / 40;
-      position.sub(look).multiplyScalar(zoom).add(look);
+      const skillsZoom = desktop
+        ? Math.max(zoom * 0.94, 0.94, 1.6 / (viewportWidth / viewportHeight))
+        : zoom;
+      position
+        .sub(look)
+        .multiplyScalar(MathUtils.lerp(zoom, skillsZoom, skillsWeight))
+        .add(look);
       parallaxX = reducedMotion ? 0 : damp(parallaxX, pointerX, 3, dt);
       parallaxY = reducedMotion ? 0 : damp(parallaxY, pointerY, 3, dt);
       position.x += parallaxX * 0.7;

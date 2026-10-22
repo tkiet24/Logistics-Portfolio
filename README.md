@@ -1,6 +1,6 @@
 # Logistics Portfolio
 
-A Vite and Three.js portfolio following a coffee shipment through Home, Port, Skills, Work, and Contact. Readable HTML and navigation remain available when WebGL is unavailable.
+A Vite and Three.js logistics portfolio for Bui Thi Kieu Nga, with Home, About, Skills, Work, and Contact scenes. Readable HTML and navigation remain available when WebGL is unavailable.
 
 ## Run locally
 
@@ -24,10 +24,13 @@ npm run preview
 
 ## Documentation
 
+- [Portfolio content template](docs/portfolio-content-template.md): fill-in prompts for each section and optional case studies.
 - [Architecture](docs/architecture.md): source map, scene lifecycle, loading, rendering, and debug statistics.
 - [Configuration](docs/configuration.md): content, visual tokens, scene settings, and the model allowlist.
 - [Deployment](docs/deployment.md): local release checks and Vercel import settings.
 
 Source models live in `kits/`; production includes only allowlisted models and their dependencies. Keep model credits in `index.html` and the supplied asset licenses when reusing them.
+
+The CV download uses `CV_KieuNga_LogisticsIntern.pdf` from the project root. Keep that source file in Git; Vite bundles it under a fingerprinted URL, and `verify` checks that the output matches the original PDF.
 
 <!-- Last reviewed: 2026-10-22. -->

@@ -1,7 +1,8 @@
 import * as T from "three";
+import { createSkillContainer } from "../three/skill-container.js";
 import { SKILLS } from "../config/content.js";
 export function createScene(ctx) {
-  const { config, cont } = ctx,
+  const { config } = ctx,
     PAL = config.palette.containers;
   let act = ctx.ui.activeSkill;
   const W = new T.Group();
@@ -14,7 +15,7 @@ export function createScene(ctx) {
   );
   const rows = Math.ceil(SKILLS.length / columns);
   SKILLS.forEach((k, i) => {
-    const m = cont(PAL[i % PAL.length], k[2]);
+    const m = createSkillContainer(ctx, PAL[i % PAL.length], k[2], i);
     m.position.set(
       ((i % columns) - (columns - 1) / 2) * config.skills.gap,
       ((rows - 1) / 2 - Math.floor(i / columns)) * config.skills.rowGap,
@@ -26,11 +27,10 @@ export function createScene(ctx) {
     sk.push(m);
   });
   const lit = () =>
-    sk.forEach((m, i) =>
-      [...new Set(m.material)].forEach((x) =>
-        x.emissive.set(i === act ? 0x663311 : i === hov ? 0x331a08 : 0),
-      ),
-    );
+    sk.forEach((m, i) => {
+      m.userData.setStatus(i === act, i === hov);
+      [...new Set(m.material)].forEach((x) => x.emissive.set(0));
+    });
   let hov = -1;
   lit();
   ctx.shadow(W, 0, 0, 7.5, 2.4, config.layout.floorY + 0.012);

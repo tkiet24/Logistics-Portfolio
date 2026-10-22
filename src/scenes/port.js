@@ -1,5 +1,6 @@
 import * as T from "three";
 import { extractTrainWheels } from "../three/wheels.js";
+import { createRailExit } from "../three/rail-exit.js";
 
 export function createScene(ctx) {
   const { config, quality } = ctx;
@@ -95,6 +96,7 @@ export function createScene(ctx) {
   trainRig.position.x = startX;
   trainGroup.add(trainRig);
   let trainWheels = [];
+  let railExit;
   let trainLoaded = false;
   let trainState = "waiting";
   let trainTime = 0;
@@ -126,19 +128,98 @@ export function createScene(ctx) {
   const signal = new T.Group();
   signal.position.set(3, 0, railZ - 0.9);
   trainGroup.add(signal);
-  const signalPost = new T.Mesh(
-    new T.BoxGeometry(0.1, 1.5, 0.1),
-    craneMaterial,
-  );
-  signalPost.position.y = 0.75;
-  signal.add(signalPost);
-  const signalMaterial = new T.MeshBasicMaterial({ color: 0x00ff00 });
-  const signalLight = new T.Mesh(
-    new T.SphereGeometry(0.08, 8, 8),
-    signalMaterial,
-  );
-  signalLight.position.set(0, 1.4, 0.1);
-  signal.add(signalLight);
+  signal.name = "Railway traffic signal";
+  const signalLamps = [];
+  const signalReady = ctx.load("kits/traffic_light.glb", (model) => {
+    const bounds = new T.Box3().setFromObject(model);
+    const size = bounds.getSize(new T.Vector3());
+    const center = bounds.getCenter(new T.Vector3());
+    const scale = port.signalHeight / size.y;
+    model.scale.setScalar(scale);
+    model.position.set(
+      -center.x * scale,
+      -bounds.min.y * scale,
+      -center.z * scale,
+    );
+    model.traverse((part) => {
+      if (!part.isMesh || part.userData.signalOverlay) return;
+      if (part.name.startsWith("lichtanimation")) {
+        const state = part.name.includes("rot")
+          ? "red"
+          : part.name.includes("gelb")
+            ? "amber"
+            : "green";
+        const colour =
+          state === "red" ? 0xff3021 : state === "amber" ? 0xffbe45 : 0x57e3a0;
+        part.material = new T.MeshStandardMaterial({
+          color: colour,
+          emissive: colour,
+          emissiveIntensity: 0.05,
+          roughness: 0.35,
+        });
+        part.geometry.computeBoundingBox();
+        const lensBounds = part.geometry.boundingBox;
+        const radius = (lensBounds.max.y - lensBounds.min.y) * 0.42;
+        const bulb = new T.Mesh(
+          new T.SphereGeometry(radius, 12, 8),
+          new T.MeshBasicMaterial({ color: colour }),
+        );
+        bulb.name = `Signal ${state} illuminated lens`;
+        bulb.userData.signalOverlay = true;
+        bulb.position.copy(lensBounds.getCenter(new T.Vector3()));
+        bulb.position.z = lensBounds.max.z + radius * 0.15;
+        const halo = new T.Mesh(
+          new T.RingGeometry(radius, radius * 1.45, 24),
+          new T.MeshBasicMaterial({
+            color: colour,
+            transparent: true,
+            opacity: 0.3,
+            depthWrite: false,
+            side: T.DoubleSide,
+          }),
+        );
+        halo.name = `Signal ${state} halo`;
+        halo.userData.signalOverlay = true;
+        halo.position.copy(bulb.position);
+        halo.position.z += radius * 0.8;
+        part.add(bulb, halo);
+        signalLamps.push({
+          material: part.material,
+          state,
+          colour,
+          bulb,
+          halo,
+        });
+      } else {
+        for (const mat of Array.isArray(part.material)
+          ? part.material
+          : [part.material]) {
+          mat.transparent = false;
+          mat.alphaTest = 0.5;
+          mat.depthWrite = true;
+          mat.emissiveIntensity = 0.12;
+        }
+      }
+    });
+    signal.add(model);
+    setSignal(
+      trainState === "arriving" &&
+        !ctx.reducedMotion() &&
+        trainTime < greenUntil(),
+    );
+  });
+  function greenUntil() {
+    return Math.max(0, port.arrivalSeconds - port.redLeadSeconds);
+  }
+  function setSignal(green) {
+    for (const lamp of signalLamps) {
+      const on = lamp.state === (green ? "green" : "red");
+      lamp.material.emissiveIntensity = on ? 1.5 : 0.025;
+      lamp.material.color.setHex(lamp.colour).multiplyScalar(on ? 1 : 0.12);
+      lamp.bulb.material.color.setHex(on ? lamp.colour : 0x142326);
+      lamp.halo.visible = on;
+    }
+  }
 
   function normalizeModel(model, scale) {
     const holder = new T.Group();
@@ -172,6 +253,8 @@ export function createScene(ctx) {
       );
       trainGroup.add(piece);
     }
+    railExit = createRailExit(trackHolder, port, gravelMaterial, lowDetail);
+    trainGroup.add(railExit);
 
     const modelsToExtract = [locoModel];
     const locoHolder = normalizeModel(locoModel, port.trainScale);
@@ -236,7 +319,7 @@ export function createScene(ctx) {
       })
       .then((loaded) => model ?? loaded);
   };
-  const ready = Promise.allSettled([
+  const trainReady = Promise.allSettled([
     loadModel("kits/train-kit/Models/GLB format/railroad-straight.glb"),
     loadModel("kits/train-kit/Models/GLB format/train-locomotive-a.glb"),
     loadModel("kits/train-kit/Models/GLB format/train-carriage-flatbed.glb"),
@@ -267,9 +350,11 @@ export function createScene(ctx) {
   function update(frame) {
     if (!P.visible) return;
     const distance = Math.abs(frame.progress - 1);
-    trainGroup.visible = distance < 1.2;
+    trainGroup.visible = distance < 1.4;
+    trainRig.visible = distance < 1.2;
     if (distance >= 1.2) {
       trainState = "waiting";
+      setSignal(false);
       trainTime = 0;
       trainRig.position.x = startX;
       smokePuffs.forEach(({ mesh }) => {
@@ -280,12 +365,12 @@ export function createScene(ctx) {
     const dt = Math.max(0, frame.dt);
     if (!frame.reducedMotion) activeTime += dt;
     positionCrane(frame.reducedMotion ? 0 : activeTime);
-    if (!trainGroup.visible) return;
+    if (!trainRig.visible) return;
     if (frame.reducedMotion) {
       trainRig.position.x = 0;
       trainState = "parked";
       trainTime = 0;
-      signalMaterial.color.setHex(0x00ff00);
+      setSignal(false);
       smokePuffs.forEach(({ mesh }) => {
         mesh.visible = false;
       });
@@ -309,9 +394,7 @@ export function createScene(ctx) {
       moving = progress < 1;
       if (!moving) trainState = "parked";
     }
-    signalMaterial.color.setHex(
-      moving ? ((activeTime * 4) % 2 < 1 ? 0xff0000 : 0x220000) : 0x00ff00,
-    );
+    setSignal(moving && trainTime < greenUntil());
     for (const puff of smokePuffs) {
       puff.life = (puff.life + dt * (moving ? 2 : 0.5)) % 1;
       const life = puff.life;
@@ -329,10 +412,14 @@ export function createScene(ctx) {
 
   function theme(tokens) {
     gravelMaterial.color.set(tokens.ground).multiplyScalar(0.8);
+    railExit
+      ?.getObjectByName("Curved ballast bed")
+      .material.color.copy(gravelMaterial.color);
     ctx.changed();
   }
 
   positionCrane(0);
   ctx.changed();
+  const ready = Promise.allSettled([trainReady, signalReady]);
   return { group: P, update, theme, ready, animated: true };
 }
