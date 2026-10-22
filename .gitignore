@@ -1,0 +1,16 @@
+/node_modules/
+/dist/
+/.vercel/
+/coverage/
+/reports/
+/scratch/
+
+# Root-only experimental scripts; source kits remain versioned.
+/scratch.js
+/dump.js
+/debug*.js
+/script[0-9]*.js
+/testBox3.js
+/testHtml.js
+/testSplit*.js
+/testWorldToLocal.js

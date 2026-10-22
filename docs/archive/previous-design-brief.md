@@ -1,3 +1,5 @@
+> Historical design brief, retained for reference. Its implementation restrictions and token values predate the modular refactor. See [configuration](../configuration.md) and src/styles/site.css for current settings.
+
 ## 1. Scope
 
 **Redesign (allowed):** font, colors, typography, spacing, radius, elevation, and the CSS look of existing components. In the JS, only the visual constants listed in section 8.
