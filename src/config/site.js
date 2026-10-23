@@ -91,7 +91,7 @@ export const CONFIG = {
       exitReach: 26,
       exitDepth: 30,
     },
-    milestones: [0.1, 0.3, 0.5, 0.7, 0.9],
+    milestones: [0.1, 0.3, 0.5, 0.7],
     route: [
       [-9, -1, 1],
       [-4.5, -1, -2],

@@ -1,5 +1,6 @@
 // Only these source models and their texture dependencies enter dist/.
 export const ASSET_SOURCES = [
+  "kits/checkpoint.glb",
   "kits/car-kit/Models/GLB format/delivery-flat.glb",
   "kits/car-kit/Models/GLB format/sedan-sports.glb",
   "kits/car-kit/Models/GLB format/truck.glb",

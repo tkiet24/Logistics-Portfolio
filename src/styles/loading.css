@@ -1,0 +1,32 @@
+body.is-loading { overflow: hidden; }
+#opening-loader {
+  position: fixed; inset: 0; z-index: 10000;
+  display: grid; place-items: center; min-height: 100dvh;
+  background: var(--bg); color: var(--fg); padding: 40px;
+  outline: none;
+}
+.opening-content { width: min(340px, 100%); text-align: center; }
+.opening-name { font: 500 clamp(22px, 5vw, 28px)/1.2 var(--font-sans); letter-spacing: -.035em; }
+.opening-runway { position: relative; margin-top: 76px; }
+.opening-track { height: 3px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.opening-track > span { display: block; height: 100%; background: #dc8942; transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
+.opening-cat { position: absolute; left: 0; bottom: 0; width: 64px; height: 40px; transform: translateX(-50%); transition: left .3s ease; }
+.opening-cat svg { width: 100%; height: 100%; overflow: visible; }
+.cat-stride { animation: cat-bounce .32s ease-in-out infinite alternate; }
+.cat-leg { transform-box: fill-box; transform-origin: top center; animation: cat-run .32s ease-in-out infinite alternate; }
+.cat-leg-back { animation-delay: -.32s; }
+@keyframes cat-bounce { to { transform: translateY(-2px); } }
+@keyframes cat-run { from { transform: rotate(-18deg); } to { transform: rotate(18deg); } }
+.opening-status, .opening-percent, .opening-skip {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.opening-skip:focus-visible {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  width: auto; height: auto; margin: 0; padding: 10px 14px;
+  clip-path: none; background: var(--bg); color: var(--fg); outline: 2px solid var(--accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-stride, .cat-leg { animation: none; }
+  .opening-cat, .opening-track > span { transition: none; }
+}

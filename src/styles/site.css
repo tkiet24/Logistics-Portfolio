@@ -22,7 +22,7 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --shadow-soft: 0 12px 40px #161d1710;
   --horizon: 46%;
-  --sky-top: #b9d0d2;
+  --sky-top: #7ab3d1;
   --sky-rim: #f0efdf;
   --sky-cloud: rgba(255, 255, 247, 0.44);
   --ground-far: #d1d4bc;
@@ -48,8 +48,8 @@
     --timeline-ink: #cdb88d;
     --timeline-halo: rgba(205, 184, 141, 0.16);
     --ball: #303c32;
-    --sky-top: #142833;
-    --sky-rim: #3d504b;
+    --sky-top: #071427;
+    --sky-rim: #263847;
     --sky-cloud: rgba(165, 188, 180, 0.06);
     --ground-far: #344436;
     --ground-near: #19271d;
@@ -73,8 +73,8 @@
   --timeline-ink: #cdb88d;
   --timeline-halo: rgba(205, 184, 141, 0.16);
   --ball: #303c32;
-  --sky-top: #142833;
-  --sky-rim: #3d504b;
+  --sky-top: #071427;
+  --sky-rim: #263847;
   --sky-cloud: rgba(165, 188, 180, 0.06);
   --ground-far: #344436;
   --ground-near: #19271d;
@@ -259,53 +259,6 @@ button:focus-visible {
   transform: scaleX(0);
   z-index: 20;
 }
-/* A quiet, full-width masthead gives the miniature world room to breathe. */
-header {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 10;
-  height: calc(100px + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) var(--gutter) 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  background: var(--panel);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-header b {
-  position: relative;
-  display: grid;
-  padding-left: 50px;
-  font-size: 23px;
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.055em;
-  flex-shrink: 0;
-}
-header b::before {
-  content: "↗";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 40px;
-  background: var(--accent);
-  color: var(--onacc);
-  font-size: 30px;
-  font-weight: 400;
-  transform: translateY(-50%);
-}
-header b::after {
-  content: attr(data-role);
-  margin-top: 7px;
-  color: var(--muted);
-  font: 400 9px/1 var(--font-mono);
-  letter-spacing: 0.14em;
-}
 nav {
   position: absolute;
   left: 50%;
@@ -448,8 +401,13 @@ nav a:hover::before {
 @media (max-width: 860px) {
   #section-nav {
     position: fixed;
-    inset: calc(82px + env(safe-area-inset-top, 0px)) var(--gutter) auto;
+    inset: auto max(var(--gutter), env(safe-area-inset-right, 0px))
+      max(12px, env(safe-area-inset-bottom, 0px))
+      max(var(--gutter), env(safe-area-inset-left, 0px));
     z-index: 12;
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--panel);
   }
 }
 #theme-toggle {
@@ -813,12 +771,6 @@ p {
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
 }
-.skills-nav-label {
-  margin: 0 8px 14px;
-  font: 400 9px/1.5 var(--font-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
 .chips {
   display: grid;
   grid-template-columns: 1fr;
@@ -1122,7 +1074,8 @@ p {
   align-items: center;
 }
 .nogl #work .panel {
-  position: static;
+  position: relative;
+  top: auto;
 }
 .nogl .wl {
   display: block;
@@ -1145,9 +1098,6 @@ p {
   }
 }
 @media (min-width: 861px) and (max-height: 760px) {
-  header {
-    height: 80px;
-  }
   section {
     padding-top: 106px;
     padding-bottom: 76px;
@@ -1195,25 +1145,6 @@ p {
     --light-x: 65%;
     --light-y: 22%;
   }
-  header {
-    height: calc(126px + env(safe-area-inset-top, 0px));
-    align-items: flex-start;
-    padding-top: calc(18px + env(safe-area-inset-top, 0px));
-    gap: 14px;
-  }
-  header b {
-    margin-top: 4px;
-    font-size: 21px;
-    padding-left: 45px;
-  }
-  header b::before {
-    width: 32px;
-    height: 36px;
-    font-size: 27px;
-  }
-  header b::after {
-    font-size: 8px;
-  }
   #theme-toggle {
     width: 44px;
     height: 44px;
@@ -1225,6 +1156,8 @@ p {
     transform: none;
   }
   nav a {
+    flex: 1;
+    text-align: center;
     padding: 12px 8px 14px;
     font-size: 12px;
   }
@@ -1236,7 +1169,7 @@ p {
   section {
     align-items: flex-end;
     min-height: max(100svh, 800px);
-    padding: 320px var(--gutter) 84px;
+    padding: 320px var(--gutter) calc(104px + env(safe-area-inset-bottom, 0px));
   }
   .panel {
     width: 100%;
@@ -1356,6 +1289,12 @@ p {
   .chip {
     font-size: 12px;
   }
+  .stats > div {
+    padding-inline: 8px;
+  }
+  .stats b {
+    font-size: 32px;
+  }
 }
 @media (max-width: 580px) {
   .skills-card {
@@ -1368,9 +1307,6 @@ p {
     border-bottom: 1px solid var(--line);
     padding: 10px;
     overflow: visible;
-  }
-  .skills-nav-label {
-    display: none;
   }
   .chips {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1411,8 +1347,15 @@ p {
 }
 
 /* Readable document fallback when JavaScript is unavailable. */
-.no-js #c {
+.no-js #c,
+.no-js #theme-toggle,
+.no-js .skills-nav,
+.no-js #skill-number,
+.no-js .skills-heading p {
   display: none;
+}
+.no-js .skills-card {
+  grid-template-columns: 1fr;
 }
 .no-js .panel,
 .no-js .panel > *,
@@ -1426,7 +1369,8 @@ p {
   align-items: center;
 }
 .no-js #work .panel {
-  position: static;
+  position: relative;
+  top: auto;
 }
 .no-js .wl {
   display: block;

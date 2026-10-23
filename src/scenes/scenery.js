@@ -25,6 +25,47 @@ function normalizeModel(model, width, maxHeight, count) {
   };
 }
 
+function createSiteSurface(layout) {
+  const group = new T.Group();
+  group.name = `${layout.name} pavement`;
+  const [width, depth] = layout.size;
+  const asphalt = new T.MeshStandardMaterial({ color: 0x383e42, roughness: 0.96 });
+  const concrete = new T.MeshStandardMaterial({ color: 0x939b94, roughness: 0.95 });
+  const paint = new T.MeshStandardMaterial({ color: 0xeee6ce, roughness: 0.9 });
+  function slab(name, x, z, w, d, height, y, material) {
+    const mesh = new T.Mesh(new T.BoxGeometry(w, height, d), material);
+    mesh.name = name;
+    mesh.position.set(x, y, z);
+    // Paint ground layers before markings and fading vehicles.
+    mesh.renderOrder = material === asphalt ? -3 : material === concrete ? -2 : -1;
+    group.add(mesh);
+  }
+  slab("Asphalt pad", 0, 0, width, depth, 0.08, -0.04, asphalt);
+  for (const side of [-1, 1]) {
+    slab("Side curb", side * (width / 2 - 0.09), 0, 0.18, depth, 0.08, 0, concrete);
+  }
+  slab("Rear curb", 0, -depth / 2 + 0.09, width, 0.18, 0.08, 0, concrete);
+  if (layout.kind === "parking") {
+    const { columns, bayWidth, bayDepth, rowZ } = layout.parking;
+    for (const side of [-1, 1]) {
+      for (let column = 0; column <= columns; column++) {
+        slab("Parking bay divider", (column - columns / 2) * bayWidth,
+          side * rowZ, 0.045, bayDepth, 0.012, 0.008, paint);
+      }
+      slab("Parking bay end", 0, side * (rowZ + bayDepth / 2),
+        columns * bayWidth, 0.045, 0.012, 0.008, paint);
+    }
+  } else {
+    for (const side of [-1, 1]) {
+      slab("City sidewalk", 0, side * 1.65, width - 0.36, 0.55, 0.06, 0.02, concrete);
+    }
+    for (let x = -width / 2 + 0.8; x < width / 2 - 0.4; x += 1.4) {
+      slab("City lane dash", x, 0, 0.65, 0.045, 0.012, 0.008, paint);
+    }
+  }
+  return group;
+}
+
 export function createScenery(ctx) {
   const { config, quality } = ctx;
   const settings = config.scenery;
@@ -35,29 +76,33 @@ export function createScenery(ctx) {
     siteGroup.name = layout.name;
     siteGroup.position.set(layout.x, config.layout.floorY, layout.z);
     siteGroup.visible = false;
+    const surface = createSiteSurface(layout);
+    siteGroup.add(surface);
+    const fade = createFade(siteGroup);
+    fade.register(surface);
     group.add(siteGroup);
     return {
       layout,
       group: siteGroup,
-      fade: createFade(siteGroup),
+      fade,
       visibility: createVisibility(siteGroup),
       started: false,
       wasNear: false,
+      pending: Promise.resolve(),
       remainingItems: quality.mobile
         ? layout.items.slice(0, settings.mobileItems)
         : [...layout.items],
       dirty: true,
-      cranes: [],
     };
   });
 
   function loadSite(site) {
     site.started = true;
     const items = site.remainingItems.splice(0);
-    for (const item of items) {
+    const loads = items.map((item) => {
       const [pack, name, x, z, width, yaw, stack = 1] = item;
       const source = `kits/${SCENERY_PACKS[pack]}/Models/GLB format/${name}.glb`;
-      ctx.assets
+      return ctx.assets
         .load(source, { priority: 4 })
         .then((model) => {
           const count = quality.mobile ? 1 : stack;
@@ -74,11 +119,8 @@ export function createScenery(ctx) {
                 : normalized.template.clone(true);
             placed.rotation.y = yaw;
             placed.position.set(x, level * normalized.height, z);
+            placed.name = name;
             site.group.add(placed);
-            if (name === "crane") {
-              const arm = placed.getObjectByName("arm");
-              if (arm) site.cranes.push({ arm, yaw: arm.rotation.y });
-            }
             site.fade.register(placed);
           }
           const cosine = Math.abs(Math.cos(yaw)),
@@ -99,13 +141,22 @@ export function createScenery(ctx) {
         })
         .catch((error) => {
           site.remainingItems.push(item);
-          console.warn("Scenery GLB load error:", source, error);
+          if (ctx.error) ctx.error(error);
+          else console.warn("Scenery GLB load error:", source, error);
         });
-    }
+    });
+    // Include earlier loads when re-entry retries begin before they all settle.
+    site.pending = Promise.allSettled([site.pending, ...loads]);
+    return site.pending;
+  }
+
+  function preload() {
+    return Promise.allSettled(
+      sites.map((site) => site.started ? site.pending : loadSite(site)),
+    );
   }
 
   function update(camera, time, reducedMotion = ctx.reducedMotion(), frustum) {
-    let animated = false;
     for (const site of sites) {
       const distance = Math.abs(camera.position.x - site.layout.x);
       const near = distance <= config.performance.sceneryPreloadDistance;
@@ -124,31 +175,14 @@ export function createScenery(ctx) {
         site.group.visible = false;
         continue;
       }
-      const swinging =
-        !reducedMotion &&
-        settings.craneSpeed !== 0 &&
-        settings.craneSwing !== 0;
-      for (const { arm, yaw } of site.cranes) {
-        const target =
-          yaw +
-          (swinging
-            ? Math.sin(time * settings.craneSpeed + site.layout.x * 0.1) *
-              settings.craneSwing
-            : 0);
-        if (arm.rotation.y !== target) {
-          arm.rotation.y = target;
-          site.dirty = true;
-        }
-      }
       if (site.dirty) {
         // The world disables automatic matrix updates; do not traverse hidden sites.
         site.group.updateWorldMatrix(true, true);
         site.dirty = false;
       }
-      if (swinging && site.cranes.length) animated = true;
     }
-    return animated;
+    return false;
   }
 
-  return { group, update };
+  return { group, update, preload };
 }

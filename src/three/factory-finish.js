@@ -8,7 +8,13 @@ export function finishFactoryModel(model, bodyColour, trimColour) {
     if (materials.has(source)) return materials.get(source);
     const material = source.clone();
     materials.set(source, material);
-    if (source.name.includes("glass")) {
+    // Three's clone does not copy these hooks. Retain source shader changes and
+    // their cache identity before adding paint (and, later, scene coverage).
+    const compile = source.onBeforeCompile;
+    const cacheKey = source.customProgramCacheKey();
+    material.onBeforeCompile = compile;
+    material.customProgramCacheKey = () => cacheKey;
+    if (/glass/i.test(source.name)) {
       material.color.setHex(0x8fb6b8);
       material.roughness = 0.25;
       return material;
@@ -17,7 +23,9 @@ export function finishFactoryModel(model, bodyColour, trimColour) {
     material.metalness = 0.12;
     const body = new T.Color(bodyColour);
     const trim = new T.Color(trimColour);
-    material.onBeforeCompile = (shader) => {
+    material.onBeforeCompile = function (shader, renderer) {
+      compile.call(this, shader, renderer);
+      shader.uniforms ??= {};
       shader.uniforms.factoryBody = { value: body };
       shader.uniforms.factoryTrim = { value: trim };
       shader.fragmentShader =
@@ -35,7 +43,8 @@ export function finishFactoryModel(model, bodyColour, trimColour) {
          diffuseColor.rgb = mix(diffuseColor.rgb, factoryTrim * (0.6 + luminance * 0.55), orange);`,
       );
     };
-    material.customProgramCacheKey = () => "factory-industrial-finish-v1";
+    material.customProgramCacheKey = () => `${cacheKey}:factory-industrial-finish-v1`;
+    material.needsUpdate = true;
     return material;
   }
   model.traverse((part) => {

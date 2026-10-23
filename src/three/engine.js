@@ -15,7 +15,8 @@ const sceneImports = [
   () => import("../scenes/contact.js"),
 ];
 
-export function startEngine(config, ui) {
+export async function startEngine(config, ui) {
+  if (ui.opening.cancelled) return;
   const canvas = document.querySelector("#c"),
     settings = config.performance;
   const mobile =
@@ -28,22 +29,25 @@ export function startEngine(config, ui) {
     powerPreference: "high-performance",
   });
   renderer.setClearColor(0x000000, 0);
+  renderer.autoClear = false;
+  renderer.info.autoReset = false;
   const world = new T.Scene(),
     rig = createCameraRig(config, ui.scroll.read().progress),
     camera = rig.camera;
   // Static parts of the world do not need a recursive matrix walk every frame.
   world.autoUpdate = false;
-  world.add(new T.HemisphereLight(0xffffff, 0x6b6564, 1.1));
+  const ambient = new T.HemisphereLight(0xffffff, 0x6b6564, 1.1);
+  world.add(ambient);
   const sun = new T.DirectionalLight(0xffffff, 1.1);
   sun.position.set(5, 8, 6);
   world.add(sun);
   const environment = createEnvironment(config, quality);
-  world.add(environment.group);
   const helpers = createHelpers(config, quality),
     scenes = new Map(),
     pending = new Set(),
     failed = new Set();
   let raf = 0,
+    booting = true,
     stopped = false,
     last = 0,
     time = 0,
@@ -70,14 +74,32 @@ export function startEngine(config, ui) {
     pointer = new T.Vector2();
   const assets = createAssets(
     mobile ? settings.mobileConcurrentLoads : settings.maxConcurrentLoads,
-    invalidate,
+    (stats) => {
+      if (booting && scenes.size === sceneImports.length && factory && scenery) {
+        const total = stats.completed + stats.failed + stats.active + stats.queued;
+        ui.opening.progress(8 + 88 * ((stats.completed + stats.failed) / Math.max(1, total)), "Loading the journey…");
+      }
+      invalidate();
+    },
   );
+  let loadFailures = 0;
+  ui.opening.onFinish(() => {
+    if (!ui.opening.cancelled) return;
+    stopped = true;
+    assets.cancel();
+    cancelAnimationFrame(raf);
+    environment.dispose();
+    renderer.dispose();
+  });
   function invalidate() {
-    if (!raf && !stopped && !document.hidden)
+    if (!booting && !raf && !stopped && !document.hidden)
       raf = requestAnimationFrame(frame);
   }
-  const error = (problem) =>
-    console.warn("A portfolio model could not be loaded:", problem);
+  const error = (problem) => {
+    if (stopped) return;
+    loadFailures++;
+    console.warn("A portfolio asset could not be loaded:", problem);
+  };
   function context(record, priority) {
     return {
       config,
@@ -97,9 +119,11 @@ export function startEngine(config, ui) {
         record.fade?.motion(material, value);
       },
       load(source, onLoad) {
+        if (stopped) return Promise.reject(new Error("Portfolio loading was cancelled"));
         return assets
           .load(source, { priority })
           .then((model) => {
+            if (stopped) return model;
             onLoad?.(model);
             record.visibility?.invalidate();
             record.fade?.register();
@@ -119,6 +143,7 @@ export function startEngine(config, ui) {
     try {
       const module = await sceneImports[index](),
         record = {};
+      if (stopped) return;
       record.scene = module.createScene(
         context(record, index === Math.round(progress) ? 0 : 2),
       );
@@ -130,6 +155,7 @@ export function startEngine(config, ui) {
       scenes.set(index, record);
       record.scene.ready?.catch(error);
       invalidate();
+      await record.scene.ready;
     } catch (problem) {
       failed.add(index);
       error(problem);
@@ -137,9 +163,9 @@ export function startEngine(config, ui) {
       pending.delete(index);
     }
   }
-  async function ensureBackground(cameraX) {
-    const nearScenery = cameraX > 25,
-      nearFactory = Math.abs(cameraX - config.factory.originX) < 18,
+  async function ensureBackground(cameraX, preload = false) {
+    const nearScenery = preload || cameraX > 25,
+      nearFactory = preload || Math.abs(cameraX - config.factory.originX) < 18,
       enterScenery = nearScenery && !sceneryWasNear,
       enterFactory = nearFactory && !factoryWasNear;
     // Record both visits before awaiting either import, including overlapping frames.
@@ -149,6 +175,7 @@ export function startEngine(config, ui) {
       sceneryPending = true;
       try {
         const { createScenery } = await import("../scenes/scenery.js");
+        if (stopped) return;
         scenery = createScenery({
           config,
           quality,
@@ -156,8 +183,10 @@ export function startEngine(config, ui) {
           ...helpers,
           invalidate,
           error,
+          reducedMotion: () => ui.reducedMotion.matches,
         });
         world.add(scenery.group);
+        if (preload) await scenery.preload();
         invalidate();
       } catch (problem) {
         error(problem);
@@ -165,17 +194,20 @@ export function startEngine(config, ui) {
         sceneryPending = false;
       }
     }
+    if (stopped) return;
     if (!factory && !factoryPending && enterFactory) {
       factoryPending = true;
       try {
         const { createScene } = await import("../scenes/factory.js"),
           record = {};
+        if (stopped) return;
         record.scene = createScene(context(record, 3));
-        record.fade = createFade(record.scene.group);
+        record.fade = createFade(record.scene.group, { dither: true });
         record.visibility = createVisibility(record.scene.group);
         record.fade.register();
         factory = record;
         world.add(record.scene.group);
+        if (preload) await record.scene.ready;
         invalidate();
       } catch (problem) {
         error(problem);
@@ -188,6 +220,7 @@ export function startEngine(config, ui) {
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(innerWidth, innerHeight, false);
     rig.resize(innerWidth, innerHeight);
+    environment.resize(innerWidth, innerHeight, pixelRatio);
     invalidate();
   }
   function applyTheme() {
@@ -256,14 +289,20 @@ export function startEngine(config, ui) {
     if (assets.stats().completed >= 2 || progress > 0.3)
       ensureBackground(camera.position.x);
     const frameState = {
+      camera,
       dt,
       time,
       progress,
       workProgress: state.workProgress,
       reducedMotion,
     };
-    let animating = false,
+    let animating = environment.update(frameState),
       settling = movingCamera;
+    const night = environment.nightMix;
+    ambient.color.setRGB(1 - night * .22, 1 - night * .12, 1);
+    ambient.intensity = 1.1 - night * .22;
+    sun.color.setRGB(1 - night * .25, .98 - night * .12, .92 + night * .08);
+    sun.intensity = 1.1 - night * .3;
     scenes.forEach(({ scene, fade, visibility }, index) => {
       const distance = Math.abs(progress - index),
         visible = distance < 1.4;
@@ -309,6 +348,10 @@ export function startEngine(config, ui) {
         scenery.update(camera, time, reducedMotion, frustum) || animating;
     if (pointerDirty || movingCamera) pick();
     const renderStart = performance.now();
+    renderer.info.reset();
+    renderer.clear();
+    renderer.render(environment.scene, environment.camera);
+    renderer.clearDepth();
     renderer.render(world, camera);
     // Lower resolution after sustained slow frames or expensive draw submission.
     if (
@@ -381,18 +424,54 @@ export function startEngine(config, ui) {
     event.preventDefault();
     stopped = true;
     cancelAnimationFrame(raf);
+    environment.dispose();
     ui.fallback();
+    ui.opening.cancel();
   });
   ui.connect({
     invalidate,
     onSkill: (index) => scenes.get(2)?.scene.select(index),
     onTheme: applyTheme,
   });
-  world.updateMatrixWorld(true);
-  applyTheme();
-  resize();
-  ensureScene(Math.round(progress));
-  invalidate();
+  try {
+    if (ui.opening.cancelled || stopped) return;
+    ui.opening.progress(8, "Loading the journey…");
+    // Canvas lettering must use the loaded portfolio font on the first frame.
+    await document.fonts?.ready;
+    if (ui.opening.cancelled || stopped) return;
+    await Promise.all([
+      ...sceneImports.map((_, index) => ensureScene(index)),
+      ensureBackground(camera.position.x, true),
+    ]);
+    if (ui.opening.cancelled || stopped) return;
+    if (loadFailures || failed.size || scenes.size !== sceneImports.length || !factory || !scenery || assets.stats().failed > 0)
+      throw new Error("The complete 3D journey could not be prepared");
+    world.updateMatrixWorld(true);
+    applyTheme();
+    resize();
+    ui.opening.progress(98, "Almost there…");
+    environment.prepare(renderer);
+    renderer.compile(environment.scene, environment.camera);
+    // Warm every scene's shaders, including transparent and late-loaded materials.
+    scenes.forEach(({ scene, fade }) => { fade.update(1); scene.group.visible = true; });
+    factory.fade.update(1);
+    scenery.group.traverse((part) => { part.visible = true; });
+    renderer.compile(world, camera);
+    scenes.forEach(({ fade }) => fade.update(0));
+    factory.fade.update(0);
+    booting = false;
+    last = 0;
+    frame(performance.now());
+    ui.opening.progress(100, "Ready to explore.");
+    await new Promise((resolve) => setTimeout(resolve, ui.reducedMotion.matches ? 0 : 350));
+    ui.opening.finish();
+  } catch (problem) {
+    stopped = true;
+    environment.dispose();
+    renderer.dispose();
+    ui.opening.cancel();
+    throw problem;
+  }
   if (new URLSearchParams(location.search).has("debug"))
     window.__portfolio = {
       config,

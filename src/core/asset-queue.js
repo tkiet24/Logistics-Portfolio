@@ -15,8 +15,10 @@ export class AssetQueue {
     this.active = 0;
     this.completed = 0;
     this.failed = 0;
+    this.cancelReason = null;
   }
   load(key, { priority = 0 } = {}) {
+    if (this.cancelReason) return Promise.reject(this.cancelReason);
     let entry = this.cache.get(key);
     if (!entry) {
       let resolve, reject;
@@ -31,15 +33,31 @@ export class AssetQueue {
     } else if (priority < entry.priority) {
       entry.priority = priority;
     }
-    return entry.promise.then((value) => this.clone(value));
+    return entry.promise.then((value) => {
+      if (this.cancelReason) throw this.cancelReason;
+      return this.clone(value);
+    });
+  }
+  cancel(reason = new Error("Asset loading was cancelled")) {
+    if (this.cancelReason) return;
+    this.cancelReason = reason;
+    for (const job of this.pending.splice(0)) {
+      this.cache.delete(job.key);
+      job.reject(reason);
+    }
+    this.onChange(this.stats());
   }
   pump() {
+    if (this.cancelReason) return;
     this.pending.sort((a, b) => a.priority - b.priority);
     while (this.active < this.limit && this.pending.length) {
       const job = this.pending.shift();
       this.active++;
       Promise.resolve()
-        .then(() => this.fetch(job.key))
+        .then(() => {
+          if (this.cancelReason) throw this.cancelReason;
+          return this.fetch(job.key);
+        })
         .then(
           (value) => {
             this.completed++;

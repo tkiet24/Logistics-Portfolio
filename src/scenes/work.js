@@ -42,6 +42,7 @@ export function createScene(ctx) {
   group.add(createRoad(curve, work.road, lowDetail));
   const nodes = milestonePoints.map((point, index) => {
     const checkpoint = createCheckpoint(ctx, index);
+    loads.push(checkpoint.ready);
     const tangent = curve.getTangent(work.milestones[index]);
     const normal = new T.Vector3(-tangent.z, 0, tangent.x).normalize();
     checkpoint.group.position
