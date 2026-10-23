@@ -2,9 +2,10 @@ import * as T from "three";
 import { createRibbonGeometry } from "./ribbon.js";
 
 export class RailExitCurve extends T.Curve {
-  constructor(settings) {
+  constructor(settings, direction = 1) {
     super();
     this.settings = settings;
+    this.direction = direction;
     this.bendLength = (settings.trackBendRadius * Math.PI) / 2;
     this.length = this.bendLength + settings.trackExitLength;
   }
@@ -18,20 +19,33 @@ export class RailExitCurve extends T.Curve {
     if (distance < this.bendLength) {
       const angle = distance / radius;
       return target.set(
-        x + radius * Math.sin(angle),
+        this.direction * (x + radius * Math.sin(angle)),
         0,
         z - radius * (1 - Math.cos(angle)),
       );
     }
-    return target.set(x + radius, 0, z - radius - (distance - this.bendLength));
+    return target.set(
+      this.direction * (x + radius),
+      0,
+      z - radius - (distance - this.bendLength),
+    );
   }
 }
 
 /** Bend copies of the real track mesh so rails and sleepers join the straight run. */
-export function createRailExit(track, settings, gravelMaterial, lowDetail) {
+export function createRailExit(
+  track,
+  settings,
+  gravelMaterial,
+  lowDetail,
+  direction = 1,
+) {
   const group = new T.Group();
-  group.name = "Railway bend into the horizon";
-  const curve = new RailExitCurve(settings);
+  group.name =
+    direction === 1
+      ? "Railway bend into the horizon"
+      : "Railway entrance from the horizon";
+  const curve = new RailExitCurve(settings, direction);
   const length = curve.length;
   track.updateWorldMatrix(true, true);
   const bounds = new T.Box3().setFromObject(track);

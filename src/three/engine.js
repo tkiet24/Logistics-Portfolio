@@ -267,12 +267,21 @@ export function startEngine(config, ui) {
     scenes.forEach(({ scene, fade, visibility }, index) => {
       const distance = Math.abs(progress - index),
         visible = distance < 1.4;
-      const contactClearance = index === 3 ? 1 - smoothstep(3.55, 3.95, progress) : 1;
+      const contactClearance =
+        index === 3 ? 1 - smoothstep(3.55, 3.95, progress) : 1;
+      const homeClearance =
+        index === 1
+          ? smoothstep(...config.factory.revealProgress, progress)
+          : 1;
       fade.update(
-        visible ? (0.22 + 0.78 * (1 - smoothstep(0.55, 1.4, distance))) * contactClearance : 0,
+        visible
+          ? (0.22 + 0.78 * (1 - smoothstep(0.55, 1.4, distance))) *
+              contactClearance *
+              homeClearance
+          : 0,
       );
       if (!visible) return;
-      scene.group.visible = visibility.intersects(frustum);
+      scene.group.visible &&= visibility.intersects(frustum);
       if (!scene.group.visible) return;
       settling = !!scene.update?.(frameState) || settling;
       scene.group.updateMatrixWorld(true);
@@ -280,12 +289,13 @@ export function startEngine(config, ui) {
     });
     if (factory) {
       factory.fade.update(
-        1 -
-          smoothstep(
-            16,
-            28,
-            Math.abs(camera.position.x - config.factory.originX),
-          ),
+        smoothstep(...config.factory.revealProgress, progress) *
+          (1 -
+            smoothstep(
+              16,
+              28,
+              Math.abs(camera.position.x - config.factory.originX),
+            )),
       );
       factory.scene.group.visible &&= factory.visibility.intersects(frustum);
       if (factory.scene.group.visible) {

@@ -21,7 +21,6 @@ export function createTheme(onChange = () => {}) {
         /* Storage can be disabled. */
       }
     }
-    button.textContent = theme === "dark" ? "☀" : "🌙";
     button.setAttribute(
       "aria-label",
       theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
