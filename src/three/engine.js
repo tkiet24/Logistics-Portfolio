@@ -6,6 +6,7 @@ import { createFade } from "./fade.js";
 import { createEnvironment } from "./environment.js";
 import { createCameraRig } from "./camera.js";
 import { createVisibility } from "./visibility.js";
+import { createSectionLights } from "./section-lights.js";
 
 const sceneImports = [
   () => import("../scenes/home.js"),
@@ -42,6 +43,18 @@ export async function startEngine(config, ui) {
   sun.position.set(5, 8, 6);
   world.add(sun);
   const environment = createEnvironment(config, quality);
+  const sectionLights = new Set();
+  function disposeLighting() {
+    sectionLights.forEach((lights) => lights.dispose());
+    sectionLights.clear();
+  }
+  function attachLighting(record, section) {
+    if (stopped) return;
+    record.lights = createSectionLights(record.scene, section, config, quality);
+    sectionLights.add(record.lights);
+    record.visibility.invalidate();
+    invalidate();
+  }
   const helpers = createHelpers(config, quality),
     scenes = new Map(),
     pending = new Set(),
@@ -89,6 +102,7 @@ export async function startEngine(config, ui) {
     assets.cancel();
     cancelAnimationFrame(raf);
     environment.dispose();
+    disposeLighting();
     renderer.dispose();
   });
   function invalidate() {
@@ -156,6 +170,7 @@ export async function startEngine(config, ui) {
       record.scene.ready?.catch(error);
       invalidate();
       await record.scene.ready;
+      attachLighting(record, index);
     } catch (problem) {
       failed.add(index);
       error(problem);
@@ -206,6 +221,7 @@ export async function startEngine(config, ui) {
         record.visibility = createVisibility(record.scene.group);
         record.fade.register();
         factory = record;
+        attachLighting(record, "factory");
         world.add(record.scene.group);
         if (preload) await record.scene.ready;
         invalidate();
@@ -303,7 +319,7 @@ export async function startEngine(config, ui) {
     ambient.intensity = 1.1 - night * .22;
     sun.color.setRGB(1 - night * .25, .98 - night * .12, .92 + night * .08);
     sun.intensity = 1.1 - night * .3;
-    scenes.forEach(({ scene, fade, visibility }, index) => {
+    scenes.forEach(({ scene, fade, visibility, lights }, index) => {
       const distance = Math.abs(progress - index),
         visible = distance < 1.4;
       const contactClearance =
@@ -324,6 +340,8 @@ export async function startEngine(config, ui) {
       if (!scene.group.visible) return;
       settling = !!scene.update?.(frameState) || settling;
       scene.group.updateMatrixWorld(true);
+      lights?.update({ ...frameState, nightMix: night,
+        opacity: fade.opacity, height: innerHeight, pixelRatio });
       animating ||= !!scene.animated;
     });
     if (factory) {
@@ -340,6 +358,8 @@ export async function startEngine(config, ui) {
       if (factory.scene.group.visible) {
         factory.scene.update(frameState);
         factory.scene.group.updateMatrixWorld(true);
+        factory.lights?.update({ ...frameState, nightMix: night,
+          opacity: factory.fade.opacity, height: innerHeight, pixelRatio });
         animating = true;
       }
     }
@@ -425,6 +445,7 @@ export async function startEngine(config, ui) {
     stopped = true;
     cancelAnimationFrame(raf);
     environment.dispose();
+    disposeLighting();
     ui.fallback();
     ui.opening.cancel();
   });
@@ -468,6 +489,7 @@ export async function startEngine(config, ui) {
   } catch (problem) {
     stopped = true;
     environment.dispose();
+    disposeLighting();
     renderer.dispose();
     ui.opening.cancel();
     throw problem;

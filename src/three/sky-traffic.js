@@ -103,7 +103,7 @@ function birdGeometries() {
     [foil([[0.0058, 0.001], [0.0094, 0], [0.0058, -0.001]], 0.001)],
     [foil([[-0.004, 0.0012], [-0.01, 0.003], [-0.0085, 0],
       [-0.01, -0.003], [-0.004, -0.0012]], 0.0006)],
-  ]);
+  ], true);
   const inner = foil([
     [0.0028, 0], [0.002, 0.005], [-0.001, 0.013],
     [-0.0058, 0.013], [-0.0048, 0.007], [-0.004, 0],
@@ -113,7 +113,7 @@ function birdGeometries() {
     [-0.0042, 0.009], [-0.0057, 0.011], [-0.0055, 0.0074],
     [-0.0068, 0.0085], [-0.0061, 0.0045], [-0.0048, 0],
   ], 0.0004);
-  return [body, inner, outer];
+  return [body, combine([[inner]], true), combine([[outer]], true)];
 }
 
 /**
@@ -150,7 +150,8 @@ export function createSkyTraffic({ mobile = false } = {}) {
   const planePaint = material(0xffffff, 0.96, true);
   const trailPaint = material(0xffffff, 0.28, true);
   trailPaint.side = T.DoubleSide;
-  const birdPaint = material(0x101922, 0.88);
+  // Moonlit plumage stays legible against both the dark sky and drifting clouds.
+  const birdPaint = material(0xf4e5c7, 1, true);
   birdPaint.side = T.DoubleSide;
   const flights = [
     { span: 0.106, length: 0.53, period: 116, y: 0.745, start: -0.38, direction: 1, phase: 0.4 },
@@ -177,7 +178,7 @@ export function createSkyTraffic({ mobile = false } = {}) {
   ];
   const birds = formation.map(([x, y, scale, phase]) => {
     const root = new T.Object3D();
-    root.scale.setScalar(scale);
+    root.scale.setScalar(scale * (mobile ? 1.7 : 1.55));
     const wings = [-1, 1].map((side) => {
       const shoulder = new T.Object3D(), wrist = new T.Object3D();
       shoulder.position.set(0.001, side * 0.0014, 0);

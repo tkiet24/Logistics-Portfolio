@@ -79,6 +79,7 @@ export function createEnvironment(config, quality) {
       nightMix = reducedMotion ? targetNight : damp(nightMix, targetNight, 3.2, dt);
       if (Math.abs(nightMix - targetNight) < .001) nightMix = targetNight;
       uniforms.nightMix.value = nightMix;
+      disc.scale.setScalar((quality.mobile ? .061 : .074) * (1 + nightMix * .28));
       uniforms.time.value = time;
       uniforms.progress.value = progress;
       const lightX = aspect * .63 - Math.sin(progress * .5) * .07;

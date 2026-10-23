@@ -21,7 +21,8 @@ export const skyFragment = `
     // Broad atmospheric scattering and a smaller halo, without lens-flare rings.
     colour += (vec3(1.0,.79,.46) * .16 * exp(-distanceToLight * 3.2)
              + vec3(1.0,.91,.72) * .28 * exp(-distanceToLight * 13.0)) * (1.0 - nightMix);
-    colour += vec3(.34,.46,.64) * .12 * exp(-distanceToLight * 8.0) * nightMix;
+    colour += (vec3(1.0,.65,.20) * .10 * exp(-distanceToLight * 7.0)
+             + vec3(1.0,.82,.42) * .16 * exp(-distanceToLight * 19.0)) * nightMix;
     gl_FragColor = vec4(colour, smoothstep(.48,.58,vUv.y));
   }
 `;
@@ -54,11 +55,12 @@ export const discFragment = `
     float r = dot(p,p);
     if (r > 1.0) discard;
     vec3 normal = vec3(p, sqrt(max(0.0,1.0-r)));
-    float diffuse = max(0.0,dot(normal,normalize(vec3(-.62,.32,.78))));
+    float diffuse = max(0.0,dot(normal,normalize(vec3(-.28,.18,.94))));
     float maria = smoothstep(.28,.68,noise(p * 3.6 + 2.0) * .75 + noise(p * 8.0) * .25);
-    float detail = noise(p * 65.0) * .045 + craters(p * 8.0) + craters(p * 19.0) * .35;
-    vec3 moon = mix(vec3(.45,.51,.58),vec3(.88,.90,.86),maria) + detail;
-    moon *= .12 + .88 * pow(diffuse,.65);
+    float detail = noise(p * 65.0) * .025 + craters(p * 8.0) * .55 + craters(p * 19.0) * .20;
+    vec3 moon = mix(vec3(.76,.49,.15),vec3(1.0,.86,.46),maria);
+    moon += detail * vec3(1.0,.82,.44);
+    moon *= .62 + .38 * pow(diffuse,.65);
     vec3 sun = mix(vec3(1.0,.91,.65),vec3(1.0,.99,.9),pow(normal.z,.5));
     gl_FragColor = vec4(mix(sun,moon,nightMix), 1.0 - smoothstep(.97,1.0,r));
   }
