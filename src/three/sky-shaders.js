@@ -21,7 +21,7 @@ export const skyFragment = `
     // Broad atmospheric scattering and a smaller halo, without lens-flare rings.
     colour += (vec3(1.0,.79,.46) * .16 * exp(-distanceToLight * 3.2)
              + vec3(1.0,.91,.72) * .28 * exp(-distanceToLight * 13.0)) * (1.0 - nightMix);
-    colour += vec3(.34,.46,.64) * .12 * exp(-distanceToLight * 8.0) * nightMix;
+    colour += vec3(.66,.73,.83) * .055 * exp(-distanceToLight * 15.0) * nightMix;
     gl_FragColor = vec4(colour, smoothstep(.48,.58,vUv.y));
   }
 `;
@@ -29,6 +29,8 @@ export const skyFragment = `
 export const discFragment = `
   varying vec2 vUv;
   uniform float nightMix;
+  uniform sampler2D moonMap;
+  uniform float moonReady;
   float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7))) * 43758.5453); }
   float noise(vec2 p) {
     vec2 i = floor(p), f = fract(p);
@@ -54,11 +56,18 @@ export const discFragment = `
     float r = dot(p,p);
     if (r > 1.0) discard;
     vec3 normal = vec3(p, sqrt(max(0.0,1.0-r)));
-    float diffuse = max(0.0,dot(normal,normalize(vec3(-.62,.32,.78))));
+    float diffuse = max(0.0,dot(normal,normalize(vec3(.24,.10,.97))));
     float maria = smoothstep(.28,.68,noise(p * 3.6 + 2.0) * .75 + noise(p * 8.0) * .25);
-    float detail = noise(p * 65.0) * .045 + craters(p * 8.0) + craters(p * 19.0) * .35;
-    vec3 moon = mix(vec3(.45,.51,.58),vec3(.88,.90,.86),maria) + detail;
-    moon *= .12 + .88 * pow(diffuse,.65);
+    float detail = noise(p * 65.0) * .025 + craters(p * 8.0) * .55 + craters(p * 19.0) * .20;
+    vec2 lunarUv = vec2(.5 + atan(normal.x, normal.z) / 6.2831853,
+                       .5 + asin(clamp(normal.y, -1.0, 1.0)) / 3.14159265);
+    vec3 albedo = texture2D(moonMap, lunarUv).rgb;
+    float grey = dot(albedo, vec3(.2126,.7152,.0722));
+    // Near-side maria and crater rays come from LRO imagery, with a soft limb.
+    vec3 moon = mix(vec3(.36 + maria * .42 + detail),
+                    mix(vec3(grey), albedo, .18), moonReady);
+    moon = clamp((moon - .18) * 1.38 + .13, .06, .94);
+    moon *= .38 + .62 * pow(diffuse,.45);
     vec3 sun = mix(vec3(1.0,.91,.65),vec3(1.0,.99,.9),pow(normal.z,.5));
     gl_FragColor = vec4(mix(sun,moon,nightMix), 1.0 - smoothstep(.97,1.0,r));
   }
