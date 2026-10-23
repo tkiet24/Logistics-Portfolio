@@ -1,14 +1,22 @@
 import * as T from "three";
 import { latLon } from "./flight.js";
+import { createNightFixtures } from "./night-fixtures.js";
 
 const WARM = 0xffc779, COOL = 0x81d9d1, AMBER = 0xf29c59;
 
-// One small, depth-tested glow batch per section. No bloom pass or extra lights
-// washing out the models; the glow centres follow their actual scene objects.
+// Depth-tested halos complement physical fixtures and illuminated glass.
 export function createSectionLights(scene, section, config, { mobile = false } = {}) {
   const root = scene.group, anchors = [];
-  const add = (object, position, color = WARM, size = .25, strength = .65) => {
-    if (object) anchors.push({ object, position: new T.Vector3(...position), color, size, strength });
+  const fixtures = createNightFixtures(root);
+  const add = (object, position, color = WARM, size = .25, strength = .65, pulse = 0) => {
+    if (object) anchors.push({ object, position: new T.Vector3(...position), color, size, strength, pulse });
+  };
+  const streetLamp = (position, options) => {
+    const { object, bulb } = fixtures.pole(root, position, options);
+    add(object, bulb, options?.color ?? 0xffe0b0, .38, .65);
+    const yaw = options?.yaw ?? 0;
+    fixtures.pool(root, [position[0] + .38 * Math.cos(yaw), position[1] + .024,
+      position[2] - .38 * Math.sin(yaw)], [2.8, 2.6], { color: options?.color ?? 0xffe0b0 });
   };
   if (section === 0) {
     const globe = root.children[0];
@@ -18,16 +26,27 @@ export function createSectionLights(scene, section, config, { mobile = false } =
       [48.9,2.3],[51.5,-.1],[52.5,13.4],[40.4,-3.7],[40.7,-74],
       [34.1,-118.2],[-23.6,-46.6],[-33.9,151.2]];
     cities.forEach(([lat, lon], i) => {
-      add(globe, latLon(lat, lon, config.home.earthRadius + .025).toArray(), WARM, .14, .55);
-      if (!mobile) add(globe, latLon(lat + .7, lon + 1, config.home.earthRadius + .025).toArray(), i % 3 ? WARM : COOL, .09, .4);
+      add(globe, latLon(lat, lon, config.home.earthRadius + .025).toArray(), WARM, .12, .6, .15);
+      for (let j = 0; j < (mobile ? 3 : 7); j++) {
+        const angle = j * 2.4 + i, radius = .3 + (j % 3) * .28;
+        add(globe, latLon(lat + Math.sin(angle) * radius,
+          lon + Math.cos(angle) * radius / Math.max(.4, Math.cos(lat * Math.PI / 180)),
+          config.home.earthRadius + .027).toArray(), 0xffdca2, .055 + (j % 2) * .02, .38, .1);
+      }
     });
   } else if (section === 1) {
     const gantry = root.getObjectByName("Container yard gantry");
-    for (let x = -7.4; x <= 3.5; x += 1.8)
-      add(gantry, [x, 5.28, config.port.railZ + .87], WARM, .32);
-    for (const x of [-7.4, 3.4])
-      add(gantry, [x, 5.82, config.port.railZ], AMBER, .3, .55);
+    for (let x = -7.4; x <= 3.5; x += 2.7) {
+      if (gantry) fixtures.flood(gantry, [x, 5.22, config.port.railZ + .79], { color: 0xe3ebdc });
+      add(gantry, [x, 5.19, config.port.railZ + .79], 0xe3ebdc, .4, .62);
+      fixtures.pool(root, [x, config.layout.floorY - root.position.y + .025, config.port.railZ + .8], [2.5, 2]);
+    }
+    for (const x of [-7.4, 3.4]) {
+      if (gantry) fixtures.beacon(gantry, [x, 5.82, config.port.railZ]);
+      add(gantry, [x, 5.82, config.port.railZ], AMBER, .3, .5, 1);
+    }
     add(root.getObjectByName("Gantry trolley and cabin"), [0, -.43, 1.37], COOL, .25, .5);
+    fixtures.spot(root, [-2, 5.15, config.port.railZ + .75], [-2, 0, config.port.railZ], 0xe3ebdc);
   } else if (section === 2) {
     for (const [i, container] of scene.pickable.entries()) {
       for (const x of [-1.02, 1.02])
@@ -35,14 +54,21 @@ export function createSectionLights(scene, section, config, { mobile = false } =
     }
   } else if (section === 3) {
     for (const building of root.children.filter((child) => child.userData.size)) {
-      const { x, y, z } = building.userData.size;
-      // Sparse windows on the front and camera-facing side of each building.
-      for (let row = 1; row <= (mobile ? 2 : 3); row++) {
-        for (const column of [-.27, .27]) {
-          add(building, [x * column, y * row / 4, z / 2 + .025], WARM, .2, .45);
-        }
-        if (!mobile) add(building, [x / 2 + .025, y * row / 4, z * .12], COOL, .17, .35);
+      fixtures.building(building);
+      const { y } = building.userData.size;
+      if (y * building.scale.y > 3) {
+        fixtures.beacon(building, [0, y + .04, 0]);
+        add(building, [0, y + .07, 0], AMBER, .19, .4, 1);
       }
+    }
+    const route = new T.CatmullRomCurve3(config.work.route.map((p) => new T.Vector3(...p)));
+    for (const t of [.12, .38, .64, .88]) {
+      const point = route.getPoint(t), tangent = route.getTangent(t);
+      const normal = new T.Vector3(-tangent.z, 0, tangent.x).normalize();
+      point.addScaledVector(normal, -config.work.road.width / 2 - .6);
+      streetLamp([point.x, config.layout.floorY + .02, point.z], {
+        height: 2, yaw: Math.atan2(-normal.z, normal.x),
+      });
     }
   } else if (section === 4) {
     root.traverse((part) => {
@@ -53,14 +79,44 @@ export function createSectionLights(scene, section, config, { mobile = false } =
     });
     for (let x = -4.2; x <= 4.3; x += 1.4)
       add(root, [x, .32, -1.73], WARM, .22, .4);
+    for (const x of [-3.7, 0, 3.7]) {
+      fixtures.pool(root, [x + .22, .303, -2.8], [1.9, 1.6]);
+      fixtures.pool(root, [x + .22, .025, -.5], [.45, 2.4], { reflection: true });
+    }
+    for (const x of [-2.1, 2.1]) {
+      fixtures.flood(root, [x, 3.6, -1.6], { color: 0xe3ebdc });
+      add(root, [x, 3.57, -1.6], 0xe3ebdc, .4, .55);
+    }
+    fixtures.spot(root, [.22, 1.83, -3], [.22, .3, -2.2]);
   } else if (section === "factory") {
     root.traverse((part) => {
       if (part.name === "Machine ready indicator") add(part, [0, .6, .6], COOL, .23, .6);
     });
     const f = config.factory;
-    for (const x of [1.5, 3.5, 5.5, 7.5, 9.5])
-      add(root, [f.originX + x * f.unit, config.layout.floorY + .18 + (f.wallHeight + .1) * f.unit,
-        f.originZ + .32 * f.unit], WARM, .3, .5);
+    for (const x of [1.5, 3.5, 5.5, 7.5, 9.5]) {
+      const position = [f.originX + x * f.unit, config.layout.floorY + .18 + (f.wallHeight - .15) * f.unit,
+        f.originZ + .32 * f.unit];
+      fixtures.flood(root, position, { color: 0xe3ebdc, width: .4 });
+      add(root, [position[0], position[1] - .04, position[2]], 0xe3ebdc, .34, .55);
+      fixtures.pool(root, [position[0], config.layout.floorY + .19, position[2] + .65], [1.6, 2.1]);
+    }
+    fixtures.spot(root, [f.originX + 5 * f.unit, config.layout.floorY + .18 + f.wallHeight * f.unit, f.originZ + .4],
+      [f.originX + 5 * f.unit, config.layout.floorY + .2, f.originZ + 3 * f.unit], 0xe3ebdc);
+  } else if (section === "parking" || section === "city") {
+    const { layout } = scene;
+    const [width, depth] = layout.size;
+    if (section === "parking") {
+      // The poles sit in the end curb strips, outside the parking bays and aisle.
+      for (const x of [-width / 2 + .22, width / 2 - .22])
+        for (const z of [-depth / 2 + .35, depth / 2 - .35])
+          streetLamp([x, .045, z], { height: 2.6, color: 0xe3ebdc, yaw: x > 0 ? Math.PI : 0 });
+      fixtures.spot(root, [-width / 2 + .6, 2.55, -depth / 2 + .35],
+        [-width / 2 + 1.4, 0, -depth / 2 + 1.3], 0xe3ebdc);
+    } else {
+      for (const x of [-width / 2 + .5, width / 2 - .5])
+        for (const z of [-1.65, 1.65]) streetLamp([x, .06, z], { height: 2.15 });
+      fixtures.building(root);
+    }
   }
 
   const geometry = new T.BufferGeometry();
@@ -71,6 +127,7 @@ export function createSectionLights(scene, section, config, { mobile = false } =
   geometry.setAttribute("size", new T.Float32BufferAttribute(anchors.map((a) => a.size), 1));
   geometry.setAttribute("strength", new T.Float32BufferAttribute(anchors.map((a) => a.strength), 1));
   geometry.setAttribute("phase", new T.Float32BufferAttribute(anchors.map((_, i) => i * 2.39996), 1));
+  geometry.setAttribute("pulse", new T.Float32BufferAttribute(anchors.map((a) => a.pulse), 1));
   const uniforms = {
     time: { value: 0 }, intensity: { value: 0 },
     focal: { value: 1 }, pixelRatio: { value: 1 },
@@ -83,6 +140,7 @@ export function createSectionLights(scene, section, config, { mobile = false } =
       attribute float size;
       attribute float strength;
       attribute float phase;
+      attribute float pulse;
       uniform float time;
       uniform float intensity;
       uniform float focal;
@@ -93,8 +151,7 @@ export function createSectionLights(scene, section, config, { mobile = false } =
         vec4 view = modelViewMatrix * vec4(position, 1.0);
         gl_Position = projectionMatrix * view;
         gl_PointSize = clamp(size * focal / max(.1, -view.z), 2.0 * pixelRatio, 28.0 * pixelRatio);
-        float shimmer = .80 + .12 * sin(time * .85 + phase)
-                             + .08 * sin(time * 1.31 + phase * 1.7);
+        float shimmer = 1.0 - pulse * (.15 - .15 * sin(time * 1.1 + phase));
         vAlpha = intensity * strength * shimmer;
         vTint = tint;
       }
@@ -124,9 +181,11 @@ export function createSectionLights(scene, section, config, { mobile = false } =
   let disposed = false;
   return {
     points,
+    fixtures,
     update({ time, reducedMotion, camera, nightMix, opacity = 1, height, pixelRatio }) {
       if (disposed) return;
       uniforms.intensity.value = T.MathUtils.clamp(nightMix, 0, 1) * T.MathUtils.clamp(opacity, 0, 1);
+      fixtures.update(T.MathUtils.clamp(nightMix, 0, 1), T.MathUtils.clamp(opacity, 0, 1), time, reducedMotion);
       points.visible = uniforms.intensity.value > .002;
       if (!points.visible) return;
       uniforms.time.value = reducedMotion ? 0 : time;
@@ -145,6 +204,7 @@ export function createSectionLights(scene, section, config, { mobile = false } =
       root.remove(points);
       geometry.dispose();
       material.dispose();
+      fixtures.dispose();
     },
   };
 }

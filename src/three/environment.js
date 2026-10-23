@@ -5,6 +5,18 @@ import { createSkyTraffic } from "./sky-traffic.js";
 import { skyVertex, skyFragment, discFragment, starVertex, starFragment } from "./sky-shaders.js";
 
 export function createEnvironment(config, quality) {
+  let disposed = false;
+  let finishTexture;
+  const ready = new Promise((resolve) => { finishTexture = resolve; });
+  // Keep the display-referred map in its original colour space in the sky shader.
+  const moonTexture = new T.TextureLoader().load(
+    new URL("../assets/moon-lroc-2k.jpg", import.meta.url).href,
+    (texture) => {
+      if (disposed) texture.dispose();
+      else uniforms.moonReady.value = 1;
+      finishTexture();
+    }, undefined, () => finishTexture(),
+  );
   // A dedicated pass keeps the sky behind transparent lettering, glass and shadows.
   const scene = new T.Scene();
   scene.name = "Day and night sky";
@@ -14,6 +26,8 @@ export function createEnvironment(config, quality) {
     nightMix: { value: 0 }, aspect: { value: 1 },
     lightPosition: { value: new T.Vector2(.63, .73) },
     time: { value: 0 }, progress: { value: 0 }, pixelRatio: { value: 1 },
+    moonMap: { value: moonTexture },
+    moonReady: { value: 0 },
   };
   const plane = new T.PlaneGeometry(2, 2);
   const backdrop = new T.Mesh(plane, new T.ShaderMaterial({
@@ -56,9 +70,9 @@ export function createEnvironment(config, quality) {
   scene.add(disc);
   const clouds = createSkyClouds(quality), traffic = createSkyTraffic(quality);
   scene.add(clouds.group, traffic.day, traffic.night);
-  let aspect = 1, nightMix = 0, targetNight = 0, initialized = false, disposed = false;
+  let aspect = 1, nightMix = 0, targetNight = 0, initialized = false;
   return {
-    scene, camera,
+    scene, camera, ready,
     get nightMix() { return nightMix; },
     prepare(renderer) { clouds.prepare(renderer); },
     resize(width, height, pixelRatio = 1) {
@@ -79,7 +93,7 @@ export function createEnvironment(config, quality) {
       nightMix = reducedMotion ? targetNight : damp(nightMix, targetNight, 3.2, dt);
       if (Math.abs(nightMix - targetNight) < .001) nightMix = targetNight;
       uniforms.nightMix.value = nightMix;
-      disc.scale.setScalar((quality.mobile ? .061 : .074) * (1 + nightMix * .28));
+      disc.scale.setScalar((quality.mobile ? .061 : .074) * (1 + nightMix * .55));
       uniforms.time.value = time;
       uniforms.progress.value = progress;
       const lightX = aspect * .63 - Math.sin(progress * .5) * .07;
@@ -97,6 +111,7 @@ export function createEnvironment(config, quality) {
       disposed = true;
       plane.dispose();
       starGeometry.dispose();
+      moonTexture.dispose();
       [backdrop, stars, disc].forEach((item) => item.material.dispose());
       clouds.dispose();
       traffic.dispose();

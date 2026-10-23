@@ -47,11 +47,13 @@ export async function startEngine(config, ui) {
   function disposeLighting() {
     sectionLights.forEach((lights) => lights.dispose());
     sectionLights.clear();
+    scenery?.disposeLighting();
   }
   function attachLighting(record, section) {
     if (stopped) return;
     record.lights = createSectionLights(record.scene, section, config, quality);
     sectionLights.add(record.lights);
+    record.fade.register();
     record.visibility.invalidate();
     invalidate();
   }
@@ -200,6 +202,7 @@ export async function startEngine(config, ui) {
           error,
           reducedMotion: () => ui.reducedMotion.matches,
         });
+        scenery.prepareLighting();
         world.add(scenery.group);
         if (preload) await scenery.preload();
         invalidate();
@@ -316,9 +319,9 @@ export async function startEngine(config, ui) {
       settling = movingCamera;
     const night = environment.nightMix;
     ambient.color.setRGB(1 - night * .22, 1 - night * .12, 1);
-    ambient.intensity = 1.1 - night * .22;
+    ambient.intensity = 1.1 - night * .3;
     sun.color.setRGB(1 - night * .25, .98 - night * .12, .92 + night * .08);
-    sun.intensity = 1.1 - night * .3;
+    sun.intensity = 1.1 - night * .45;
     scenes.forEach(({ scene, fade, visibility, lights }, index) => {
       const distance = Math.abs(progress - index),
         visible = distance < 1.4;
@@ -365,7 +368,9 @@ export async function startEngine(config, ui) {
     }
     if (scenery)
       animating =
-        scenery.update(camera, time, reducedMotion, frustum) || animating;
+        scenery.update(camera, time, reducedMotion, frustum, {
+          nightMix: night, height: innerHeight, pixelRatio,
+        }) || animating;
     if (pointerDirty || movingCamera) pick();
     const renderStart = performance.now();
     renderer.info.reset();
@@ -461,6 +466,7 @@ export async function startEngine(config, ui) {
     await document.fonts?.ready;
     if (ui.opening.cancelled || stopped) return;
     await Promise.all([
+      environment.ready,
       ...sceneImports.map((_, index) => ensureScene(index)),
       ensureBackground(camera.position.x, true),
     ]);

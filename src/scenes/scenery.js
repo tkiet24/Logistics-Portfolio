@@ -3,6 +3,7 @@ import { SCENERY_PACKS, SCENERY_SITES } from "../config/scenery.js";
 import { smoothstep } from "../core/math.js";
 import { createFade } from "../three/fade.js";
 import { createVisibility } from "../three/visibility.js";
+import { createSectionLights } from "../three/section-lights.js";
 
 function normalizeModel(model, width, maxHeight, count) {
   const bounds = new T.Box3().setFromObject(model);
@@ -121,6 +122,7 @@ export function createScenery(ctx) {
             placed.position.set(x, level * normalized.height, z);
             placed.name = name;
             site.group.add(placed);
+            if (pack === "city") site.lights?.fixtures.building(placed);
             site.fade.register(placed);
           }
           const cosine = Math.abs(Math.cos(yaw)),
@@ -156,7 +158,17 @@ export function createScenery(ctx) {
     );
   }
 
-  function update(camera, time, reducedMotion = ctx.reducedMotion(), frustum) {
+  function prepareLighting() {
+    for (const site of sites) {
+      if (site.lights) continue;
+      site.lights = createSectionLights({ group: site.group, layout: site.layout }, site.layout.kind, config, quality);
+      site.fade.register();
+      site.visibility.invalidate();
+      site.dirty = true;
+    }
+  }
+
+  function update(camera, time, reducedMotion = ctx.reducedMotion(), frustum, lighting) {
     for (const site of sites) {
       const distance = Math.abs(camera.position.x - site.layout.x);
       const near = distance <= config.performance.sceneryPreloadDistance;
@@ -180,9 +192,15 @@ export function createScenery(ctx) {
         site.group.updateWorldMatrix(true, true);
         site.dirty = false;
       }
+      if (lighting) site.lights?.update({ camera, time, reducedMotion,
+        ...lighting, opacity: site.fade.opacity });
     }
     return false;
   }
 
-  return { group, update, preload };
+  return { group, update, preload, prepareLighting,
+    disposeLighting() {
+      for (const site of sites) { site.lights?.dispose(); site.lights = null; }
+    },
+  };
 }

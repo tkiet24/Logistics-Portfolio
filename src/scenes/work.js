@@ -1,6 +1,7 @@
 ﻿import * as T from "three";
 import { createCheckpoint } from "../three/checkpoint.js";
 import { createRoad } from "../three/ribbon.js";
+import { createWorkPavement } from "../three/work-pavement.js";
 import {
   clamp,
   createRandom,
@@ -39,6 +40,7 @@ export function createScene(ctx) {
   let position = workStart;
   let activeIndex = -1;
 
+  group.add(createWorkPavement(curve, config, lowDetail));
   group.add(createRoad(curve, work.road, lowDetail));
   const nodes = milestonePoints.map((point, index) => {
     const checkpoint = createCheckpoint(ctx, index);
