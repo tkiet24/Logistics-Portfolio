@@ -134,5 +134,21 @@ export const CONFIG = {
     craneSpeed: 0.35,
     craneSwing: 0.16,
   },
-  factory: { unit: 0.85, originX: 9.2, originZ: -8, conveyorSpeed: 0.8 },
+  factory: {
+    unit: 0.85,
+    originX: 16,
+    originZ: -8,
+    revealProgress: [0.12, 0.32],
+    conveyorSpeed: 0.8,
+    wallHeight: 2.25,
+    colours: {
+      wall: 0xa9b4af,
+      machinery: 0x536d70,
+      steel: 0x38474a,
+      accent: 0xbc2431,
+      safety: 0xc5a46e,
+      carton: 0xb8956b,
+      floor: 0x7d8984,
+    },
+  },
 };

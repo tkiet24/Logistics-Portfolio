@@ -145,8 +145,10 @@ export function createUI(config) {
     }
     if (scene !== lastScene) {
       atmosphere.dataset.scene = String(scene);
+      document.querySelector("#section-nav").style.setProperty("--journey-progress", scene / 4);
       links.forEach((link, i) => {
         link.classList.toggle("on", i === scene);
+        link.classList.toggle("is-past", i < scene);
         if (i === scene) link.setAttribute("aria-current", "location");
         else link.removeAttribute("aria-current");
       });

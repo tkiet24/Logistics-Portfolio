@@ -43,7 +43,10 @@ export function createScene(ctx) {
   }
 
   const gantry = createPortGantry({
-    groundY, railZ, containerScale: port.containerScale, lowDetail,
+    groundY,
+    railZ,
+    containerScale: port.containerScale,
+    lowDetail,
   });
   P.add(gantry.group);
   for (const x of [-7.4, 3.4])
@@ -76,6 +79,7 @@ export function createScene(ctx) {
   trainGroup.add(trainRig);
   let trainWheels = [];
   let railExit;
+  let railEntry;
   let trainLoaded = false;
   let trainState = "waiting";
   let trainTime = 0;
@@ -233,7 +237,14 @@ export function createScene(ctx) {
       trainGroup.add(piece);
     }
     railExit = createRailExit(trackHolder, port, gravelMaterial, lowDetail);
-    trainGroup.add(railExit);
+    railEntry = createRailExit(
+      trackHolder,
+      port,
+      gravelMaterial,
+      lowDetail,
+      -1,
+    );
+    trainGroup.add(railEntry, railExit);
 
     const modelsToExtract = [locoModel];
     const locoHolder = normalizeModel(locoModel, port.trainScale);
@@ -387,9 +398,11 @@ export function createScene(ctx) {
 
   function theme(tokens) {
     gravelMaterial.color.set(tokens.ground).multiplyScalar(0.8);
-    railExit
-      ?.getObjectByName("Curved ballast bed")
-      .material.color.copy(gravelMaterial.color);
+    for (const bend of [railEntry, railExit]) {
+      bend
+        ?.getObjectByName("Curved ballast bed")
+        .material.color.copy(gravelMaterial.color);
+    }
     ctx.changed();
   }
 
