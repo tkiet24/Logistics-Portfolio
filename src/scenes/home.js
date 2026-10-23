@@ -10,21 +10,37 @@ export function createScene(ctx) {
   globe.position.y = settings.positionY;
   globe.rotation.x = 0.28;
   group.add(globe);
+  const lettering = ctx.canvasTexture(2048, (paint) => {
+    paint.fillStyle = "#ffffff";
+    paint.font = '500 400px "Inter Tight", sans-serif';
+    paint.textAlign = "center";
+    paint.textBaseline = "middle";
+    paint.fillText("Kieu Nga", 1024, 256, 1960);
+  }, 512);
+  const skyInk = new T.MeshBasicMaterial({
+    map: lettering,
+    color: 0x28434a,
+    transparent: true,
+    opacity: 0.13,
+    depthWrite: false,
+    toneMapped: false,
+  });
+  const compact = ctx.quality.mobile;
+  const signature = new T.Mesh(new T.PlaneGeometry(compact ? 11 : 18, compact ? 2.75 : 4.5), skyInk);
+  signature.name = "Kieu Nga sky lettering";
+  signature.position.set(compact ? 0 : -3, 5.2, -6);
+  group.add(signature);
   const arc = createFlightCurve(settings);
   const endpoints = [
-    latLon(...settings.departure, settings.earthRadius + 0.03),
-    latLon(...settings.destination, settings.earthRadius + 0.03),
+    latLon(...settings.departure, settings.earthRadius),
+    latLon(...settings.destination, settings.earthRadius),
   ];
   const base = Math.atan2(
     -endpoints[0].clone().add(endpoints[1]).x,
     endpoints[0].clone().add(endpoints[1]).z,
   );
   const markers = endpoints.map((point, index) => {
-    const marker = createGlobeMarker(
-      point,
-      index ? settings.arrivalColour : settings.departureColour,
-      index,
-    );
+    const marker = createGlobeMarker(point, index);
     globe.add(marker.group);
     return marker;
   });
@@ -79,10 +95,15 @@ export function createScene(ctx) {
     group,
     animated: true,
     ready: Promise.allSettled([earthReady, aircraftReady]),
+    theme(tokens) {
+      const background = new T.Color(tokens.background);
+      const dark = (background.r + background.g + background.b) / 3 < 0.4;
+      skyInk.color.setHex(dark ? 0xdce7df : 0x28434a);
+    },
     drag(delta) {
       dragOffset += delta * 0.01;
     },
-    update({ time, reducedMotion }) {
+    update({ time, reducedMotion, camera }) {
       globe.rotation.y = base + dragOffset + Math.sin(time * 0.3) * 0.3;
       const u = reducedMotion ? 0.35 : (time * settings.flightSpeed) % 1;
       arc.getPointAt(u, position);
@@ -99,8 +120,7 @@ export function createScene(ctx) {
         : T.MathUtils.smoothstep(u, 0, 0.045) *
           (1 - T.MathUtils.smoothstep(u, 0.955, 1));
       for (const material of materials) ctx.fadeMaterial(material, fade);
-      for (const marker of markers)
-        marker.update(time, reducedMotion, ctx.fadeMaterial);
+      markers.forEach((marker) => marker.update(camera));
     },
   };
 }

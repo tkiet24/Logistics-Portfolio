@@ -1,5 +1,37 @@
+// Every opaque surface uses the same screen coverage, so discarded outer pixels
+// also discard the machinery behind them. Surviving pixels still write depth.
+function ditherMaterial(material) {
+  if (
+    material.userData.ditherOpacity ||
+    material.transparent ||
+    !material.depthWrite ||
+    material.opacity < 1 ||
+    material.transmission > 0 ||
+    /glass/i.test(material.name)
+  ) return;
+  const compile = material.onBeforeCompile;
+  const cacheKey = material.customProgramCacheKey();
+  const coverage = { value: 1 };
+  material.userData.ditherOpacity = coverage;
+  material.onBeforeCompile = function (shader, renderer) {
+    compile.call(this, shader, renderer);
+    shader.uniforms ??= {};
+    shader.uniforms.sceneFadeOpacity = coverage;
+    shader.fragmentShader =
+      "uniform float sceneFadeOpacity;\n" + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <alphatest_fragment>",
+      `#include <alphatest_fragment>
+       float sceneFadeCoverage = fract(52.9829189 * fract(dot(floor(gl_FragCoord.xy), vec2(0.06711056, 0.00583715))));
+       if (sceneFadeOpacity <= sceneFadeCoverage) discard;`,
+    );
+  };
+  material.customProgramCacheKey = () => `${cacheKey}:scene-coverage-v1`;
+  material.needsUpdate = true;
+}
+
 /** Register on creation/load instead of traversing every model during animation. */
-export function createFade(group) {
+export function createFade(group, { dither = false } = {}) {
   const known = new WeakSet(),
     entries = new Map();
   let opacity = 0;
@@ -25,6 +57,7 @@ export function createFade(group) {
         ? part.material
         : [part.material]) {
         if (known.has(material)) continue;
+        if (dither) ditherMaterial(material);
         known.add(material);
         entries.set(material, {
           opacity: material.opacity,

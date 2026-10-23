@@ -2,89 +2,89 @@
 export const SKILLS = [
   [
     "Logistics & supply chain",
-    "An academic foundation in logistics, with an interest in purchasing and supply chain operations.",
+    "Student-level knowledge; practical experience is my next step.",
     "LOGISTICS",
     [
       [
         "Academic foundation",
         "2024–2028 · Expected graduation",
-        "Logistics and Supply Chain Management at Ho Chi Minh City University of Transport. GPA: 3.65.",
+        "Logistics and Supply Chain Management, Ho Chi Minh City University of Transport. GPA: 3.65.",
       ],
       [
         "Purchasing & operations",
         "Areas of interest",
-        "I want to learn how purchasing requirements, stock availability and supplier lead times shape daily operations.",
+        "Learning how purchasing, stock availability and supplier lead times shape operations.",
       ],
       [
         "International freight",
         "Long-term direction",
-        "My goal is to build a career in international freight and supply chain management, starting with practical experience through an internship.",
+        "Career goal: international freight, starting with a logistics internship.",
       ],
     ],
   ],
   [
     "Market research",
-    "An interest in using market information to understand purchasing options and operational needs.",
+    "Interested in market information for purchasing decisions.",
     "RESEARCH",
     [
       [
         "Market research & analysis",
         "Purchasing interests",
-        "I want to use market information to compare purchasing options and explain the differences that matter to an operations team.",
+        "I want to compare purchasing options and summarise useful market information.",
       ],
       [
         "Problem-solving & adaptability",
         "Approach to learning",
-        "I bring a willingness to learn, adapt to new tasks and work with others to understand a problem.",
+        "Willing to learn, adapt to new tasks and solve problems with others.",
       ],
       [
         "Customer perspective",
         "F&B sales · Aug–Nov 2024",
-        "My sales and customer service experience gives me a customer-facing perspective to bring into a logistics internship.",
+        "F&B sales and customer support experience.",
       ],
     ],
   ],
   [
     "Excel for logistics",
-    "MOS Excel-certified, with an interest in applying spreadsheet skills to logistics work.",
+    "MOS certified; ready to apply Excel to logistics.",
     "EXCEL",
     [
       [
         "Microsoft Excel",
         "MOS certified",
-        "I hold MOS Excel certification and want to apply my spreadsheet skills to logistics and supply chain operations.",
+        "Certified in Excel; seeking practical logistics applications.",
       ],
       [
         "Operational information",
         "Skills I want to put to work",
-        "I want to help organise purchasing information, maintain simple trackers and compare planned and actual quantities under guidance.",
+        "Under guidance: organise purchasing data, maintain trackers and compare planned versus actual quantities.",
       ],
       [
         "Purchasing simulation",
         "Planned learning project",
-        "A proposed Excel exercise using a fictional F&B business to compare supplier quotations and basic stock requirements. Not yet completed.",
+        "Proposed Excel exercise: supplier quotes and stock needs for a fictional F&B business. Not yet completed.",
       ],
     ],
   ],
   [
     "Languages & communication",
-    "Communication and presentation skills supported by tutoring and customer service experience.",
+    "Tutoring and customer service experience.",
     "LANGUAGES",
     [
       [
         "English",
-        "Approximately IELTS 6.0 level",
-        "English tutoring experience with middle-school students since 2024. This is an approximate language level, not an official IELTS test result.",
+        "Approx. IELTS 6.0 level",
+        "Tutoring middle-school English since 2024. Approximate level, not an official IELTS score.",
       ],
       [
         "German",
-        "Approximately A2 level",
-        "A developing foundation in German at approximately A2 level.",
+        "Approx. A2 level",
+        "Basic German; continuing to learn.",
       ],
       [
         "Communication & teamwork",
         "Tutoring · 2024–present",
-        "Two years of tutoring Mathematics, English and Vietnamese Literature to middle-school students. Communication, presentation and teamwork are strengths I aim to bring to an operations team.",
+        "Two years teaching Mathematics, English and Vietnamese Literature to middle-school students.",
       ],
     ],
   ],
